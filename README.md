@@ -1,0 +1,60 @@
+# ferox
+
+![pre-release version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
+![repo-size badge](https://img.shields.io/github/repo-size/c-krit/ferox)
+![license badge](https://img.shields.io/github/license/c-krit/ferox)
+
+A simple 2D rigid body physics engine written in C.
+
+**WARNING: This library is in an early alpha stage, use it at your own risk.**
+
+## Prerequisites
+
+Make sure you have installed [raylib](https://github.com/raysan5/raylib) with [CMake](https://cmake.org/) to compile all examples.
+
+## Building
+
+This project uses [CMake](https://cmake.org/) as the build system.
+
+```console
+mkdir build && cd build
+cmake ..
+make
+make install
+```
+
+## Examples
+
+The source code for all examples can be found in the `examples` directory.
+
+## References
+
+- [Agafonkin, Vladimir. (2017, April 27), A dive into spatial search algorithms](https://blog.mapbox.com/a-dive-into-spatial-search-algorithms-ebd0c5e39d2a)
+- [Apple Inc. (2021), GKQuadtree | Apple Developer Documentation](https://developer.apple.com/documentation/gameplaykit/gkquadtree)
+- [Apple Inc. (2021), SKPhysicsBody | Apple Developer Documentation](https://developer.apple.com/documentation/spritekit/skphysicsbody)
+- [Bostock, Mike. (2018, January 23), Sutherland–Hodgman Clipping](https://observablehq.com/@mbostock/sutherland-hodgman-clipping)
+- [dyn4j. (2011, November 11), Contact Points Using Clipping](http://www.dyn4j.org/2011/11/contact-points-using-clipping)
+- [dyn4j. (2010, January 01), SAT (Separating Axis Theorem)](http://dyn4j.org/2010/01/sat)
+- [Catto, Erin. (2006), Fast and Simple Physics using Sequential Impulses](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
+- [Catto, Erin. (2019, March 19), Math for Game Developers: Dynamic Bounding Volume Hierarchies](https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc2019/presentations/Catto_Erin_MathForGame.pdf)
+- [Coumans, Erwin. (2010, July 26), Collision Detection: Contact Generation and GPU Acceleration](https://sgvr.kaist.ac.kr/~sungeui/Collision_tutorial/Erwin.pdf)
+- [fang. (2014, September 07), How to check if a circle lies inside of convex polygon](https://stackoverflow.com/questions/25701346/how-to-check-if-a-circle-lies-inside-of-convex-polygon)
+- [Fiedler, Glen. (2013, February 24), Collision Response and Coulomb Friction](https://gafferongames.com/post/collision_response_and_coulomb_friction/)
+- [Fiedler, Glenn. (2004, June 10), Fix Your Timestep!](https://gafferongames.com/post/fix_your_timestep)
+- [Fiedler, Glenn. (2004, June 01), Integration Basics](https://gafferongames.com/post/integration_basics)
+- [Gaul, Randy. (2013, April 06), How to Create a Custom Physics Engine](https://gamedevelopment.tutsplus.com/series/how-to-create-a-custom-physics-engine--gamedev-12715)
+- [Gaul, Randy. (2013, July 16), Separating Axis Test (SAT) and Support Points in 2D](http://www.randygaul.net/wp-content/uploads/2013/07/SATandSupportPoints.pdf)
+- [Gregorius, Dirk. (2013), The Separating Axis Test between Convex Polyhedra](https://code.google.com/archive/p/box2d/downloads)
+- [Lambert, Steven. (2012, September 03), Quick Tip: Use Quadtrees to Detect Likely Collisions in 2D Space](https://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374)
+- [Lysenko, Mikola. (2015, January 13), Collision detection (part 3): Benchmarks](https://0fps.net/2015/01/23/collision-detection-part-3-benchmarks)
+- [Manzke, Michael. (2016, February 22), Multiply Contact Resolution](https://www.scss.tcd.ie/~manzkem/CS7057/cs7057-1516-10-MultipleContacts-mm.pdf)
+- [NVIDIA Corporation. (2017, May 12), NVIDIA PhysX 3.4.0 API Documentation](https://docs.nvidia.com/gameworks/content/gameworkslibrary/physx/guide/Manual/Index.html)
+- [Randall, James. (2017, January 15), Introductory Guide to AABB Tree Collision Detection](https://www.azurefromthetrenches.com/introductory-guide-to-aabb-tree-collision-detection)
+- [Rees, Gareth. (2019, February 09), How do you detect where two line segments intersect?](https://stackoverflow.com/a/565282)
+- [Scratchapixel. (n.d.), A Minimal Ray-Tracer: Rendering Simple Shapes (Sphere, Cube, Disk, Plane, etc.)](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection)
+- [Unity Technologies. (2018, April 04), Unity Manual: Physics Reference 2D](https://docs.unity3d.com/Manual/Physics2DReference.html)
+- [Vigier, Pierre. (2019, August 04), Quadtree and Collision Detection](https://pvigier.github.io/2019/08/04/quadtree-collision-detection.html)
+
+## License
+
+MIT License
