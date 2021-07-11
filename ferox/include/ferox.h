@@ -76,14 +76,23 @@
 
 /* | 매크로 값... | */
 
-#define FR_GLOBAL_PIXELS_PER_METER 8.0f
+#ifndef FR_GLOBAL_PIXELS_PER_METER
+    #define FR_GLOBAL_PIXELS_PER_METER 16.0f
+#endif
+
+#ifdef HAVE_RAYLIB
+    #define FR_DEBUG_BACKGROUND_COLOR (GetColor(0x111111FF))
+#endif
+
+#define FR_DYNAMICS_CORRECTION_SCALE 0.25f
+#define FR_DYNAMICS_CORRECTION_THRESHOLD 0.03
 
 #define FR_GEOMETRY_MAX_VERTEX_COUNT 10
 
 #define FR_QUADTREE_MAX_LEAF_COUNT 8
 #define FR_QUADTREE_MAX_DEPTH 8
 
-#define FR_WORLD_ACCUMULATOR_LIMIT 0.25
+#define FR_WORLD_ACCUMULATOR_LIMIT 150
 #define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_OBJECT_COUNT 1024
 #define FR_WORLD_MAX_ITERATIONS 8
@@ -108,8 +117,9 @@ typedef enum frShapeType {
 /* 도형의 재질을 나타내는 구조체. */
 typedef struct frMaterial {
     float density;
-    // float friction;
     float restitution;
+    float static_friction;
+    float dynamic_friction;
 } frMaterial;
 
 /* 도형 또는 강체의 위치와 회전 각도 (단위: rad.)를 나타내는 구조체. */
@@ -169,6 +179,9 @@ frShape *frSutherlandHodgman(frShape *s1, frShape *s2);
 
     /* 게임 화면에 강체 `b`의 도형 테두리를 그린다. */
     void frDrawBodyLines(frBody *b, Color color);
+
+    /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
+    void frDrawBodyAABB(frBody *b, Color color);
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
     void frDrawBodyProperties(frBody *b, Color color);
@@ -284,7 +297,7 @@ void frIntegrateForBodyPosition(frBody *b, double dt);
 /* 단위 시간 `dt` 이후의 강체 `b`의 속도와 각속도를 계산한다. */
 void frIntegrateForBodyVelocities(frBody *b, double dt);
 
-/* 서로 충돌하고 있는 두 강체 `b1`과 `b2`의 충돌 이후의 속도와 각속도를 계산한다. */
+/* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision);
 
 /* | `geometry` 모듈 함수... | */
@@ -385,7 +398,7 @@ int frGetQuadtreeDepth(frQuadtree *tree);
 int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds);
 
 /* 쿼드 트리 `tree`에서 `bounds`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-int *frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *count);
+void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *result);
 
 /* 쿼드 트리 `tree`를 4등분하고, `tree`에 저장된 모든 값을 자식 노드로 분배한다. */
 void frSplitQuadtree(frQuadtree *tree);
@@ -406,13 +419,16 @@ double frGetTimeSince(double old_time);
 
 /* | `utils` 모듈 함수... | */
 
-/* 배열의 길이가 `n`인 동적 배열을 생성한다. */
+/* 배열의 크기가 `n`인 동적 배열을 생성한다. */
 #define frCreateArray(a, n) arrsetcap(a, n)
 
 /* 동적 배열 `a`에 할당된 메모리를 해제한다. */
 #define frReleaseArray(a) arrfree(a)
 
-/* 동적 배열 `a`의 길이를 반환한다. */
+/* 동적 배열 `a`에 저장할 수 있는 최대 원소 개수를 반환한다. */
+#define frGetArrayCapacity(a) arrcap(a)
+
+/* 동적 배열 `a`의 크기를 반환한다. */
 #define frGetArrayLength(a) arrlen(a)
 
 /* 동적 배열 `a`에서 인덱스가 `i`인 원소를 반환한다. */
@@ -515,8 +531,11 @@ void frClearWorld(frWorld *world);
 /* 세계 `world`에서 강체 `body`를 제거한다. */
 bool frRemoveFromWorld(frWorld *world, frBody *body);
 
-/* 세계 `world`의 강체 배열의 메모리 주소를 반환한다. */
-frBody **frGetWorldBodies(frWorld *world, int *count);
+/* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
+frBody *frGetWorldBody(frWorld *world, int index);
+
+/* 세계 `world`의 강체 배열의 크기를 반환한다. */
+int frGetWorldBodyCount(frWorld *world);
 
 /* 세계 `world`의 경계 범위를 반환한다. */
 Rectangle frGetWorldBounds(frWorld *world);
@@ -526,6 +545,9 @@ frQuadtree *frGetWorldQuadtree(frWorld *world);
 
 /* 세계 `world`의 중력 가속도를 반환한다. */
 Vector2 frGetWorldGravity(frWorld *world);
+
+/* 세계 `world`의 모든 강체와 충돌 처리용 도형에 할당된 메모리를 해제한다. */
+void frReleaseWorldBodies(frWorld *world);
 
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity);

@@ -26,7 +26,8 @@
 #define SCREEN_WIDTH_IN_METERS (SCREEN_WIDTH / FR_GLOBAL_PIXELS_PER_METER)
 #define SCREEN_HEIGHT_IN_METERS (SCREEN_HEIGHT / FR_GLOBAL_PIXELS_PER_METER)
 
-void DrawDebugInfo(frBody *b, Vector2 p);
+#define BALL_COLOR (GetColor(0xE6E6E6FF))
+#define PLATFORM_COLOR (GetColor(0x363636FF))
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -34,16 +35,13 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | example_collision.c");
     
-    Color ball_color = (Color) { 200, 202, 212, 255 };
-    Color platform_color = (Color) { 32, 32, 32, 255 };
-    
     Vector2 platform_vertices[3] = {
-        (Vector2) { -36.0, -8.0 },
-        (Vector2) { -36.0, 8.0 },
-        (Vector2) { 36.0, 8.0 },
+        (Vector2) { -18.0, -4.0 },
+        (Vector2) { -18.0, 4.0 },
+        (Vector2) { 18.0, 4.0 },
     };
     
-    frShape *ball_circle = frCreateCircle((frMaterial) { .density = 0.5f }, 8);
+    frShape *ball_circle = frCreateCircle((frMaterial) { .density = 0.5f }, 3);
     frShape *platform_polygon = frCreatePolygon((frMaterial) { .density = 1.0f }, platform_vertices, 3);
                                           
     frBody *ball = frCreateBodyFromShape(
@@ -63,12 +61,15 @@ int main(void) {
     while (!WindowShouldClose()) {
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(FR_DEBUG_BACKGROUND_COLOR);
         
         frSetBodyPosition(ball, FR_VECTOR_P2M(GetMousePosition()));
         
-        frDrawBody(platform, platform_color);
-        frDrawBody(ball, ball_color);
+        frDrawBody(platform, PLATFORM_COLOR);
+        frDrawBodyAABB(platform, PLATFORM_COLOR);
+        
+        frDrawBody(ball, BALL_COLOR);
+        frDrawBodyAABB(ball, BALL_COLOR);
         
         frTransform ball_tx = frGetBodyTransform(ball);
         frTransform platform_tx = frGetBodyTransform(platform);
@@ -77,7 +78,7 @@ int main(void) {
         
         if (collision.check) {
             for (int i = 0; i < collision.count; i++)
-                DrawCircleV(FR_VECTOR_M2P(collision.points[i]), 4, RED);
+                DrawCircleV(FR_VECTOR_M2P(collision.points[i]), 3, RED);
         }
         
         DrawTextEx(
@@ -98,13 +99,19 @@ int main(void) {
             (Vector2) { 8, 32 },
             10, 
             1, 
-            BLACK
+            WHITE
         );
         
         DrawFPS(8, 8);
 
         EndDrawing();
     }
+    
+    frReleaseShape(frGetBodyShape(ball));
+    frReleaseBody(ball);
+    
+    frReleaseShape(frGetBodyShape(platform));
+    frReleaseBody(platform);
     
     CloseWindow();
 

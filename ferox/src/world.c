@@ -30,6 +30,7 @@ typedef struct frWorld {
     frQuadtree *tree;
     frBody **bodies;
     frCollision *collisions;
+    int *tree_query;
     double last_time;
 } frWorld;
 
@@ -48,6 +49,7 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     
     frCreateArray(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
     frCreateArray(result->collisions, FR_WORLD_MAX_OBJECT_COUNT);
+    frCreateArray(result->tree_query, FR_WORLD_MAX_OBJECT_COUNT);
     
     return result;
 }
@@ -62,6 +64,7 @@ void frReleaseWorld(frWorld *world) {
     
     frReleaseArray(world->bodies);
     frReleaseArray(world->collisions);
+    frReleaseArray(world->tree_query);
     
     free(world);
 }
@@ -101,13 +104,16 @@ bool frRemoveFromWorld(frWorld *world, frBody *body) {
     return false;
 }
 
-/* 세계 `world`의 강체 배열의 메모리 주소를 반환한다. */
-frBody **frGetWorldBodies(frWorld *world, int *count) {
-    if (world == NULL || count == NULL) return NULL;
-    
-    *count = frGetArrayLength(world->bodies);
-    
-    return world->bodies;
+/* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
+frBody *frGetWorldBody(frWorld *world, int index) {
+    return (world != NULL && index >= 0 && index < frGetArrayLength(world->bodies)) 
+        ? world->bodies[index]
+        : NULL;
+}
+
+/* 세계 `world`의 강체 배열의 크기를 반환한다. */
+int frGetWorldBodyCount(frWorld *world) {
+    return (world != NULL) ? frGetArrayLength(world->bodies) : 0;
 }
 
 /* 세계 `world`의 경계 범위를 반환한다. */
@@ -125,6 +131,18 @@ frQuadtree *frGetWorldQuadtree(frWorld *world) {
 /* 세계 `world`의 중력 가속도를 반환한다. */
 Vector2 frGetWorldGravity(frWorld *world) {
     return (world != NULL) ? world->gravity : FR_STRUCT_ZERO(Vector2);
+}
+
+/* 세계 `world`의 모든 강체와 충돌 처리용 도형에 할당된 메모리를 해제한다. */
+void frReleaseWorldBodies(frWorld *world) {
+    if (world == NULL || world->bodies == NULL) return;
+    
+    for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
+        frReleaseShape(frGetBodyShape(world->bodies[i]));
+        frReleaseBody(world->bodies[i]);
+    }
+    
+    frClearWorld(world);
 }
 
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
@@ -158,18 +176,16 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frAddToQuadtree(world->tree, i, frGetBodyAABB(frGetArrayValue(world->bodies, i)));
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {   
-        int query_count = -1;
-        
-        int *query_indexes = frQueryQuadtree(
+        frQueryQuadtree(
             world->tree, 
-            frGetBodyAABB(frGetArrayValue(world->bodies, i)),
-            &query_count
+            frGetBodyAABB(frGetArrayValue(world->bodies, i)), 
+            world->tree_query
         );
         
-        if (query_count <= 0 || query_indexes == NULL) continue;
+        if (frGetArrayLength(world->tree_query) <= 0) continue;
         
-        for (int k = 0; k < query_count; k++) {
-            int j = query_indexes[k];
+        for (int k = 0; k < frGetArrayLength(world->tree_query); k++) {
+            int j = world->tree_query[k];
             
             if (j <= i) continue;
             
@@ -194,8 +210,8 @@ static void frUpdateWorld(frWorld *world, double dt) {
             
             frAddToArray(world->collisions, collision);
         }
-            
-        frReleaseArray(query_indexes);
+        
+        frClearArray(world->tree_query);
     }
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {

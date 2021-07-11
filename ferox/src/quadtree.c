@@ -40,9 +40,6 @@ typedef struct frQuadtree {
 
 /* | `quadtree` 모듈 함수... | */
 
-/* 쿼드 트리 `tree`에서 경계 범위 `bounds`와 AABB가 겹치는 모든 도형의 인덱스를 반환한다. */
-static void frQueryQuadtreeHelper(frQuadtree *tree, Rectangle bounds, int *result, int *count);
-
 /* 경계 범위가 `bounds`인 쿼드 트리 구조체의 메모리 주소를 반환한다. */
 frQuadtree *frCreateQuadtree(int depth, Rectangle bounds) {
     frQuadtree *result = calloc(1, sizeof(frQuadtree));
@@ -92,6 +89,8 @@ void frClearQuadtree(frQuadtree *tree) {
     if (tree == NULL) return;
     
     frClearArray(tree->values);
+    
+    if (tree->depth > 0) frReleaseArray(tree->values);
     
     if (!frIsQuadtreeLeaf(tree)) {
         for (int i = 0; i < 4; i++) {
@@ -147,18 +146,18 @@ int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds) {
 }
 
 /* 쿼드 트리 `tree`에서 `bounds`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-int *frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *count) {
-    if (tree == NULL || count == NULL) return NULL;
+void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *result) {
+    if (tree == NULL || tree->values == NULL || result == NULL) return;
     
-    int *result = NULL;
-    int new_count = 0;
+    for (int i = 0; i < frGetArrayLength(tree->values); i++)
+        if (CheckCollisionRecs(bounds, tree->values[i].aabb))
+            frAddToArray(result, tree->values[i].index);
     
-    frCreateArray(result, FR_WORLD_MAX_OBJECT_COUNT);
-    frQueryQuadtreeHelper(tree, bounds, result, &new_count);
-    
-    *count = new_count;
-    
-    return result;
+    if (frIsQuadtreeLeaf(tree)) return;
+        
+    for (int i = 0; i < 4; i++)
+        if (CheckCollisionRecs(bounds, tree->children[i]->bounds))
+            frQueryQuadtree(tree->children[i], bounds, result);
 }
 
 /* 쿼드 트리 `tree`를 4등분하고, `tree`에 저장된 모든 값을 자식 노드로 분배한다. */
@@ -215,38 +214,12 @@ void frSplitQuadtree(frQuadtree *tree) {
     for (int i = 0; i < frGetArrayLength(tree->values); i++) {
         int child_index = frGetQuadtreeIndex(tree, tree->values[i].aabb);
         
-        if (child_index != -1) {
-            frQuadtree *child = tree->children[child_index];
-            frAddToArray(child->values, tree->values[i]);
-        } else {
-            frAddToArray(new_values, tree->values[i]);
-        }
-    }
-    
-    for (int i = 0; i < frGetArrayLength(new_values); i++)
-        frAddToArray(tree->values, new_values[i]);
-    
-   frReleaseArray(new_values);
-}
-
-/* 
-    쿼드 트리 `tree`에서 경계 범위 `bounds`와 AABB (Axis-Aligned Bounding Box)가 
-    겹치는 모든 도형의 인덱스를 반환한다. 
-*/
-static void frQueryQuadtreeHelper(frQuadtree *tree, Rectangle bounds, int *result, int *count) {
-    if (tree == NULL) return;
-    
-    for (int i = 0; i < frGetArrayLength(tree->values); i++) {
-        frQuadtreeValue value = tree->values[i];
+        if (tree->children[child_index] == NULL) continue;
         
-        if (CheckCollisionRecs(bounds, value.aabb))
-            result[(*count)++] = value.index;
+        if (child_index != -1) frAddToArray(tree->children[child_index]->values, tree->values[i]);
+        else frAddToArray(new_values, tree->values[i]);
     }
     
-    if (!frIsQuadtreeLeaf(tree)) {
-        for (int i = 0; i < 4; i++) {
-            if (CheckCollisionRecs(bounds, tree->children[i]->bounds))
-                frQueryQuadtreeHelper(tree->children[i], bounds, result, count);
-        }
-    }
+    frReleaseArray(tree->values);
+    tree->values = new_values;
 }

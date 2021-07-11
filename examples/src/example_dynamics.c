@@ -26,7 +26,19 @@
 #define SCREEN_WIDTH_IN_METERS (SCREEN_WIDTH / FR_GLOBAL_PIXELS_PER_METER)
 #define SCREEN_HEIGHT_IN_METERS (SCREEN_HEIGHT / FR_GLOBAL_PIXELS_PER_METER)
 
-void DrawDebugInfo(frBody *b, Vector2 p);
+#define BLOCK1_COLOR (GetColor(0xC8CAD4FF))
+#define BLOCK2_COLOR (GetColor(0xEEBF3CFF))
+#define BLOCK3_COLOR (GetColor(0x18402CFF))
+
+#define PLATFORM_COLOR (GetColor(0x2B2B2BFF))
+
+#define BALL_COLOR (GetColor(0x1C1C1CFF))
+
+#define BLOCK1_MATERIAL ((frMaterial) { 0.45f, 0.0f, 0.5f, 0.5f })
+#define BLOCK2_MATERIAL ((frMaterial) { 0.65f, 0.0f, 0.5f, 0.5f })
+#define BLOCK3_MATERIAL ((frMaterial) { 0.85f, 0.0f, 0.5f, 0.5f })
+
+#define PLATFORM_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.75f, 0.75f })
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -34,53 +46,39 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | example_dynamics.c");
     
-    Color block1_color = (Color) { 200, 202, 212, 255 };
-    Color block2_color = (Color) { 238, 190, 60, 255 };
-    Color block3_color = (Color) { 24, 66, 44, 255 };
-    
-    Color platform_color = (Color) { 32, 32, 32, 255 };
-    
-    Color ball_color = (Color) { 150, 234, 90, 255 };
-    
     Vector2 block1_vertices[4] = {
+        (Vector2) { -2.0, -1.5 },
+        (Vector2) { -2.0, 1.5 },
+        (Vector2) { 2.0, 1.5 },
+        (Vector2) { 2.0, -1.5 }
+    };
+    
+    Vector2 block2_vertices[4] = {
         (Vector2) { -4.0, -3.0 },
         (Vector2) { -4.0, 3.0 },
         (Vector2) { 4.0, 3.0 },
         (Vector2) { 4.0, -3.0 }
     };
     
-    Vector2 block2_vertices[4] = {
-        (Vector2) { -8.0, -6.0 },
-        (Vector2) { -8.0, 6.0 },
-        (Vector2) { 8.0, 6.0 },
-        (Vector2) { 8.0, -6.0 }
-    };
-    
     Vector2 block3_vertices[4] = {
-        (Vector2) { -12.0, -8.0 },
-        (Vector2) { -12.0, 8.0 },
-        (Vector2) { 12.0, 8.0 },
-        (Vector2) { 12.0, -8.0 }
+        (Vector2) { -6.0, -4.0 },
+        (Vector2) { -6.0, 4.0 },
+        (Vector2) { 6.0, 4.0 },
+        (Vector2) { 6.0, -4.0 }
     };
     
     Vector2 platform_vertices[4] = {
-        (Vector2) { -24.0, -4.0 },
-        (Vector2) { -24.0, 4.0 },
-        (Vector2) { 24.0, 4.0 },
-        (Vector2) { 24.0, -4.0 }
+        (Vector2) { -12.0, -2.0 },
+        (Vector2) { -12.0, 2.0 },
+        (Vector2) { 12.0, 2.0 },
+        (Vector2) { 12.0, -2.0 }
     };
     
-    frShape *block1_polygon = frCreatePolygon((frMaterial) { .density = 0.4f }, block1_vertices, 4);
-    frShape *block2_polygon = frCreatePolygon((frMaterial) { .density = 0.8f }, block2_vertices, 4);
-    frShape *block3_polygon = frCreatePolygon((frMaterial) { .density = 1.2f }, block3_vertices, 4);
+    frShape *block1_polygon = frCreatePolygon(BLOCK1_MATERIAL, block1_vertices, 4);
+    frShape *block2_polygon = frCreatePolygon(BLOCK2_MATERIAL, block2_vertices, 4);
+    frShape *block3_polygon = frCreatePolygon(BLOCK3_MATERIAL, block3_vertices, 4);
     
-    frShape *platform_polygon = frCreatePolygon((frMaterial) { .density = 1.0f }, platform_vertices, 4);
-    
-    frBody *ball = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC,
-        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.35f, (SCREEN_HEIGHT_IN_METERS * 0.85f) - 7.0f },
-        frCreateCircle((frMaterial) { .density = 1.0f }, 3.0f)
-    );
+    frShape *platform_polygon = frCreatePolygon(PLATFORM_MATERIAL, platform_vertices, 4);
     
     frBody *block1 = frCreateBodyFromShape(
         FR_BODY_DYNAMIC, 
@@ -90,13 +88,13 @@ int main(void) {
     
     frBody *block2 = frCreateBodyFromShape(
         FR_BODY_DYNAMIC, 
-        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.55f, SCREEN_HEIGHT_IN_METERS * 0.32f }, 
+        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.55f, SCREEN_HEIGHT_IN_METERS * 0.26f }, 
         block2_polygon
     );
     
     frBody *block3 = frCreateBodyFromShape(
         FR_BODY_DYNAMIC, 
-        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.55f, SCREEN_HEIGHT_IN_METERS * 0.38f }, 
+        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.55f, SCREEN_HEIGHT_IN_METERS * 0.32f }, 
         block3_polygon
     );
     
@@ -104,6 +102,12 @@ int main(void) {
         FR_BODY_STATIC, 
         (Vector2) { SCREEN_WIDTH_IN_METERS * 0.5f, SCREEN_HEIGHT_IN_METERS * 0.85f },
         platform_polygon
+    );
+    
+    frBody *ball = frCreateBodyFromShape(
+        FR_BODY_KINEMATIC,
+        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.35f, (SCREEN_HEIGHT_IN_METERS * 0.85f) - 3.0f },
+        frCreateCircle(FR_STRUCT_ZERO(frMaterial), 1.0f)
     );
     
     frWorld *world = frCreateWorld(
@@ -122,24 +126,31 @@ int main(void) {
     while (!WindowShouldClose()) {
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(FR_DEBUG_BACKGROUND_COLOR);
         
         Vector2 ball_position = frGetBodyPosition(ball);
         
-        if (IsKeyDown(KEY_UP)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { 0.0f, -0.2f }));
-        if (IsKeyDown(KEY_DOWN)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { 0.0f, 0.2f }));
-        if (IsKeyDown(KEY_LEFT)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { -0.2f, 0.0f }));
-        if (IsKeyDown(KEY_RIGHT)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { 0.2f, 0.0f }));
+        if (IsKeyDown(KEY_UP)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { 0.0f, -0.15f }));
+        if (IsKeyDown(KEY_DOWN)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { 0.0f, 0.15f }));
+        if (IsKeyDown(KEY_LEFT)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { -0.15f, 0.0f }));
+        if (IsKeyDown(KEY_RIGHT)) frSetBodyPosition(ball, frVec2Add(ball_position, (Vector2) { 0.15f, 0.0f }));
         
-        frDrawBody(platform, platform_color);
+        frDrawBody(platform, PLATFORM_COLOR);
+        frDrawBodyAABB(platform, GREEN);
         
-        frDrawBody(block1, block1_color);
-        frDrawBody(block2, block2_color);
-        frDrawBody(block3, block3_color);
-        frDrawBodyProperties(block3, GRAY);
+        frDrawBody(block1, BLOCK1_COLOR);
+        frDrawBodyAABB(block1, GREEN);
         
-        frDrawBody(ball, ball_color);
-        frDrawBodyProperties(ball, GRAY);
+        frDrawBody(block2, BLOCK2_COLOR);
+        frDrawBodyAABB(block2, GREEN);
+        
+        frDrawBody(block3, BLOCK3_COLOR);
+        frDrawBodyAABB(block3, GREEN);
+        frDrawBodyProperties(block3, WHITE);
+        
+        frDrawBody(ball, BALL_COLOR);
+        frDrawBodyAABB(ball, GREEN);
+        frDrawBodyProperties(ball, WHITE);
         
         frDrawQuadtree(frGetWorldQuadtree(world));
         
@@ -149,6 +160,9 @@ int main(void) {
 
         EndDrawing();
     }
+    
+    frReleaseWorldBodies(world);
+    frReleaseWorld(world);
     
     CloseWindow();
 

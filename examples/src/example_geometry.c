@@ -37,9 +37,9 @@ int main(void) {
     Color triangle_color = (Color) { 200, 202, 212, 255 };
     
     Vector2 triangle_vertices[3] = {
-        (Vector2) { 0.0, -12.0 },
-        (Vector2) { -8.0, 12.0 },
-        (Vector2) { 8.0, 12.0 }
+        (Vector2) { 0.0, -6.0 },
+        (Vector2) { -4.0, 6.0 },
+        (Vector2) { 4.0, 6.0 }
     };
     
     frBody *triangle = frCreateBodyFromShape(
@@ -58,14 +58,12 @@ int main(void) {
     while (!WindowShouldClose()) {
         BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+        ClearBackground(FR_DEBUG_BACKGROUND_COLOR);
         
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) frSetBodyPosition(triangle, FR_VECTOR_P2M(GetMousePosition()));
-        
-        if (IsKeyPressed(KEY_LEFT)) frSetBodyRotation(triangle, frGetBodyRotation(triangle) - 2 * DEG2RAD);
-        if (IsKeyPressed(KEY_RIGHT)) frSetBodyRotation(triangle, frGetBodyRotation(triangle) + 2 * DEG2RAD);
     
         frDrawBody(triangle, triangle_color);
+        frDrawBodyAABB(triangle, triangle_color);
         frDrawBodyProperties(triangle, GRAY);
         
         frDrawQuadtree(frGetWorldQuadtree(world));
@@ -76,6 +74,11 @@ int main(void) {
 
         EndDrawing();
     }
+    
+    frReleaseWorld(world);
+    
+    frReleaseShape(frGetBodyShape(triangle));
+    frReleaseBody(triangle);
     
     CloseWindow();
 

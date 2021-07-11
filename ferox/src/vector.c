@@ -62,7 +62,7 @@ Vector2 frVec2Normalize(Vector2 v) {
 
 /* 벡터 `v1`과 `v2`가 이루는 각도 (단위: rad.)를 반환한다. */
 float frVec2Angle(Vector2 v1, Vector2 v2) {
-    return frNormalizeAngle(atan2f(v2.y - v1.y, v2.x - v1.x), PI);
+    return atan2f(v2.y, v1.y) - atan2f(v2.x, v1.x);
 }
 
 /* 벡터 `v1`과 `v2`의 외적을 반환한다. */

@@ -305,7 +305,7 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
         return FR_STRUCT_ZERO(frCollision);
     
     Vector2 direction = frVec2Subtract(tx2.position, tx1.position);
-    float depth = frVec2Magnitude(direction) - (frGetCircleRadius(s1) + frGetCircleRadius(s2));
+    float depth = (frGetCircleRadius(s1) + frGetCircleRadius(s2)) - frVec2Magnitude(direction);
     
     if (depth < 0.0f) return FR_STRUCT_ZERO(frCollision);
     
@@ -375,11 +375,11 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         => 벡터의 내적을 통해 확인할 수 있다.
     */
     
-    float dot_v1 = frVec2DotProduct(frVec2Subtract(circle_tx.position, p1), frVec2Subtract(p2, p1));
-    float dot_v2 = frVec2DotProduct(frVec2Subtract(circle_tx.position, p2), frVec2Subtract(p1, p2));
+    float v1_dot = frVec2DotProduct(frVec2Subtract(circle_tx.position, p1), frVec2Subtract(p2, p1));
+    float v2_dot = frVec2DotProduct(frVec2Subtract(circle_tx.position, p2), frVec2Subtract(p1, p2));
     
-    if (dot_v1 <= 0.0f) direction = frVec2Normalize(frVec2Subtract(p1, circle_tx.position));
-    else if (dot_v2 <= 0.0f) direction = frVec2Normalize(frVec2Subtract(p2, circle_tx.position));
+    if (v1_dot <= 0.0f) direction = frVec2Normalize(frVec2Subtract(p1, circle_tx.position));
+    else if (v2_dot <= 0.0f) direction = frVec2Normalize(frVec2Subtract(p2, circle_tx.position));
     else direction = frVec2Normalize(frVec2Negate(frVec2Rotate(normals[normal_index], polygon_tx.rotation)));
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
@@ -486,11 +486,11 @@ static frEdge frClipEdge(frEdge e1, frEdge e2) {
 static frEdge frClipEdgeWithAxis(frEdge e, Vector2 v, float min_dot) {
     frEdge result = FR_STRUCT_ZERO(frEdge);
     
-    float dot_p1 = frVec2DotProduct(e.points[0], v) - min_dot;
-    float dot_p2 = frVec2DotProduct(e.points[1], v) - min_dot;
+    float p1_dot = frVec2DotProduct(e.points[0], v) - min_dot;
+    float p2_dot = frVec2DotProduct(e.points[1], v) - min_dot;
     
-    bool inside_p1 = dot_p1 >= 0.0f;
-    bool inside_p2 = dot_p2 >= 0.0f;
+    bool inside_p1 = p1_dot >= 0.0f;
+    bool inside_p2 = p2_dot >= 0.0f;
     
     if (inside_p1 && inside_p2) {
         result.points[0] = e.points[0];
@@ -500,7 +500,7 @@ static frEdge frClipEdgeWithAxis(frEdge e, Vector2 v, float min_dot) {
     } else {
         Vector2 e_v = frVec2Subtract(e.points[1], e.points[0]);
         
-        float distance = dot_p1 / (dot_p1 - dot_p2);
+        float distance = p1_dot / (p1_dot - p2_dot);
         
         Vector2 midpoint = frVec2Add(
             e.points[0], 
@@ -614,11 +614,11 @@ static frCollision frComputeCollisionManifold(
 
         Vector2 ref_v = frVec2Normalize(frVec2Subtract(ref_e.points[1], ref_e.points[0]));
 
-        float dot_ref1 = frVec2DotProduct(ref_e.points[0], ref_v);
-        float dot_ref2 = frVec2DotProduct(ref_e.points[1], ref_v);
+        float ref_dot1 = frVec2DotProduct(ref_e.points[0], ref_v);
+        float ref_dot2 = frVec2DotProduct(ref_e.points[1], ref_v);
 
-        inc_e = frClipEdgeWithAxis(inc_e, ref_v, dot_ref1);
-        inc_e = frClipEdgeWithAxis(inc_e, frVec2Negate(ref_v), -dot_ref2);
+        inc_e = frClipEdgeWithAxis(inc_e, ref_v, ref_dot1);
+        inc_e = frClipEdgeWithAxis(inc_e, frVec2Negate(ref_v), -ref_dot2);
 
         Vector2 refn_v = frVec2RightNormal(ref_v);
 

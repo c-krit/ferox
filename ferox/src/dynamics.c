@@ -39,8 +39,6 @@ typedef struct frMotionData {
     float inverse_inertia;
     Vector2 velocity;
     float angular_velocity;
-    // float damping;
-    // float angular_damping;
     float gravity_scale;
     Vector2 force;
     float torque;
@@ -300,17 +298,14 @@ void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
         
         return;
     }
-        
-    float depth_scale = 0.35f;
-    float threshold = 0.02f;
     
     float max_depth = _FR_MAX(collision.depths[0], collision.depths[1]);
     
     // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
     Vector2 correction = frVec2ScalarMultiply(
         collision.direction,
-        depth_scale * (
-            _FR_MAX(0.0f, max_depth - threshold) 
+        FR_DYNAMICS_CORRECTION_SCALE * (
+            _FR_MAX(0.0f, max_depth - FR_DYNAMICS_CORRECTION_THRESHOLD) 
             / (b1->motion.inverse_mass + b2->motion.inverse_mass)
         )
     );
@@ -361,26 +356,26 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
     b->motion.angular_velocity += (b->motion.torque * b->motion.inverse_inertia) * (dt / 2.0f);
 }
 
-/* 서로 충돌하고 있는 두 강체 `b1`과 `b2`의 충돌 이후의 속도와 각속도를 계산한다. */
+/* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
     if (b1 == NULL || b2 == NULL || !collision.check) return;
     
     for (int i = 0; i < collision.count; i++) {
-        Vector2 b1_radius_v = frVec2Subtract(collision.points[i], frGetBodyPosition(b1));
-        Vector2 b2_radius_v = frVec2Subtract(collision.points[i], frGetBodyPosition(b2));
+        Vector2 r1 = frVec2Subtract(collision.points[i], frGetBodyPosition(b1));
+        Vector2 r2 = frVec2Subtract(collision.points[i], frGetBodyPosition(b2));
         
-        Vector2 b1_radius_normal = frVec2LeftNormal(b1_radius_v);
-        Vector2 b2_radius_normal = frVec2LeftNormal(b2_radius_v);
+        Vector2 r1_normal = frVec2LeftNormal(r1);
+        Vector2 r2_normal = frVec2LeftNormal(r2);
         
         // `b1`이 측정한 `b2`의 속도 (`b1`에 대한 `b2`의 상대 속도)를 계산한다.
         Vector2 relative_velocity = frVec2Subtract(
             frVec2Add(
                 b2->motion.velocity,
-                frVec2ScalarMultiply(b2_radius_normal, b2->motion.angular_velocity)
+                frVec2ScalarMultiply(r2_normal, b2->motion.angular_velocity)
             ),
             frVec2Add(
                 b1->motion.velocity, 
-                frVec2ScalarMultiply(b1_radius_normal, b1->motion.angular_velocity)
+                frVec2ScalarMultiply(r1_normal, b1->motion.angular_velocity)
             )
         );
         
@@ -389,27 +384,25 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
         // 두 강체가 서로 충돌하는 방향으로 진행하고 있지 않으면 계산을 종료한다.
         if (relative_normal_velocity > 0.0f) return;
         
-        float b1_radius_normal_dot = frVec2DotProduct(b1_radius_normal, collision.direction);
-        float b2_radius_normal_dot = frVec2DotProduct(b2_radius_normal, collision.direction);
+        float r1_normal_dot = frVec2DotProduct(r1_normal, collision.direction);
+        float r2_normal_dot = frVec2DotProduct(r2_normal, collision.direction);
         
-        float epsilon = _FR_MIN(b1->material.restitution, b2->material.restitution);
+        float epsilon = _FR_MAX(0.0f, _FR_MIN(b1->material.restitution, b2->material.restitution));
         
-        float magnitude_numerator = -(1.0f + epsilon) * relative_normal_velocity;
-        float magnitude_denominator = collision.count * (
-            b1->motion.inverse_mass + b2->motion.inverse_mass
-            + b1->motion.inverse_inertia * (b1_radius_normal_dot * b1_radius_normal_dot)
-            + b2->motion.inverse_inertia * (b2_radius_normal_dot * b2_radius_normal_dot)
-        );
+        float inverse_mass_sum = (b1->motion.inverse_mass + b2->motion.inverse_mass)
+            + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
+            + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
             
-        float magnitude = magnitude_numerator / magnitude_denominator;
+        float impulse_magnitude = (-(1.0f + epsilon) * relative_normal_velocity) 
+            / (collision.count * inverse_mass_sum);
 
-        Vector2 impulse = frVec2ScalarMultiply(collision.direction, magnitude);
+        Vector2 impulse = frVec2ScalarMultiply(collision.direction, impulse_magnitude);
 
         frApplyImpulse(b1, frVec2Negate(impulse));
-        frApplyTorqueImpulse(b1, b1_radius_v, frVec2Negate(impulse));
+        frApplyTorqueImpulse(b1, r1, frVec2Negate(impulse));
         
         frApplyImpulse(b2, impulse);
-        frApplyTorqueImpulse(b2, b2_radius_v, impulse);
+        frApplyTorqueImpulse(b2, r2, impulse);
     }
 }
 

@@ -25,9 +25,6 @@
 /* | `debug` 모듈 함수... | */
 
 #ifdef HAVE_RAYLIB
-    /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
-    static void frDrawBodyAABB(frBody *b);
-
     /* 게임 화면에 쿼드 트리 `tree`의 경계 범위를 그린다. */
     static void frDrawQuadtreeBounds(frQuadtree *tree);
 
@@ -44,13 +41,10 @@
             DrawCircleV(FR_VECTOR_M2P(frGetBodyPosition(b)), FR_NUMBER_M2P(frGetCircleRadius(s)), color);
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
             Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
-            
             int world_vertex_count = frGetWorldVertices(b, world_vertices);
             
             DrawTriangleFan(world_vertices, world_vertex_count, color);
         }
-        
-        frDrawBodyAABB(b);
     }
 
     /* 게임 화면에 강체 `b`의 도형 테두리를 그린다. */
@@ -61,17 +55,34 @@
         
         if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
             Vector2 p = frGetBodyPosition(b);
-            DrawCircleLines(p.x, p.y, frGetCircleRadius(s), color);
+            DrawCircleLines(FR_NUMBER_M2P(p.x), FR_NUMBER_M2P(p.y), FR_NUMBER_M2P(frGetCircleRadius(s)), color);
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
             Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
-            
             int world_vertex_count = frGetWorldVertices(b, world_vertices);
                 
             for (int j = world_vertex_count - 1, i = 0; i < world_vertex_count; j = i, i++)
-                DrawLineEx(world_vertices[i], world_vertices[j], 2, color);
+                DrawLineEx(world_vertices[j], world_vertices[i], 2, color);
         }
+    }
+
+    /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
+    void frDrawBodyAABB(frBody *b, Color color) {
+        if (b == NULL) return;
         
-        frDrawBodyAABB(b);
+        Rectangle aabb = frGetBodyAABB(b);
+        
+        DrawRectangleLinesEx(
+            (Rectangle) { 
+                FR_NUMBER_M2P(aabb.x), 
+                FR_NUMBER_M2P(aabb.y),
+                FR_NUMBER_M2P(aabb.width),
+                FR_NUMBER_M2P(aabb.height)
+            }, 
+            1, 
+            color
+        );
+        
+        DrawCircleV(FR_VECTOR_M2P(frGetBodyPosition(b)), 2, BLACK);
     }
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
@@ -120,26 +131,6 @@
         return ColorFromHSV(GetRandomValue(0, 360), 1, 1);
     }
 
-    /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
-    static void frDrawBodyAABB(frBody *b) {
-        if (b == NULL) return;
-        
-        Rectangle aabb = frGetBodyAABB(b);
-        
-        DrawRectangleLinesEx(
-            (Rectangle) { 
-                FR_NUMBER_M2P(aabb.x), 
-                FR_NUMBER_M2P(aabb.y),
-                FR_NUMBER_M2P(aabb.width),
-                FR_NUMBER_M2P(aabb.height)
-            }, 
-            1, 
-            GREEN
-        );
-        
-        DrawCircleV(FR_VECTOR_M2P(frGetBodyPosition(b)), 2, BLACK);
-    }
-
     /* 게임 화면에 쿼드 트리 `tree`의 경계 범위를 그린다. */
     static void frDrawQuadtreeBounds(frQuadtree *tree) {
         Rectangle bounds = frGetQuadtreeBounds(tree);
@@ -150,8 +141,8 @@
         Vector2 v1 = (Vector2) { (2 * bounds.x + bounds.width) / 2, bounds.y };
         Vector2 v2 = (Vector2) { (2 * bounds.x + bounds.width) / 2, bounds.y + bounds.height };
 
-        DrawLineEx(FR_VECTOR_M2P(h1), FR_VECTOR_M2P(h2), 0.25f, BLACK);
-        DrawLineEx(FR_VECTOR_M2P(v1), FR_VECTOR_M2P(v2), 0.25f, BLACK);
+        DrawLineEx(FR_VECTOR_M2P(h1), FR_VECTOR_M2P(h2), 0.25f, GRAY);
+        DrawLineEx(FR_VECTOR_M2P(v1), FR_VECTOR_M2P(v2), 0.25f, GRAY);
     }
 
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준 좌표 배열로 변환한다. */

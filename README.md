@@ -36,6 +36,7 @@ The source code for all examples can be found in the `examples` directory.
 - [dyn4j. (2011, November 11), Contact Points Using Clipping](http://www.dyn4j.org/2011/11/contact-points-using-clipping)
 - [dyn4j. (2010, January 01), SAT (Separating Axis Theorem)](http://dyn4j.org/2010/01/sat)
 - [Catto, Erin. (2006), Fast and Simple Physics using Sequential Impulses](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
+- [Catto, Erin. (2005), Iterative Dynamics with Temporal Coherence](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
 - [Catto, Erin. (2019, March 19), Math for Game Developers: Dynamic Bounding Volume Hierarchies](https://ubm-twvideo01.s3.amazonaws.com/o1/vault/gdc2019/presentations/Catto_Erin_MathForGame.pdf)
 - [Coumans, Erwin. (2010, July 26), Collision Detection: Contact Generation and GPU Acceleration](https://sgvr.kaist.ac.kr/~sungeui/Collision_tutorial/Erwin.pdf)
 - [fang. (2014, September 07), How to check if a circle lies inside of convex polygon](https://stackoverflow.com/questions/25701346/how-to-check-if-a-circle-lies-inside-of-convex-polygon)
