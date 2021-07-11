@@ -23,18 +23,18 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
+
 #define SCREEN_WIDTH_IN_METERS (SCREEN_WIDTH / FR_GLOBAL_PIXELS_PER_METER)
 #define SCREEN_HEIGHT_IN_METERS (SCREEN_HEIGHT / FR_GLOBAL_PIXELS_PER_METER)
 
-void DrawDebugInfo(frBody *b, Vector2 p);
+#define TRIANGLE_COLOR (GetColor(0xC8CAD4FF))
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetTargetFPS(TARGET_FPS);
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | example_geometry.c");
-    
-    Color triangle_color = (Color) { 200, 202, 212, 255 };
     
     Vector2 triangle_vertices[3] = {
         (Vector2) { 0.0, -6.0 },
@@ -61,9 +61,11 @@ int main(void) {
         ClearBackground(FR_DEBUG_BACKGROUND_COLOR);
         
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) frSetBodyPosition(triangle, FR_VECTOR_P2M(GetMousePosition()));
+        
+        frSetBodyRotation(triangle, frVec2Angle((Vector2) { 0, -1 }, frVec2Subtract(GetMousePosition(), SCREEN_CENTER)));
     
-        frDrawBody(triangle, triangle_color);
-        frDrawBodyAABB(triangle, triangle_color);
+        frDrawBody(triangle, TRIANGLE_COLOR);
+        frDrawBodyAABB(triangle, TRIANGLE_COLOR);
         frDrawBodyProperties(triangle, GRAY);
         
         frDrawQuadtree(frGetWorldQuadtree(world));

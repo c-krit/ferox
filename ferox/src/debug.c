@@ -28,8 +28,8 @@
     /* 게임 화면에 쿼드 트리 `tree`의 경계 범위를 그린다. */
     static void frDrawQuadtreeBounds(frQuadtree *tree);
 
-    /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준 좌표 배열로 변환한다. */
-    static int frGetWorldVertices(frBody *b, Vector2 *result);
+    /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
+    static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result);
 
     /* 게임 화면에 강체 `b`의 도형을 그린다. */
     void frDrawBody(frBody *b, Color color) {
@@ -41,7 +41,7 @@
             DrawCircleV(FR_VECTOR_M2P(frGetBodyPosition(b)), FR_NUMBER_M2P(frGetCircleRadius(s)), color);
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
             Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
-            int world_vertex_count = frGetWorldVertices(b, world_vertices);
+            int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
             
             DrawTriangleFan(world_vertices, world_vertex_count, color);
         }
@@ -58,7 +58,7 @@
             DrawCircleLines(FR_NUMBER_M2P(p.x), FR_NUMBER_M2P(p.y), FR_NUMBER_M2P(frGetCircleRadius(s)), color);
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
             Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
-            int world_vertex_count = frGetWorldVertices(b, world_vertices);
+            int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
                 
             for (int j = world_vertex_count - 1, i = 0; i < world_vertex_count; j = i, i++)
                 DrawLineEx(world_vertices[j], world_vertices[i], 2, color);
@@ -145,8 +145,8 @@
         DrawLineEx(FR_VECTOR_M2P(v1), FR_VECTOR_M2P(v2), 0.25f, GRAY);
     }
 
-    /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준 좌표 배열로 변환한다. */
-    static int frGetWorldVertices(frBody *b, Vector2 *result) {
+    /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
+    static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result) {
         if (b == NULL || result == NULL) return 0;
         
         int vertex_count = 0;
