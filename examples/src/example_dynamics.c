@@ -34,11 +34,11 @@
 
 #define BALL_COLOR (GetColor(0x1C1C1CFF))
 
-#define BLOCK1_MATERIAL ((frMaterial) { 0.45f, 0.0f, 0.5f, 0.5f })
-#define BLOCK2_MATERIAL ((frMaterial) { 0.65f, 0.0f, 0.5f, 0.5f })
-#define BLOCK3_MATERIAL ((frMaterial) { 0.85f, 0.0f, 0.5f, 0.5f })
+#define BLOCK1_MATERIAL ((frMaterial) { 0.45f, 0.0f, 0.5f, 0.35f })
+#define BLOCK2_MATERIAL ((frMaterial) { 0.65f, 0.0f, 0.5f, 0.35f })
+#define BLOCK3_MATERIAL ((frMaterial) { 0.85f, 0.0f, 0.5f, 0.35f })
 
-#define PLATFORM_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.75f, 0.75f })
+#define PLATFORM_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.35f, 0.2f })
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);

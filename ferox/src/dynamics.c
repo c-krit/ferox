@@ -66,6 +66,8 @@ frBody *frCreateBody(frBodyType type, Vector2 p) {
     
     frBody *result = calloc(1, sizeof(frBody));
     
+    result->material = FR_DYNAMICS_DEFAULT_MATERIAL;
+    
     frSetBodyType(result, type);
     frSetBodyGravityScale(result, 1.0f);
     frSetBodyPosition(result, p);
@@ -95,6 +97,7 @@ void frAttachShapeToBody(frBody *b, frShape *s) {
     if (b == NULL || s == NULL) return;
     
     b->shape = s;
+    b->material = frGetShapeMaterial(s);
     b->aabb = frGetShapeAABB(b->shape, b->tx);
     
     frResetBodyMass(b);
@@ -105,6 +108,7 @@ void frDetachShapeFromBody(frBody *b) {
     if (b == NULL) return;
     
     b->shape = NULL;
+    b->material = FR_DYNAMICS_DEFAULT_MATERIAL;
     b->aabb = FR_STRUCT_ZERO(Rectangle);
     
     frResetBodyMass(b);
@@ -330,10 +334,7 @@ void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
 void frIntegrateForBodyPosition(frBody *b, double dt) {
     if (b == NULL || b->type == FR_BODY_STATIC) return;
     
-    Vector2 position = frVec2Add(
-        b->tx.position,
-        frVec2ScalarMultiply(b->motion.velocity, dt)
-    );
+    Vector2 position = frVec2Add(b->tx.position,frVec2ScalarMultiply(b->motion.velocity, dt));
     
     float rotation = b->tx.rotation + (b->motion.angular_velocity * dt);
     
@@ -403,6 +404,43 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
         
         frApplyImpulse(b2, impulse);
         frApplyTorqueImpulse(b2, r2, impulse);
+        
+        // 마찰력 적용을 위해 상대 속도를 다시 계산한다.
+        relative_velocity = frVec2Subtract(
+            frVec2Add(
+                b2->motion.velocity,
+                frVec2ScalarMultiply(r2_normal, b2->motion.angular_velocity)
+            ),
+            frVec2Add(
+                b1->motion.velocity, 
+                frVec2ScalarMultiply(r1_normal, b1->motion.angular_velocity)
+            )
+        );
+        
+        relative_normal_velocity = frVec2DotProduct(relative_velocity, collision.direction);
+        
+        Vector2 tangent = frVec2Normalize(
+            frVec2Subtract(
+                relative_velocity,
+                frVec2ScalarMultiply(collision.direction, relative_normal_velocity)
+            )
+        );
+        
+        float friction_magnitude = -frVec2DotProduct(relative_velocity, tangent)
+            / (collision.count * inverse_mass_sum);
+        
+        float static_coefficient = b1->material.static_friction * b2->material.static_friction;
+        float dynamic_coefficient = b1->material.dynamic_friction * b2->material.dynamic_friction;
+        
+        Vector2 frictional_impulse = (fabs(friction_magnitude) < impulse_magnitude * static_coefficient)
+            ? frVec2ScalarMultiply(tangent, friction_magnitude)
+            : frVec2ScalarMultiply(tangent, -impulse_magnitude * dynamic_coefficient);
+        
+        frApplyImpulse(b1, frVec2Negate(frictional_impulse));
+        frApplyTorqueImpulse(b1, r1, frVec2Negate(frictional_impulse));
+        
+        frApplyImpulse(b2, frictional_impulse);
+        frApplyTorqueImpulse(b2, r2, frictional_impulse);
     }
 }
 
@@ -411,9 +449,7 @@ static void frResetBodyMass(frBody *b) {
     if (b == NULL) return;
     
     b->motion.mass = 0.0f;
-    
     b->motion.inertia = 0.0f;
-    b->motion.inverse_inertia = 0.0f;
     
     if (b->type == FR_BODY_STATIC) {
         b->motion.velocity = FR_STRUCT_ZERO(Vector2);

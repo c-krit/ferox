@@ -57,7 +57,10 @@ Vector2 frVec2Negate(Vector2 v) {
 /* 벡터 `v`를 정규화한 2차원 벡터를 반환한다. */
 Vector2 frVec2Normalize(Vector2 v) {
     float magnitude = frVec2Magnitude(v);
-    return (Vector2) { v.x / magnitude, v.y / magnitude };
+    
+    return (!frApproxEquals(magnitude, 0.0f))
+        ? (Vector2) { v.x / magnitude, v.y / magnitude }
+        : FR_STRUCT_ZERO(Vector2);
 }
 
 /* 벡터 `v1`과 `v2`가 이루는 각도 (단위: rad.)를 반환한다. */
@@ -121,10 +124,14 @@ bool frVec2CCW(Vector2 v1, Vector2 v2, Vector2 v3) {
 
 /* 픽셀 단위 벡터 `v`를 미터 단위 벡터로 변환한다. */
 Vector2 frVec2PixelsToMeters(Vector2 v) {
+    if (FR_GLOBAL_PIXELS_PER_METER <= 0.0f) return FR_STRUCT_ZERO(Vector2);
+    
     return frVec2ScalarMultiply(v, 1.0f / FR_GLOBAL_PIXELS_PER_METER);
 }
 
 /* 미터 단위 벡터 `v`를 픽셀 단위 벡터로 변환한다. */
 Vector2 frVec2MetersToPixels(Vector2 v) {
+    if (FR_GLOBAL_PIXELS_PER_METER <= 0.0f) return FR_STRUCT_ZERO(Vector2);
+    
     return frVec2ScalarMultiply(v, FR_GLOBAL_PIXELS_PER_METER);
 }
