@@ -84,8 +84,8 @@
     #define FR_DEBUG_BACKGROUND_COLOR (GetColor(0x111111FF))
 #endif
 
-#define FR_DYNAMICS_CORRECTION_SCALE 0.24f
-#define FR_DYNAMICS_CORRECTION_THRESHOLD 0.06
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE 0.24f
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.06f
 #define FR_DYNAMICS_DEFAULT_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
 #define FR_GEOMETRY_MAX_VERTEX_COUNT 10
@@ -475,6 +475,9 @@ Vector2 frVec2Normalize(Vector2 v);
 
 /* 벡터 `v1`과 `v2`가 이루는 각도 (단위: rad.)를 반환한다. */
 float frVec2Angle(Vector2 v1, Vector2 v2);
+
+/* 벡터 `v1`의 모든 성분이 `v2`의 모든 성분과 근접한 값인지 확인한다. */
+bool frVec2ApproxEquals(Vector2 v1, Vector2 v2);
 
 /* 벡터 `v1`과 `v2`의 외적을 반환한다. */
 float frVec2CrossProduct(Vector2 v1, Vector2 v2);

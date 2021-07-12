@@ -68,6 +68,11 @@ float frVec2Angle(Vector2 v1, Vector2 v2) {
     return atan2f(v2.y, v2.x) - atan2f(v1.y, v1.x);
 }
 
+/* 벡터 `v1`의 모든 성분이 `v2`의 모든 성분과 근접한 값인지 확인한다. */
+bool frVec2ApproxEquals(Vector2 v1, Vector2 v2) {
+    return frApproxEquals(v1.x, v2.x) && frApproxEquals(v1.y, v2.y);
+}
+
 /* 벡터 `v1`과 `v2`의 외적을 반환한다. */
 float frVec2CrossProduct(Vector2 v1, Vector2 v2) {
     // 평면 벡터의 외적은 스칼라 값이다.

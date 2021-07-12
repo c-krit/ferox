@@ -308,8 +308,8 @@ void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
     // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
     Vector2 correction = frVec2ScalarMultiply(
         collision.direction,
-        FR_DYNAMICS_CORRECTION_SCALE * (
-            _FR_MAX(0.0f, max_depth - FR_DYNAMICS_CORRECTION_THRESHOLD) 
+        FR_DYNAMICS_CORRECTION_DEPTH_SCALE * (
+            _FR_MAX(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
             / (b1->motion.inverse_mass + b2->motion.inverse_mass)
         )
     );
@@ -334,12 +334,8 @@ void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
 void frIntegrateForBodyPosition(frBody *b, double dt) {
     if (b == NULL || b->type == FR_BODY_STATIC) return;
     
-    Vector2 position = frVec2Add(b->tx.position,frVec2ScalarMultiply(b->motion.velocity, dt));
-    
-    float rotation = b->tx.rotation + (b->motion.angular_velocity * dt);
-    
-    frSetBodyPosition(b, position);
-    frSetBodyRotation(b, rotation);
+    frSetBodyPosition(b, frVec2Add(b->tx.position, frVec2ScalarMultiply(b->motion.velocity, dt)));
+    frSetBodyRotation(b, b->tx.rotation + (b->motion.angular_velocity * dt));
 }
 
 /* 단위 시간 `dt` 이후의 강체 `b`의 속도와 각속도를 계산한다. */

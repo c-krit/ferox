@@ -23,8 +23,6 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
-
 #define SCREEN_WIDTH_IN_METERS (SCREEN_WIDTH / FR_GLOBAL_PIXELS_PER_METER)
 #define SCREEN_HEIGHT_IN_METERS (SCREEN_HEIGHT / FR_GLOBAL_PIXELS_PER_METER)
 
@@ -62,7 +60,13 @@ int main(void) {
         
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) frSetBodyPosition(triangle, FR_VECTOR_P2M(GetMousePosition()));
         
-        frSetBodyRotation(triangle, frVec2Angle((Vector2) { 0, -1 }, frVec2Subtract(GetMousePosition(), SCREEN_CENTER)));
+        frSetBodyRotation(
+            triangle, 
+            frVec2Angle(
+                (Vector2) { 0, -1 }, 
+                frVec2Subtract(GetMousePosition(), FR_VECTOR_M2P(frGetBodyPosition(triangle)))
+            )
+        );
     
         frDrawBody(triangle, TRIANGLE_COLOR);
         frDrawBodyAABB(triangle, TRIANGLE_COLOR);
