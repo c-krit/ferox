@@ -190,7 +190,7 @@ static bool frCheckCollisionAABB(frShape *s1, frTransform tx1, frShape *s2, frTr
 static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
     if (frGetShapeType(s) != FR_SHAPE_POLYGON) return -1;
     
-    v = frVec2Normalize(v);
+    v = frVec2Normalize(frVec2Rotate(v, -tx.rotation));
     
     int result = 0;
     int vertex_count = -1;
@@ -200,7 +200,7 @@ static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
     float max_dot = -FLT_MAX;
     
     for (int i = 0; i < vertex_count; i++) {
-        float dot = frVec2DotProduct(frVec2Rotate(vertices[i], tx.rotation), v);
+        float dot = frVec2DotProduct(vertices[i], v);
         
         if (max_dot < dot) {
             max_dot = dot;
@@ -220,7 +220,10 @@ static frEdge frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v) {
     v = frVec2Normalize(v);
     
     if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
-        result.points[0] = result.points[1] = frVec2Transform(frVec2ScalarMultiply(v, frGetCircleRadius(s)), tx);
+        result.points[0] = result.points[1] = frVec2Transform(
+            frVec2ScalarMultiply(v, frGetCircleRadius(s)), 
+            tx
+        );
         
         result.count = 1;
         
@@ -276,7 +279,7 @@ static int frGetSeparatingAxisIndex(
     
     Vector2 *s1_normals = frGetPolygonNormals(s1, &s1_normal_count);
     
-    int normal_index = -1;
+    int result = -1;
     float max_distance = -FLT_MAX;
     
     for (int i = 0; i < s1_normal_count; i++) {
@@ -290,13 +293,13 @@ static int frGetSeparatingAxisIndex(
         
         if (max_distance < distance) {
             max_distance = distance;
-            normal_index = i;
+            result = i;
         }
     }
     
     *distance = max_distance;
     
-    return normal_index;
+    return result;
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 `s2`로의 충돌을 계산한다. */

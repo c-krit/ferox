@@ -95,7 +95,7 @@ bool frRemoveFromWorld(frWorld *world, frBody *body) {
         return false;
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
-        if (frGetArrayValue(world->bodies, i) == body) {
+        if (world->bodies[i] == body) {
             frRemoveFromArray(world->bodies, i);
             return true;
         }
@@ -171,15 +171,15 @@ void frSimulateWorld(frWorld *world, double dt) {
 /* 세계 `world`를 단위 시간 `dt`만큼 업데이트한다. */
 static void frUpdateWorld(frWorld *world, double dt) {
     if (world == NULL || world->tree == NULL || world->bodies == NULL) return;
-    
+
     for (int i = 0; i < frGetArrayLength(world->bodies); i++)
-        frAddToQuadtree(world->tree, i, frGetBodyAABB(frGetArrayValue(world->bodies, i)));
+        frAddToQuadtree(world->tree, i, frGetBodyAABB(world->bodies[i]));
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {   
         frQueryQuadtree(
             world->tree, 
-            frGetBodyAABB(frGetArrayValue(world->bodies, i)), 
-            world->tree_query
+            frGetBodyAABB(world->bodies[i]), 
+            &world->tree_query
         );
         
         if (frGetArrayLength(world->tree_query) <= 0) continue;
@@ -189,8 +189,8 @@ static void frUpdateWorld(frWorld *world, double dt) {
             
             if (j <= i) continue;
             
-            frBody *b1 = frGetArrayValue(world->bodies, i);
-            frBody *b2 = frGetArrayValue(world->bodies, j);
+            frBody *b1 = world->bodies[i];
+            frBody *b2 = world->bodies[j];
             
             if (b1 == NULL || b2 == NULL) continue;
             
@@ -215,8 +215,8 @@ static void frUpdateWorld(frWorld *world, double dt) {
     }
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
-        frApplyGravity(frGetArrayValue(world->bodies, i), world->gravity);
-        frIntegrateForBodyVelocities(frGetArrayValue(world->bodies, i), dt);
+        frApplyGravity(world->bodies[i], world->gravity);
+        frIntegrateForBodyVelocities(world->bodies[i], dt);
     }
     
     for (int i = 0; i < FR_WORLD_MAX_ITERATIONS; i++) {
@@ -231,7 +231,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
     }
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++)
-        frIntegrateForBodyPosition(frGetArrayValue(world->bodies, i), dt);
+        frIntegrateForBodyPosition(world->bodies[i], dt);
     
     for (int i = 0; i < frGetArrayLength(world->collisions); i++) {
         frBody *b1 = world->collisions[i].bodies[0];
@@ -241,9 +241,9 @@ static void frUpdateWorld(frWorld *world, double dt) {
         
         frCorrectBodyPositions(b1, b2, world->collisions[i]);
     }
-    
+
     for (int i = 0; i < frGetArrayLength(world->bodies); i++)
-        frClearBodyForces(frGetArrayValue(world->bodies, i));
+        frClearBodyForces(world->bodies[i]);
     
     frClearArray(world->collisions);
     frClearQuadtree(world->tree);

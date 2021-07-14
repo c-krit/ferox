@@ -399,7 +399,7 @@ int frGetQuadtreeDepth(frQuadtree *tree);
 int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds);
 
 /* 쿼드 트리 `tree`에서 `bounds`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *result);
+void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int **result);
 
 /* 쿼드 트리 `tree`를 4등분하고, `tree`에 저장된 모든 값을 자식 노드로 분배한다. */
 void frSplitQuadtree(frQuadtree *tree);
@@ -431,9 +431,6 @@ double frGetTimeSince(double old_time);
 
 /* 동적 배열 `a`의 크기를 반환한다. */
 #define frGetArrayLength(a) arrlen(a)
-
-/* 동적 배열 `a`에서 인덱스가 `i`인 원소를 반환한다. */
-#define frGetArrayValue(a, i) ((a)[i])
 
 /* 동적 배열 `a`에 값 `v`를 추가한다. */
 #define frAddToArray(a, v) arrput(a, v)

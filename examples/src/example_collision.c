@@ -52,7 +52,7 @@ int main(void) {
     
     frBody *platform = frCreateBodyFromShape(
         FR_BODY_STATIC, 
-        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.38f, SCREEN_HEIGHT_IN_METERS * 0.75f },
+        (Vector2) { SCREEN_WIDTH_IN_METERS * 0.38f, SCREEN_HEIGHT_IN_METERS * 0.65f },
         platform_polygon
     );
     

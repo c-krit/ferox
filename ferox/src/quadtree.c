@@ -35,6 +35,7 @@ typedef struct frQuadtree {
     int depth;
     Rectangle bounds;
     frQuadtreeValue *values;
+    frQuadtreeValue *temp_values;
     struct frQuadtree *children[4];
 } frQuadtree;
 
@@ -48,6 +49,7 @@ frQuadtree *frCreateQuadtree(int depth, Rectangle bounds) {
     result->bounds = bounds;
     
     frCreateArray(result->values, FR_QUADTREE_MAX_LEAF_COUNT);
+    frCreateArray(result->temp_values, FR_QUADTREE_MAX_LEAF_COUNT);
     
     return result;
 }
@@ -57,7 +59,9 @@ void frReleaseQuadtree(frQuadtree *tree) {
     if (tree == NULL) return;
     
     frClearQuadtree(tree);
+    
     frReleaseArray(tree->values);
+    frReleaseArray(tree->temp_values);
     
     free(tree);
 }
@@ -90,7 +94,8 @@ void frClearQuadtree(frQuadtree *tree) {
     
     frClearArray(tree->values);
     
-    if (tree->depth > 0) frReleaseArray(tree->values);
+    if (tree->depth > 0) 
+        frReleaseArray(tree->values);
     
     if (!frIsQuadtreeLeaf(tree)) {
         for (int i = 0; i < 4; i++) {
@@ -126,8 +131,8 @@ int frGetQuadtreeDepth(frQuadtree *tree) {
 int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds) {
     int result = -1;
     
-    int sub_width = tree->bounds.width / 2.0f;
-    int sub_height = tree->bounds.height / 2.0f;
+    int sub_width = tree->bounds.width / 2;
+    int sub_height = tree->bounds.height / 2;
     
     Vector2 origin = (Vector2) { 
         tree->bounds.x + sub_width, 
@@ -146,12 +151,12 @@ int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds) {
 }
 
 /* 쿼드 트리 `tree`에서 `bounds`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *result) {
+void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int **result) {
     if (tree == NULL || tree->values == NULL || result == NULL) return;
     
     for (int i = 0; i < frGetArrayLength(tree->values); i++)
         if (CheckCollisionRecs(bounds, tree->values[i].aabb))
-            frAddToArray(result, tree->values[i].index);
+            frAddToArray(*result, tree->values[i].index);
     
     if (frIsQuadtreeLeaf(tree)) return;
         
@@ -164,8 +169,8 @@ void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int *result) {
 void frSplitQuadtree(frQuadtree *tree) {
     if (tree == NULL || !frIsQuadtreeLeaf(tree)) return;
     
-    int sub_width = tree->bounds.width / 2.0f;
-    int sub_height = tree->bounds.height / 2.0f;
+    int sub_width = tree->bounds.width / 2;
+    int sub_height = tree->bounds.height / 2;
     
     tree->children[0] = frCreateQuadtree(
         tree->depth + 1, 
@@ -207,19 +212,17 @@ void frSplitQuadtree(frQuadtree *tree) {
         }
     );
     
-    frQuadtreeValue *new_values = NULL;
-    
-    frCreateArray(new_values, FR_QUADTREE_MAX_LEAF_COUNT);
-    
     for (int i = 0; i < frGetArrayLength(tree->values); i++) {
         int child_index = frGetQuadtreeIndex(tree, tree->values[i].aabb);
         
         if (tree->children[child_index] == NULL) continue;
         
         if (child_index != -1) frAddToArray(tree->children[child_index]->values, tree->values[i]);
-        else frAddToArray(new_values, tree->values[i]);
+        else frAddToArray(tree->temp_values, tree->values[i]);
     }
     
-    frReleaseArray(tree->values);
-    tree->values = new_values;
+    for (int i = 0; i < frGetArrayLength(tree->temp_values); i++)
+        tree->values[i] = tree->temp_values[i];
+    
+    frClearArray(tree->temp_values);
 }
