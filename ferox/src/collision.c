@@ -175,6 +175,7 @@ frShape *frSutherlandHodgman(frShape *s1, frShape *s2) {
     // 다각형 `s1`에서 `s2`의 각 변의 바깥쪽에 위치한 모든 부분을 삭제한다.
     for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
         if (result == NULL) break;
+        
         result = frClipPolygon(result, (frEdge) { vertices[j], vertices[i], 2 });
     }
     
@@ -234,12 +235,8 @@ static frEdge frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v) {
         
         Vector2 *vertices = frGetPolygonVertices(s, &vertex_count);
 
-        int prev_index = (furthest_index == 0)
-            ? vertex_count - 1
-            : furthest_index - 1;
-        int next_index = (furthest_index == vertex_count - 1)
-            ? 0
-            : furthest_index + 1;
+        int prev_index = (furthest_index == 0) ? vertex_count - 1 : furthest_index - 1;
+        int next_index = (furthest_index == vertex_count - 1) ? 0 : furthest_index + 1;
 
         Vector2 furthest_vertex = frVec2Transform(vertices[furthest_index], tx);
 
@@ -272,10 +269,10 @@ static int frGetSeparatingAxisIndex(
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON 
         || distance == NULL) return -1;
     
-    int s1_vertex_count = -1, s2_vertex_count = -1, s1_normal_count = -1;
+    Vector2 *s1_vertices = frGetPolygonVertices(s1, NULL);
+    Vector2 *s2_vertices = frGetPolygonVertices(s2, NULL);
     
-    Vector2 *s1_vertices = frGetPolygonVertices(s1, &s1_vertex_count);
-    Vector2 *s2_vertices = frGetPolygonVertices(s2, &s2_vertex_count);
+    int s1_normal_count = -1;
     
     Vector2 *s1_normals = frGetPolygonNormals(s1, &s1_normal_count);
     
@@ -337,10 +334,10 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         polygon_tx = tx1;
     }
     
-    int vertex_count = -1, normal_count = -1;
+    int vertex_count = -1;
     
     Vector2 *vertices = frGetPolygonVertices(polygon, &vertex_count);
-    Vector2 *normals = frGetPolygonNormals(polygon, &normal_count);
+    Vector2 *normals = frGetPolygonNormals(polygon, NULL);
     
     int normal_index = -1;
     float max_distance = -FLT_MAX;
@@ -406,11 +403,9 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     
     int index2 = frGetSeparatingAxisIndex(s2, tx2, s1, tx1, &distance2);
     if (distance2 >= 0.0f) return FR_STRUCT_ZERO(frCollision);
-    
-    int s1_normal_count = -1, s2_normal_count = -1;
-    
-    Vector2 *s1_normals = frGetPolygonNormals(s1, &s1_normal_count);
-    Vector2 *s2_normals = frGetPolygonNormals(s2, &s2_normal_count);
+
+    Vector2 *s1_normals = frGetPolygonNormals(s1, NULL);
+    Vector2 *s2_normals = frGetPolygonNormals(s2, NULL);
     
     direction = (distance1 > distance2) 
         ? frVec2Rotate(s1_normals[index1], tx1.rotation) 
@@ -536,16 +531,16 @@ static frShape *frClipPolygon(frShape *s, frEdge e) {
     frShape *result = frCreateShape();
     frSetShapeType(result, FR_SHAPE_POLYGON);
     
-    int vertex_count = -1, new_vertex_count = -1;
+    int vertex_count = -1, new_vertex_count = 0;
     
     Vector2 *vertices = frGetPolygonVertices(s, &vertex_count);
     Vector2 new_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT];
     
     for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
-        frEdge clipped_e = frClipEdge((frEdge) { vertices[j], vertices[i], 2 }, e);
+        frEdge new_e = frClipEdge((frEdge) { vertices[j], vertices[i], 2 }, e);
         
-        for (int k = 0; k < clipped_e.count; k++)
-            new_vertices[new_vertex_count++] = clipped_e.points[i];
+        for (int k = 0; k < new_e.count; k++)
+            new_vertices[new_vertex_count++] = new_e.points[i];
     }
     
     frSetPolygonVertices(result, new_vertices, new_vertex_count);

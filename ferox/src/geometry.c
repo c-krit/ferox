@@ -146,19 +146,17 @@ float frGetCircleRadius(frShape *s) {
 
 /* 다각형 `s`의 꼭짓점 배열의 메모리 주소를 반환한다. */
 Vector2 *frGetPolygonVertices(frShape *s, int *vertex_count) {
-    if (s == NULL || vertex_count == NULL) return NULL;
+    if (s == NULL) return NULL;
     
-    *vertex_count = s->polygon.vertices.count;
-    
+    if (vertex_count != NULL) *vertex_count = s->polygon.vertices.count;
     return s->polygon.vertices.data;
 }
 
 /* 다각형 `s`의 각 변과 수직인 모든 변이 저장된 배열의 메모리 주소를 반환한다. */
 Vector2 *frGetPolygonNormals(frShape *s, int *normal_count) {
-    if (s == NULL || normal_count == NULL) return NULL;
+    if (s == NULL) return NULL;
     
-    *normal_count = s->polygon.normals.count;
-    
+    if (normal_count != NULL) *normal_count = s->polygon.normals.count;
     return s->polygon.normals.data;
 }
 

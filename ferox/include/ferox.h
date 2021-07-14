@@ -66,10 +66,10 @@
 #define _FR_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define _FR_MAX(x, y) (((x) > (y)) ? (x) : (y))
 
+#define FR_STRUCT_ZERO(T) ((T) { 0 })
+
 #define FR_NUMBER_P2M(v) ((float) (v) / FR_GLOBAL_PIXELS_PER_METER)
 #define FR_NUMBER_M2P(v) ((float) (v) * FR_GLOBAL_PIXELS_PER_METER)
-
-#define FR_STRUCT_ZERO(T) ((T) { 0 })
 
 #define FR_VECTOR_P2M(v) frVec2PixelsToMeters(v)
 #define FR_VECTOR_M2P(v) frVec2MetersToPixels(v)

@@ -134,10 +134,7 @@ int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds) {
     int sub_width = tree->bounds.width / 2;
     int sub_height = tree->bounds.height / 2;
     
-    Vector2 origin = (Vector2) { 
-        tree->bounds.x + sub_width, 
-        tree->bounds.y + sub_height 
-    };
+    Vector2 origin = (Vector2) { tree->bounds.x + sub_width, tree->bounds.y + sub_height };
     
     if (bounds.x + bounds.width < origin.x) {
         if (bounds.y + bounds.height < origin.y) result = 1;

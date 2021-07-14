@@ -111,9 +111,12 @@ float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v) {
 
 /* 영점을 기준으로 벡터 `v`를 `angle` (rad.)만큼 회전시킨 벡터를 반환한다. */
 Vector2 frVec2Rotate(Vector2 v, float angle) {
+    float sin_angle = sinf(angle);
+    float cos_angle = cosf(angle);
+    
     return (Vector2) {
-        (v.x * cosf(angle) - v.y * sinf(angle)),
-        (v.x * sinf(angle) + v.y * cosf(angle))
+        (v.x * cos_angle - v.y * sin_angle),
+        (v.x * sin_angle + v.y * cos_angle)
     };
 }
 
