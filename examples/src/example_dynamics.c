@@ -150,9 +150,9 @@ int main(void) {
         frDrawBody(ball, BALL_COLOR);
         frDrawBodyAABB(ball, GREEN);
         
-        // frDrawBodyProperties(block1, WHITE);
-        // frDrawBodyProperties(block2, WHITE);
-        // frDrawBodyProperties(block3, WHITE);
+        frDrawBodyProperties(block1, WHITE);
+        frDrawBodyProperties(block2, WHITE);
+        frDrawBodyProperties(block3, WHITE);
         
         frDrawBodyProperties(ball, WHITE);
         

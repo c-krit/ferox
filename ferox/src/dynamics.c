@@ -357,6 +357,11 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
     if (b1 == NULL || b2 == NULL || !collision.check) return;
     
+    float epsilon = _FR_MAX(0.0f, _FR_MIN(b1->material.restitution, b2->material.restitution));
+    
+    float static_coefficient = b1->material.static_friction * b2->material.static_friction;
+    float dynamic_coefficient = b1->material.dynamic_friction * b2->material.dynamic_friction;
+    
     for (int i = 0; i < collision.count; i++) {
         Vector2 r1 = frVec2Subtract(collision.points[i], frGetBodyPosition(b1));
         Vector2 r2 = frVec2Subtract(collision.points[i], frGetBodyPosition(b2));
@@ -383,8 +388,6 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
         
         float r1_normal_dot = frVec2DotProduct(r1_normal, collision.direction);
         float r2_normal_dot = frVec2DotProduct(r2_normal, collision.direction);
-        
-        float epsilon = _FR_MAX(0.0f, _FR_MIN(b1->material.restitution, b2->material.restitution));
         
         float inverse_mass_sum = (b1->motion.inverse_mass + b2->motion.inverse_mass)
             + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
@@ -424,9 +427,6 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
         
         float friction_magnitude = -frVec2DotProduct(relative_velocity, tangent)
             / (collision.count * inverse_mass_sum);
-        
-        float static_coefficient = b1->material.static_friction * b2->material.static_friction;
-        float dynamic_coefficient = b1->material.dynamic_friction * b2->material.dynamic_friction;
         
         Vector2 frictional_impulse = (fabs(friction_magnitude) < impulse_magnitude * static_coefficient)
             ? frVec2ScalarMultiply(tangent, friction_magnitude)

@@ -191,7 +191,7 @@ static bool frCheckCollisionAABB(frShape *s1, frTransform tx1, frShape *s2, frTr
 static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
     if (frGetShapeType(s) != FR_SHAPE_POLYGON) return -1;
     
-    v = frVec2Normalize(frVec2Rotate(v, -tx.rotation));
+    v = frVec2Rotate(v, -tx.rotation);
     
     int result = 0;
     int vertex_count = -1;
@@ -217,8 +217,6 @@ static frEdge frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v) {
     frEdge result = FR_STRUCT_ZERO(frEdge);
     
     if (s == NULL || frGetShapeType(s) == FR_SHAPE_UNKNOWN) return result;
-    
-    v = frVec2Normalize(v);
     
     if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
         result.points[0] = result.points[1] = frVec2Transform(

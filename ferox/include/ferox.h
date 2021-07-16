@@ -93,7 +93,7 @@
 #define FR_QUADTREE_MAX_LEAF_COUNT 8
 #define FR_QUADTREE_MAX_DEPTH 8
 
-#define FR_WORLD_ACCUMULATOR_LIMIT 150
+#define FR_WORLD_ACCUMULATOR_LIMIT 200
 #define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_OBJECT_COUNT 1024
 #define FR_WORLD_MAX_ITERATIONS 8
@@ -499,9 +499,6 @@ float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v);
 
 /* 영점을 기준으로 벡터 `v2`를 `angle` (rad.)만큼 회전시킨 벡터를 반환한다. */
 Vector2 frVec2Rotate(Vector2 v, float angle);
-
-/* 벡터 `v1`을 기준으로 벡터 `v2`를 `angle` (rad.)만큼 회전시킨 벡터를 반환한다. */
-Vector2 frVec2Rotate2(Vector2 v1, Vector2 v2, float angle);
 
 /* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */
 Vector2 frVec2Transform(Vector2 v, frTransform tx);

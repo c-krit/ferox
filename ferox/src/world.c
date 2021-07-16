@@ -219,6 +219,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frIntegrateForBodyVelocities(world->bodies[i], dt);
     }
     
+    // 순차적으로 충격량을 반복 적용하여, 두 강체 사이의 충돌을 해결한다.
     for (int i = 0; i < FR_WORLD_MAX_ITERATIONS; i++) {
         for (int j = 0; j < frGetArrayLength(world->collisions); j++) {
             frBody *b1 = world->collisions[j].bodies[0];
