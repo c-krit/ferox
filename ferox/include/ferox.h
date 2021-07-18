@@ -63,10 +63,10 @@
 
 /* | 매크로 함수... | */
 
-#define _FR_MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define _FR_MAX(x, y) (((x) > (y)) ? (x) : (y))
-
 #define FR_STRUCT_ZERO(T) ((T) { 0 })
+
+#define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 #define FR_NUMBER_P2M(v) ((float) (v) / FR_GLOBAL_PIXELS_PER_METER)
 #define FR_NUMBER_M2P(v) ((float) (v) * FR_GLOBAL_PIXELS_PER_METER)
@@ -107,6 +107,13 @@ typedef enum frBodyType {
     FR_BODY_KINEMATIC,
     FR_BODY_DYNAMIC
 } frBodyType;
+
+/* 강체의 상태를 나타내는 구조체. */
+typedef enum frBodyState {
+    FR_STATE_UNKNOWN = -1,
+    FR_STATE_AWAKE,
+    FR_STATE_SLEEPING
+} frBodyState;
 
 /* 도형의 종류를 나타내는 구조체. */
 typedef enum frShapeType {
@@ -214,6 +221,9 @@ void frDetachShapeFromBody(frBody *b);
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b);
 
+/* 강체 `b`의 상태를 반환한다. */
+frBodyType frGetBodyState(frBody *b);
+
 /* 강체 `b`의 질량을 반환한다. */
 float frGetBodyMass(frBody *b);
 
@@ -256,8 +266,14 @@ Vector2 frGetLocalPoint(frBody *b, Vector2 p);
 /* 강체 `b`를 기준으로 한 좌표 `p`를 세계 기준 좌표로 변환한다. */
 Vector2 frGetWorldPoint(frBody *b, Vector2 p);
 
-/* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
-void frSetBodyGravityScale(frBody *b, float gravity_scale);
+/* 강체 `b`의 상태를 반환한다. */
+frBodyType frGetBodyState(frBody *b);
+
+/* 강체 `b`의 종류를 `type`으로 설정한다. */
+void frSetBodyType(frBody *b, frBodyType type);
+
+/* 강체 `b`의 상태를 `state`으로 설정한다. */
+void frSetBodyState(frBody *b, frBodyState state);
 
 /* 강체 `b`의 위치를 `p`로 설정한다. */
 void frSetBodyPosition(frBody *b, Vector2 p);
@@ -268,14 +284,14 @@ void frSetBodyRotation(frBody *b, float rotation);
 /* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
 void frSetBodyTransform(frBody *b, frTransform tx);
 
-/* 강체 `b`의 종류를 `type`으로 설정한다. */
-void frSetBodyType(frBody *b, frBodyType type);
-
 /* 강체 `b`의 속도를 `v`로 설정한다. */
 void frSetBodyVelocity(frBody *b, Vector2 v);
 
 /* 강체 `b`의 각속도를 `a`로 설정한다. */
 void frSetBodyAngularVelocity(frBody *b, double a);
+
+/* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
+void frSetBodyGravityScale(frBody *b, float gravity_scale);
 
 /* 강체 `b`에 작용하는 모든 힘을 제거한다. */
 void frClearBodyForces(frBody *b);

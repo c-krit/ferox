@@ -24,13 +24,6 @@
 
 /* | `dynamics` 모듈 구조체... | */
 
-/* 강체의 상태를 나타내는 구조체. */
-typedef enum frBodyState {
-    FR_STATE_UNKNOWN = -1,
-    FR_STATE_AWAKE,
-    FR_STATE_SLEEPING
-} frBodyState;
-
 /* 강체의 물리량을 나타내는 구조체. */
 typedef struct frMotionData {
     float mass;
@@ -47,12 +40,13 @@ typedef struct frMotionData {
 /* 강체를 나타내는 구조체. */
 typedef struct frBody {
     frBodyType type;
-    // frBodyState state;
+    frBodyState state;
     frMaterial material;
     frMotionData motion;
     frTransform tx;
     frShape *shape;
     Rectangle aabb;
+    int counter;
 } frBody;
 
 /* | `dynamics` 모듈 함수... | */
@@ -69,6 +63,7 @@ frBody *frCreateBody(frBodyType type, Vector2 p) {
     result->material = FR_DYNAMICS_DEFAULT_MATERIAL;
     
     frSetBodyType(result, type);
+    frSetBodyState(result, FR_STATE_AWAKE);
     frSetBodyGravityScale(result, 1.0f);
     frSetBodyPosition(result, p);
     
@@ -117,6 +112,11 @@ void frDetachShapeFromBody(frBody *b) {
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b) {
     return (b != NULL) ? b->type : FR_BODY_UNKNOWN;
+}
+
+/* 강체 `b`의 상태를 반환한다. */
+frBodyType frGetBodyState(frBody *b) {
+    return (b != NULL) ? b->state : FR_STATE_UNKNOWN;
 }
 
 /* 강체 `b`의 질량을 반환한다. */
@@ -189,11 +189,30 @@ Vector2 frGetWorldPoint(frBody *b, Vector2 p) {
     return frVec2Transform(p, b->tx);
 }
 
-/* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
-void frSetBodyGravityScale(frBody *b, float gravity_scale) {
-    if (b == NULL || b->type == FR_BODY_STATIC || b->type == FR_BODY_KINEMATIC) return;
+/* 강체 `b`의 종류를 `type`으로 설정한다. */
+void frSetBodyType(frBody *b, frBodyType type) {
+    if (b == NULL || b->type == FR_BODY_UNKNOWN || b->type == type) 
+        return;
     
-    b->motion.gravity_scale = gravity_scale;
+    b->type = type;
+    
+    frResetBodyMass(b);
+}
+
+/* 강체 `b`의 상태를 `state`으로 설정한다. */
+void frSetBodyState(frBody *b, frBodyState state) {
+    if (b == NULL || b->state == FR_STATE_UNKNOWN || b->state == state) 
+        return;
+    
+    if (state == FR_STATE_SLEEPING) {
+        b->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        b->motion.angular_velocity = 0.0f;
+        
+        frClearBodyForces(b);
+    }
+    
+    b->state = state;
+    b->counter = 0;
 }
 
 /* 강체 `b`의 위치를 `p`로 설정한다. */
@@ -222,16 +241,6 @@ void frSetBodyTransform(frBody *b, frTransform tx) {
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
 
-/* 강체 `b`의 종류를 `type`으로 설정한다. */
-void frSetBodyType(frBody *b, frBodyType type) {
-    if (b == NULL || b->type == FR_BODY_UNKNOWN || b->type == type) 
-        return;
-    
-    b->type = type;
-    
-    frResetBodyMass(b);
-}
-
 /* 강체 `b`의 속도를 `v`로 설정한다. */
 void frSetBodyVelocity(frBody *b, Vector2 v) {
     if (b == NULL || b->motion.inverse_mass > 0.0f) return;
@@ -244,6 +253,13 @@ void frSetBodyAngularVelocity(frBody *b, double a) {
     if (b == NULL || b->motion.inverse_mass > 0.0f) return;
     
     b->motion.angular_velocity = a;
+}
+
+/* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
+void frSetBodyGravityScale(frBody *b, float gravity_scale) {
+    if (b == NULL || b->type == FR_BODY_STATIC || b->type == FR_BODY_KINEMATIC) return;
+    
+    b->motion.gravity_scale = gravity_scale;
 }
 
 /* 강체 `b`에 중력 가속도 `gravity`를 적용한다. */
@@ -303,13 +319,13 @@ void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
         return;
     }
     
-    float max_depth = _FR_MAX(collision.depths[0], collision.depths[1]);
+    float max_depth = FR_NUMBER_MAX(collision.depths[0], collision.depths[1]);
     
     // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
     Vector2 correction = frVec2ScalarMultiply(
         collision.direction,
         FR_DYNAMICS_CORRECTION_DEPTH_SCALE * (
-            _FR_MAX(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
+            FR_NUMBER_MAX(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
             / (b1->motion.inverse_mass + b2->motion.inverse_mass)
         )
     );
@@ -357,7 +373,7 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
     if (b1 == NULL || b2 == NULL || !collision.check) return;
     
-    float epsilon = _FR_MAX(0.0f, _FR_MIN(b1->material.restitution, b2->material.restitution));
+    float epsilon = FR_NUMBER_MAX(0.0f, FR_NUMBER_MIN(b1->material.restitution, b2->material.restitution));
     
     float static_coefficient = b1->material.static_friction * b2->material.static_friction;
     float dynamic_coefficient = b1->material.dynamic_friction * b2->material.dynamic_friction;

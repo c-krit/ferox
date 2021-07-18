@@ -30,7 +30,7 @@ typedef struct frWorld {
     frQuadtree *tree;
     frBody **bodies;
     frCollision *collisions;
-    int *tree_query;
+    int *queries;
     double last_time;
 } frWorld;
 
@@ -49,7 +49,7 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     
     frCreateArray(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
     frCreateArray(result->collisions, FR_WORLD_MAX_OBJECT_COUNT);
-    frCreateArray(result->tree_query, FR_WORLD_MAX_OBJECT_COUNT);
+    frCreateArray(result->queries, FR_WORLD_MAX_OBJECT_COUNT);
     
     return result;
 }
@@ -64,7 +64,7 @@ void frReleaseWorld(frWorld *world) {
     
     frReleaseArray(world->bodies);
     frReleaseArray(world->collisions);
-    frReleaseArray(world->tree_query);
+    frReleaseArray(world->queries);
     
     free(world);
 }
@@ -179,13 +179,13 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frQueryQuadtree(
             world->tree, 
             frGetBodyAABB(world->bodies[i]), 
-            &world->tree_query
+            &world->queries
         );
         
-        if (frGetArrayLength(world->tree_query) <= 0) continue;
+        if (frGetArrayLength(world->queries) <= 0) continue;
         
-        for (int k = 0; k < frGetArrayLength(world->tree_query); k++) {
-            int j = world->tree_query[k];
+        for (int k = 0; k < frGetArrayLength(world->queries); k++) {
+            int j = world->queries[k];
             
             if (j <= i) continue;
             
@@ -202,7 +202,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
             );
             
             // 두 강체의 질량의 역수의 합이 0이면 충돌 처리 과정에서 제외한다.
-            if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f) 
+            if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
                 continue;
             
             collision.bodies[0] = b1;
@@ -211,7 +211,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
             frAddToArray(world->collisions, collision);
         }
         
-        frClearArray(world->tree_query);
+        frClearArray(world->queries);
     }
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {

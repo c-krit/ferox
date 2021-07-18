@@ -409,7 +409,7 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
         ? frVec2Rotate(s1_normals[index1], tx1.rotation) 
         : frVec2Rotate(s2_normals[index2], tx2.rotation);
         
-    depth = _FR_MAX(distance1, distance2);
+    depth = FR_NUMBER_MAX(distance1, distance2);
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
         direction = frVec2Negate(direction);
