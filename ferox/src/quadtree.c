@@ -35,7 +35,6 @@ typedef struct frQuadtree {
     int depth;
     Rectangle bounds;
     frQuadtreeValue *values;
-    frQuadtreeValue *temp_values;
     struct frQuadtree *children[4];
 } frQuadtree;
 
@@ -49,7 +48,6 @@ frQuadtree *frCreateQuadtree(int depth, Rectangle bounds) {
     result->bounds = bounds;
     
     frCreateArray(result->values, FR_QUADTREE_MAX_LEAF_COUNT);
-    frCreateArray(result->temp_values, FR_QUADTREE_MAX_LEAF_COUNT);
     
     return result;
 }
@@ -61,7 +59,6 @@ void frReleaseQuadtree(frQuadtree *tree) {
     frClearQuadtree(tree);
     
     frReleaseArray(tree->values);
-    frReleaseArray(tree->temp_values);
     
     free(tree);
 }
@@ -209,17 +206,18 @@ void frSplitQuadtree(frQuadtree *tree) {
         }
     );
     
+    frQuadtreeValue *new_values = NULL;
+    frCreateArray(new_values, FR_QUADTREE_MAX_LEAF_COUNT);
+    
     for (int i = 0; i < frGetArrayLength(tree->values); i++) {
         int child_index = frGetQuadtreeIndex(tree, tree->values[i].aabb);
         
         if (tree->children[child_index] == NULL) continue;
         
         if (child_index != -1) frAddToArray(tree->children[child_index]->values, tree->values[i]);
-        else frAddToArray(tree->temp_values, tree->values[i]);
+        else frAddToArray(new_values, tree->values[i]);
     }
     
-    for (int i = 0; i < frGetArrayLength(tree->temp_values); i++)
-        tree->values[i] = tree->temp_values[i];
-    
-    frClearArray(tree->temp_values);
+    frReleaseArray(tree->values);
+    tree->values = new_values;
 }

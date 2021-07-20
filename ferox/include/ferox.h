@@ -76,9 +76,7 @@
 
 /* | 매크로 값... | */
 
-#ifndef FR_GLOBAL_PIXELS_PER_METER
-    #define FR_GLOBAL_PIXELS_PER_METER 16.0f
-#endif
+#define FR_GLOBAL_PIXELS_PER_METER 16.0f
 
 #ifdef HAVE_RAYLIB
     #define FR_DEBUG_BACKGROUND_COLOR (GetColor(0x111111FF))
@@ -93,8 +91,8 @@
 #define FR_QUADTREE_MAX_LEAF_COUNT 8
 #define FR_QUADTREE_MAX_DEPTH 8
 
-#define FR_WORLD_ACCUMULATOR_LIMIT 200
-#define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { .y = 9.8f })
+#define FR_WORLD_ACCUMULATOR_LIMIT 100.0f
+#define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { 0.0f, 9.8f })
 #define FR_WORLD_MAX_OBJECT_COUNT 1024
 #define FR_WORLD_MAX_ITERATIONS 8
 
@@ -437,25 +435,25 @@ double frGetTimeSince(double old_time);
 /* | `utils` 모듈 함수... | */
 
 /* 배열의 크기가 `n`인 동적 배열을 생성한다. */
-#define frCreateArray(a, n) arrsetcap(a, n)
+#define frCreateArray(a, n) arrsetcap((a), (n))
 
 /* 동적 배열 `a`에 할당된 메모리를 해제한다. */
-#define frReleaseArray(a) arrfree(a)
+#define frReleaseArray(a) arrfree((a))
 
 /* 동적 배열 `a`에 저장할 수 있는 최대 원소 개수를 반환한다. */
-#define frGetArrayCapacity(a) arrcap(a)
+#define frGetArrayCapacity(a) arrcap((a))
 
 /* 동적 배열 `a`의 크기를 반환한다. */
-#define frGetArrayLength(a) arrlen(a)
+#define frGetArrayLength(a) arrlen((a))
 
 /* 동적 배열 `a`에 값 `v`를 추가한다. */
-#define frAddToArray(a, v) arrput(a, v)
+#define frAddToArray(a, v) arrput((a), (v))
 
 /* 동적 배열 `a`의 모든 원소를 제거한다. */
-#define frClearArray(a) arrdeln(a, 0, arrlen(a))
+#define frClearArray(a) arrdeln((a), 0, arrlen((a)))
 
-/* 동적 배열 `a`에서 인덱스가 `i`인 원소를 제거한다. */
-#define frRemoveFromArray(a, i) arrdel(a, i)
+/* 동적 배열 `a`에서 인덱스가 `i`인 원소에서부터 `n`개의 원소를 제거한다. */
+#define frRemoveFromArray(a, i, n) arrdeln((a), (i), (n))
 
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frApproxEquals(float f1, float f2);

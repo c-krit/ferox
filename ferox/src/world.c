@@ -96,7 +96,7 @@ bool frRemoveFromWorld(frWorld *world, frBody *body) {
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
         if (world->bodies[i] == body) {
-            frRemoveFromArray(world->bodies, i);
+            frRemoveFromArray(world->bodies, i, 1);
             return true;
         }
     }
@@ -182,8 +182,6 @@ static void frUpdateWorld(frWorld *world, double dt) {
             &world->queries
         );
         
-        if (frGetArrayLength(world->queries) <= 0) continue;
-        
         for (int k = 0; k < frGetArrayLength(world->queries); k++) {
             int j = world->queries[k];
             
@@ -192,7 +190,9 @@ static void frUpdateWorld(frWorld *world, double dt) {
             frBody *b1 = world->bodies[i];
             frBody *b2 = world->bodies[j];
             
-            if (b1 == NULL || b2 == NULL) continue;
+            // 두 강체의 질량의 역수의 합이 0이면 충돌 처리 과정에서 제외한다.
+            if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
+                continue;
             
             frCollision collision = frComputeCollision(
                 frGetBodyShape(b1),
@@ -201,14 +201,12 @@ static void frUpdateWorld(frWorld *world, double dt) {
                 frGetBodyTransform(b2)
             );
             
-            // 두 강체의 질량의 역수의 합이 0이면 충돌 처리 과정에서 제외한다.
-            if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
-                continue;
-            
-            collision.bodies[0] = b1;
-            collision.bodies[1] = b2;
-            
-            frAddToArray(world->collisions, collision);
+            if (collision.check) {
+                collision.bodies[0] = b1;
+                collision.bodies[1] = b2;
+                
+                frAddToArray(world->collisions, collision);
+            }
         }
         
         frClearArray(world->queries);
@@ -225,8 +223,6 @@ static void frUpdateWorld(frWorld *world, double dt) {
             frBody *b1 = world->collisions[j].bodies[0];
             frBody *b2 = world->collisions[j].bodies[1];
             
-            if (b1 == NULL || b2 == NULL) continue;
-            
             frResolveCollision(b1, b2, world->collisions[j]);
         }
     }
@@ -237,8 +233,6 @@ static void frUpdateWorld(frWorld *world, double dt) {
     for (int i = 0; i < frGetArrayLength(world->collisions); i++) {
         frBody *b1 = world->collisions[i].bodies[0];
         frBody *b2 = world->collisions[i].bodies[1];
-            
-        if (b1 == NULL || b2 == NULL) continue;
         
         frCorrectBodyPositions(b1, b2, world->collisions[i]);
     }

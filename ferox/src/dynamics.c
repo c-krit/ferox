@@ -40,13 +40,11 @@ typedef struct frMotionData {
 /* 강체를 나타내는 구조체. */
 typedef struct frBody {
     frBodyType type;
-    frBodyState state;
     frMaterial material;
     frMotionData motion;
     frTransform tx;
     frShape *shape;
     Rectangle aabb;
-    int counter;
 } frBody;
 
 /* | `dynamics` 모듈 함수... | */
@@ -63,7 +61,6 @@ frBody *frCreateBody(frBodyType type, Vector2 p) {
     result->material = FR_DYNAMICS_DEFAULT_MATERIAL;
     
     frSetBodyType(result, type);
-    frSetBodyState(result, FR_STATE_AWAKE);
     frSetBodyGravityScale(result, 1.0f);
     frSetBodyPosition(result, p);
     
@@ -112,11 +109,6 @@ void frDetachShapeFromBody(frBody *b) {
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b) {
     return (b != NULL) ? b->type : FR_BODY_UNKNOWN;
-}
-
-/* 강체 `b`의 상태를 반환한다. */
-frBodyType frGetBodyState(frBody *b) {
-    return (b != NULL) ? b->state : FR_STATE_UNKNOWN;
 }
 
 /* 강체 `b`의 질량을 반환한다. */
@@ -197,22 +189,6 @@ void frSetBodyType(frBody *b, frBodyType type) {
     b->type = type;
     
     frResetBodyMass(b);
-}
-
-/* 강체 `b`의 상태를 `state`으로 설정한다. */
-void frSetBodyState(frBody *b, frBodyState state) {
-    if (b == NULL || b->state == FR_STATE_UNKNOWN || b->state == state) 
-        return;
-    
-    if (state == FR_STATE_SLEEPING) {
-        b->motion.velocity = FR_STRUCT_ZERO(Vector2);
-        b->motion.angular_velocity = 0.0f;
-        
-        frClearBodyForces(b);
-    }
-    
-    b->state = state;
-    b->counter = 0;
 }
 
 /* 강체 `b`의 위치를 `p`로 설정한다. */
