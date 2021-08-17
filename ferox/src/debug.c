@@ -97,7 +97,7 @@
         
         DrawTextEx(
             GetFontDefault(),
-            FormatText(
+            TextFormat(
                 "m: %fkg, I: %fkg*m²\n"
                 "(x, y) [theta]: (%f, %f) [%f rad.]\n"
                 "v [omega]: (%f, %f) [%f rad.]\n",

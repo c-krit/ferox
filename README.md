@@ -10,17 +10,14 @@ A simple 2D rigid body physics engine written in C.
 
 ## Prerequisites
 
-Make sure you have installed [raylib](https://github.com/raysan5/raylib) with [CMake](https://cmake.org/) to compile all examples.
+Make sure you have installed [raylib](https://github.com/raysan5/raylib) to compile all examples.
 
 ## Building
 
-This project uses [CMake](https://cmake.org/) as the build system.
+This project uses [GNU Make](https://www.gnu.org/software/make) as the build system.
 
 ```console
-mkdir build && cd build
-cmake ..
 make
-make install
 ```
 
 ## Examples

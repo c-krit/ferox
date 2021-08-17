@@ -83,7 +83,7 @@ int main(void) {
         
         DrawTextEx(
             GetFontDefault(),
-            FormatText(
+            TextFormat(
                 "collision.check: %s\n"
                 "collision.direction: (%f, %f)\n"
                 "collision.points: (%f, %f), (%f, %f)\n"
