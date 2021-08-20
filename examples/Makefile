@@ -22,9 +22,9 @@
 
 .PHONY: all clean
 
-PROJECT_NAME := "c-krit/ferox"
+PROJECT_NAME := c-krit/ferox
 PROJECT_PATH := ../ferox
-PROJECT_PREFIX := "$(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)"
+PROJECT_PREFIX := $(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)
 
 RAYLIB_PATH := ../../raylib
 
@@ -47,7 +47,7 @@ HOST_OS := LINUX
 TARGET_OS := $(HOST_OS)
 
 ifeq ($(OS),Windows_NT)
-	PROJECT_PREFIX := "$(PROJECT_NAME):"
+	PROJECT_PREFIX := $(PROJECT_NAME):
 	HOST_OS := WINDOWS
 else
 	UNAME = $(shell uname)
@@ -72,7 +72,7 @@ endif
 all: pre-build build post-build
 
 pre-build:
-	@echo "$(PROJECT_PREFIX) Using: '$(CC)' and '$(AR)' to build examples."
+	@echo "$(PROJECT_PREFIX) Using: '$(CC)' to build examples."
     
 build: $(RESULTS)
 

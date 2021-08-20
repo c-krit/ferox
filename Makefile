@@ -25,9 +25,9 @@
 BUILD := DEFAULT
 BUILD_TEXT := "$(shell echo $(BUILD) | tr '[:upper:]' '[:lower:]')"
 
-PROJECT_NAME := "c-krit/ferox"
+PROJECT_NAME := c-krit/ferox
 PROJECT_PATH := ferox
-PROJECT_PREFIX := "$(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)"
+PROJECT_PREFIX := $(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)
 
 RAYLIB_PATH := ../raylib
 
@@ -38,10 +38,10 @@ SOURCE_PATH := $(PROJECT_PATH)/src
 INCLUDE_PATH += $(SOURCE_PATH)/external
 
 SOURCES := \
+	$(SOURCE_PATH)/broadphase.c \
 	$(SOURCE_PATH)/collision.c \
 	$(SOURCE_PATH)/dynamics.c \
 	$(SOURCE_PATH)/geometry.c \
-	$(SOURCE_PATH)/quadtree.c \
 	$(SOURCE_PATH)/timer.c \
 	$(SOURCE_PATH)/utils.c \
 	$(SOURCE_PATH)/vector.c \
@@ -60,7 +60,7 @@ HOST_OS := LINUX
 TARGET_OS := $(HOST_OS)
 
 ifeq ($(OS),Windows_NT)
-	PROJECT_PREFIX := "$(PROJECT_NAME):"
+	PROJECT_PREFIX := $(PROJECT_NAME):
 	HOST_OS := WINDOWS
 else
 	UNAME = $(shell uname)

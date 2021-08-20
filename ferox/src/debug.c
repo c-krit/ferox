@@ -25,9 +25,6 @@
 /* | `debug` 모듈 함수... | */
 
 #ifdef HAVE_RAYLIB
-    /* 게임 화면에 쿼드 트리 `tree`의 경계 범위를 그린다. */
-    static void frDrawQuadtreeBounds(frQuadtree *tree);
-
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
     static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result);
 
@@ -112,37 +109,30 @@
         );
     }
 
-    /* 게임 화면에 쿼드 트리 `tree`를 그린다. */
-    void frDrawQuadtree(frQuadtree *tree) {
-        if (frGetQuadtreeDepth(tree) == 0 && frIsQuadtreeLeaf(tree)) {
-            frDrawQuadtreeBounds(tree);
-        } else {
-            if (!frIsQuadtreeLeaf(tree)) {
-                frDrawQuadtreeBounds(tree);
-
-                for (int i = 0; i < 4; i++)
-                    frDrawQuadtree(frGetQuadtreeChild(tree, i));
-            }
-        }
+    /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
+    void frDrawSpatialHash(frSpatialHash *hm) {
+        Rectangle bounds = frGetSpatialHashBounds(hm);
+        
+        for (int i = 0; i < (bounds.width / FR_BROADPHASE_CELL_SIZE); i++)
+            DrawLineEx(
+                FR_VECTOR_M2P(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0 })),
+                FR_VECTOR_M2P(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height })),
+                0.25f,
+                GRAY
+            );
+    
+        for (int i = 0; i < (bounds.height / FR_BROADPHASE_CELL_SIZE); i++)
+            DrawLineEx(
+                FR_VECTOR_M2P(((Vector2) { 0, FR_BROADPHASE_CELL_SIZE * i })), 
+                FR_VECTOR_M2P(((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i })),
+                0.25f,
+                GRAY
+            );
     }
     
     /* 무작위 색상을 반환한다. */
     Color frGetRandomColor(void) {
         return ColorFromHSV(GetRandomValue(0, 360), 1, 1);
-    }
-
-    /* 게임 화면에 쿼드 트리 `tree`의 경계 범위를 그린다. */
-    static void frDrawQuadtreeBounds(frQuadtree *tree) {
-        Rectangle bounds = frGetQuadtreeBounds(tree);
-        
-        Vector2 h1 = (Vector2) { bounds.x, (2 * bounds.y + bounds.height) / 2 };
-        Vector2 h2 = (Vector2) { bounds.x + bounds.width, (2 * bounds.y + bounds.height) / 2 };
-        
-        Vector2 v1 = (Vector2) { (2 * bounds.x + bounds.width) / 2, bounds.y };
-        Vector2 v2 = (Vector2) { (2 * bounds.x + bounds.width) / 2, bounds.y + bounds.height };
-
-        DrawLineEx(FR_VECTOR_M2P(h1), FR_VECTOR_M2P(h2), 0.25f, GRAY);
-        DrawLineEx(FR_VECTOR_M2P(v1), FR_VECTOR_M2P(v2), 0.25f, GRAY);
     }
 
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
