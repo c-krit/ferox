@@ -72,9 +72,9 @@ int main(void) {
         frDrawBodyAABB(triangle, TRIANGLE_COLOR);
         frDrawBodyProperties(triangle, GRAY);
         
-        frDrawQuadtree(frGetWorldQuadtree(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world));
         
-        frSimulateWorld(world, 1.0f / 60.0f);
+        frSimulateWorld(world, (1.0f / 60.0f) * 100);
         
         DrawFPS(8, 8);
 

@@ -78,23 +78,22 @@
 
 #define FR_GLOBAL_PIXELS_PER_METER 16.0f
 
+#define FR_BROADPHASE_CELL_SIZE 32
+
 #ifdef HAVE_RAYLIB
     #define FR_DEBUG_BACKGROUND_COLOR (GetColor(0x111111FF))
 #endif
 
-#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE 0.24f
-#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.06f
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE 0.25f
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.05f
 #define FR_DYNAMICS_DEFAULT_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
-#define FR_GEOMETRY_MAX_VERTEX_COUNT 10
+#define FR_GEOMETRY_MAX_VERTEX_COUNT 8
 
-#define FR_QUADTREE_MAX_LEAF_COUNT 8
-#define FR_QUADTREE_MAX_DEPTH 8
-
-#define FR_WORLD_ACCUMULATOR_LIMIT 100.0f
+#define FR_WORLD_ACCUMULATOR_LIMIT 200.0
 #define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { 0.0f, 9.8f })
-#define FR_WORLD_MAX_OBJECT_COUNT 1024
-#define FR_WORLD_MAX_ITERATIONS 8
+#define FR_WORLD_MAX_OBJECT_COUNT 128
+#define FR_WORLD_MAX_ITERATIONS 16
 
 /* | 전역 구조체... | */
 
@@ -160,11 +159,37 @@ typedef struct frRaycastHit {
     bool inside;
 } frRaycastHit;
 
-/* 쿼드 트리를 나타내는 구조체. */
-typedef struct frQuadtree frQuadtree;
+/* 공간 해시맵을 나타내는 구조체. */
+typedef struct frSpatialHash frSpatialHash;
 
 /* 물리 법칙이 존재하는 세계를 나타내는 구조체. */
 typedef struct frWorld frWorld;
+
+/* | `broadphase` 모듈 함수... | */
+
+/* 경계 범위가 `bounds`이고 각 셀의 크기가 `cell_size`인 공간 해시맵의 메모리 주소를 반환한다. */
+frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cell_size);
+
+/* 공간 해시맵 `hash`에 할당된 메모리를 해제한다. */
+void frReleaseSpatialHash(frSpatialHash *hash);
+
+/* 공간 해시맵 `hash`에 직사각형 `rect`로 생성한 키와 `value`를 추가한다. */
+void frAddToSpatialHash(frSpatialHash *hash, Rectangle rect, int value);
+
+/* 공간 해시맵 `hash`의 모든 키와 값을 제거한다. */
+void frClearSpatialHash(frSpatialHash *hash);
+
+/* 공간 해시맵 `hash`의 경계 범위를 반환한다. */
+Rectangle frGetSpatialHashBounds(frSpatialHash *hash);
+
+/* 공간 해시맵 `hash`에서 키가 `key`인 값을 제거한다. */
+void frRemoveFromSpatialHash(frSpatialHash *hash, int key);
+
+/* 공간 해시맵 `hash`에서 직사각형 `rect`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
+void frQuerySpatialHash(frSpatialHash *hash, Rectangle rect, int **result);
+
+/* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */
+int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
 
 /* | `collision` 모듈 함수... | */
 
@@ -192,8 +217,8 @@ frShape *frSutherlandHodgman(frShape *s1, frShape *s2);
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
     void frDrawBodyProperties(frBody *b, Color color);
 
-    /* 게임 화면에 쿼드 트리 `tree`를 그린다. */
-    void frDrawQuadtree(frQuadtree *tree);
+    /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
+    void frDrawSpatialHash(frSpatialHash *hm);
 
     /* 무작위 색상을 반환한다. */
     Color frGetRandomColor(void);
@@ -383,41 +408,6 @@ void frSetShapeType(frShape *s, frShapeType type);
 /* 점 `p`가 도형 `s`의 내부에 있는지 확인한다. */
 bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p);
 
-/* | `quadtree` 모듈 함수... | */
-
-/* 경계 범위가 `bounds`인 쿼드 트리 구조체의 메모리 주소를 반환한다. */
-frQuadtree *frCreateQuadtree(int depth, Rectangle bounds);
-
-/* 쿼드 트리 `tree`에 할당된 메모리를 해제한다. */
-void frReleaseQuadtree(frQuadtree *tree);
-
-/* 쿼드 트리 `tree`에 새로운 값을 추가한다. */
-void frAddToQuadtree(frQuadtree *tree, int index, Rectangle aabb);
-
-/* 쿼드 트리 `tree`의 모든 노드를 제거한다. */
-void frClearQuadtree(frQuadtree *tree);
-
-/* 쿼드 트리 `tree`가 잎 노드인지 확인한다. */
-bool frIsQuadtreeLeaf(frQuadtree *tree);
-
-/* 쿼드 트리 `tree`의 경계 범위를 반환한다. */
-Rectangle frGetQuadtreeBounds(frQuadtree *tree);
-
-/* 쿼드 트리 `tree`에서 인덱스가 `index`인 자식 노드의 메모리 주소를 반환한다. */
-frQuadtree *frGetQuadtreeChild(frQuadtree *tree, int index);
-
-/* 쿼드 트리 `tree`의 깊이를 반환한다. */
-int frGetQuadtreeDepth(frQuadtree *tree);
-
-/* 쿼드 트리 `tree`에서 경계 범위 `bounds`가 포함된 자식 노드의 인덱스를 반환한다. */
-int frGetQuadtreeIndex(frQuadtree *tree, Rectangle bounds);
-
-/* 쿼드 트리 `tree`에서 `bounds`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQueryQuadtree(frQuadtree *tree, Rectangle bounds, int **result);
-
-/* 쿼드 트리 `tree`를 4등분하고, `tree`에 저장된 모든 값을 자식 노드로 분배한다. */
-void frSplitQuadtree(frQuadtree *tree);
-
 /* | `timer` 모듈 함수... | */
 
 /* 단조 시계를 초기화한다. */
@@ -511,7 +501,7 @@ float frVec2DistanceSqr(Vector2 v1, Vector2 v2);
 /* 평면 위의 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
 float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v);
 
-/* 영점을 기준으로 벡터 `v2`를 `angle` (rad.)만큼 회전시킨 벡터를 반환한다. */
+/* 영점을 기준으로 벡터 `v2`를 `angle` (단위: rad.)만큼 회전시킨 벡터를 반환한다. */
 Vector2 frVec2Rotate(Vector2 v, float angle);
 
 /* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */
@@ -552,8 +542,8 @@ int frGetWorldBodyCount(frWorld *world);
 /* 세계 `world`의 경계 범위를 반환한다. */
 Rectangle frGetWorldBounds(frWorld *world);
 
-/* 세계 `world`의 쿼드 트리를 반환한다. */
-frQuadtree *frGetWorldQuadtree(frWorld *world);
+/* 세계 `world`의 공간 해시맵을 반환한다. */
+frSpatialHash *frGetWorldSpatialHash(frWorld *world);
 
 /* 세계 `world`의 중력 가속도를 반환한다. */
 Vector2 frGetWorldGravity(frWorld *world);
@@ -564,7 +554,7 @@ void frReleaseWorldBodies(frWorld *world);
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity);
 
-/* 세계 `scene`의 시간을 `dt`만큼 흐르게 한다. */
+/* 세계 `scene`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt);
 
 #endif

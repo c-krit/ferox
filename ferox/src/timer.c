@@ -22,6 +22,11 @@
 
 #include "ferox.h"
 
+#if defined(_WIN32)
+    #define NOGDI
+    #define NOUSER
+#endif
+
 #define SOKOL_TIME_IMPL
 #include "sokol_time.h"
 

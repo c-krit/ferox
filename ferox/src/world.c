@@ -27,7 +27,7 @@
 /* 물리 법칙이 존재하는 세계를 나타내는 구조체. */
 typedef struct frWorld {
     Vector2 gravity;
-    frQuadtree *tree;
+    frSpatialHash *hash;
     frBody **bodies;
     frCollision *collisions;
     int *queries;
@@ -36,7 +36,7 @@ typedef struct frWorld {
 
 /* | `world` 모듈 함수... | */
 
-/* 세계 `world`를 단위 시간 `dt`만큼 업데이트한다. */
+/* 세계 `world`를 시간 `dt` (단위: ms)만큼 업데이트한다. */
 static void frUpdateWorld(frWorld *world, double dt);
 
 /* 중력 가속도가 `gravity`이고 경계 범위가 `bounds`인 세계를 생성한다. */ 
@@ -44,7 +44,7 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     frWorld *result = calloc(1, sizeof(frWorld));
     
     result->gravity = gravity;
-    result->tree = frCreateQuadtree(0, bounds);
+    result->hash = frCreateSpatialHash(bounds, FR_BROADPHASE_CELL_SIZE);
     result->last_time = frGetCurrentTime();
     
     frCreateArray(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
@@ -60,7 +60,7 @@ void frReleaseWorld(frWorld *world) {
     
     frClearWorld(world);
     
-    frReleaseQuadtree(world->tree);
+    frReleaseSpatialHash(world->hash);
     
     frReleaseArray(world->bodies);
     frReleaseArray(world->collisions);
@@ -83,7 +83,7 @@ bool frAddToWorld(frWorld *world, frBody *body) {
 void frClearWorld(frWorld *world) {
     if (world == NULL) return;
     
-    frClearQuadtree(world->tree);
+    frClearSpatialHash(world->hash);
     
     frClearArray(world->bodies);
     frClearArray(world->collisions);
@@ -119,13 +119,13 @@ int frGetWorldBodyCount(frWorld *world) {
 /* 세계 `world`의 경계 범위를 반환한다. */
 Rectangle frGetWorldBounds(frWorld *world) {
     return (world != NULL) 
-        ? frGetQuadtreeBounds(world->tree) 
+        ? frGetSpatialHashBounds(world->hash) 
         : FR_STRUCT_ZERO(Rectangle);
 }
 
-/* 세계 `world`의 쿼드 트리를 반환한다. */
-frQuadtree *frGetWorldQuadtree(frWorld *world) {
-    return (world != NULL) ? world->tree : NULL;
+/* 세계 `world`의 공간 해시맵을 반환한다. */
+frSpatialHash *frGetWorldSpatialHash(frWorld *world){
+    return (world != NULL) ? world->hash : NULL;
 }
 
 /* 세계 `world`의 중력 가속도를 반환한다. */
@@ -150,7 +150,7 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity) {
     if (world != NULL) world->gravity = gravity;
 }
 
-/* 세계 `scene`의 시간을 `dt`만큼 흐르게 한다. */
+/* 세계 `scene`의 시간을 `dt` (단위: ms)만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt) {
     if (world == NULL) return;
     
@@ -168,16 +168,19 @@ void frSimulateWorld(frWorld *world, double dt) {
     world->last_time = current_time;
 }
 
-/* 세계 `world`를 단위 시간 `dt`만큼 업데이트한다. */
+/* 세계 `world`를 시간 `dt` (단위: ms)만큼 업데이트한다. */
 static void frUpdateWorld(frWorld *world, double dt) {
-    if (world == NULL || world->tree == NULL || world->bodies == NULL) return;
+    if (world == NULL || world->hash == NULL || world->bodies == NULL) return;
+	
+	double current_time = frGetCurrentTime();
+	double start_time = current_time;
 
     for (int i = 0; i < frGetArrayLength(world->bodies); i++)
-        frAddToQuadtree(world->tree, i, frGetBodyAABB(world->bodies[i]));
+        frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
     
     for (int i = 0; i < frGetArrayLength(world->bodies); i++) {   
-        frQueryQuadtree(
-            world->tree, 
+        frQuerySpatialHash(
+            world->hash, 
             frGetBodyAABB(world->bodies[i]), 
             &world->queries
         );
@@ -241,5 +244,5 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frClearBodyForces(world->bodies[i]);
     
     frClearArray(world->collisions);
-    frClearQuadtree(world->tree);
+    frClearSpatialHash(world->hash);
 }
