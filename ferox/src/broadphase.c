@@ -152,5 +152,7 @@ int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v) {
 
 /* C 표준 라이브러리의 `qsort()` 함수 호출에 사용되는 비교 함수이다. */
 static int frQuickSortCallback(const void *x, const void *y) {
-    return (*(const int *) x - *(const int *) y);
+    int nx = *(const int *) x, ny = *(const int *) y;
+    
+    return (nx > ny) - (nx < ny);
 }

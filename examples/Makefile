@@ -36,6 +36,7 @@ SOURCE_PATH := src
 INCLUDE_PATH += $(PROJECT_PATH)/src/external
 
 EXAMPLES := \
+	example_broadphase \
 	example_collision \
 	example_dynamics \
 	example_geometry
