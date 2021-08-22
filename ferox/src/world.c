@@ -21,6 +21,7 @@
 */
 
 #include "ferox.h"
+#include "stb_ds.h"
 
 /* | `world` 모듈 구조체... | */
 
@@ -47,9 +48,9 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     result->hash = frCreateSpatialHash(bounds, FR_BROADPHASE_CELL_SIZE);
     result->last_time = frGetCurrentTime();
     
-    frCreateArray(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
-    frCreateArray(result->collisions, FR_WORLD_MAX_OBJECT_COUNT);
-    frCreateArray(result->queries, FR_WORLD_MAX_OBJECT_COUNT);
+    arrsetcap(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
+    arrsetcap(result->collisions, FR_WORLD_MAX_OBJECT_COUNT);
+    arrsetcap(result->queries, FR_WORLD_MAX_OBJECT_COUNT);
     
     return result;
 }
@@ -62,19 +63,19 @@ void frReleaseWorld(frWorld *world) {
     
     frReleaseSpatialHash(world->hash);
     
-    frReleaseArray(world->bodies);
-    frReleaseArray(world->collisions);
-    frReleaseArray(world->queries);
+    arrfree(world->bodies);
+    arrfree(world->collisions);
+    arrfree(world->queries);
     
     free(world);
 }
 
 /* 세계 `world`에 강체 `body`를 추가한다. */
 bool frAddToWorld(frWorld *world, frBody *body) {
-    if (world == NULL || frGetArrayLength(world->bodies) >= FR_WORLD_MAX_OBJECT_COUNT) 
+    if (world == NULL || arrlen(world->bodies) >= FR_WORLD_MAX_OBJECT_COUNT) 
         return false;
     
-    frAddToArray(world->bodies, body);
+    arrput(world->bodies, body);
     
     return true;
 }
@@ -85,8 +86,8 @@ void frClearWorld(frWorld *world) {
     
     frClearSpatialHash(world->hash);
     
-    frClearArray(world->bodies);
-    frClearArray(world->collisions);
+    arrdeln(world->bodies, 0, arrlen(world->bodies));
+    arrdeln(world->collisions, 0, arrlen(world->collisions));
 }
 
 /* 세계 `world`에서 강체 `body`를 제거한다. */
@@ -94,9 +95,9 @@ bool frRemoveFromWorld(frWorld *world, frBody *body) {
     if (world == NULL || body == NULL) 
         return false;
     
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
+    for (int i = 0; i < arrlen(world->bodies); i++) {
         if (world->bodies[i] == body) {
-            frRemoveFromArray(world->bodies, i, 1);
+            arrdeln(world->bodies, i, 1);
             return true;
         }
     }
@@ -106,14 +107,14 @@ bool frRemoveFromWorld(frWorld *world, frBody *body) {
 
 /* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
 frBody *frGetWorldBody(frWorld *world, int index) {
-    return (world != NULL && index >= 0 && index < frGetArrayLength(world->bodies)) 
+    return (world != NULL && index >= 0 && index < arrlen(world->bodies)) 
         ? world->bodies[index]
         : NULL;
 }
 
 /* 세계 `world`의 강체 배열의 크기를 반환한다. */
 int frGetWorldBodyCount(frWorld *world) {
-    return (world != NULL) ? frGetArrayLength(world->bodies) : 0;
+    return (world != NULL) ? arrlen(world->bodies) : 0;
 }
 
 /* 세계 `world`의 경계 범위를 반환한다. */
@@ -137,7 +138,7 @@ Vector2 frGetWorldGravity(frWorld *world) {
 void frReleaseWorldBodies(frWorld *world) {
     if (world == NULL || world->bodies == NULL) return;
     
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
+    for (int i = 0; i < arrlen(world->bodies); i++) {
         frReleaseShape(frGetBodyShape(world->bodies[i]));
         frReleaseBody(world->bodies[i]);
     }
@@ -175,17 +176,17 @@ static void frUpdateWorld(frWorld *world, double dt) {
 	double current_time = frGetCurrentTime();
 	double start_time = current_time;
 
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++)
+    for (int i = 0; i < arrlen(world->bodies); i++)
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
     
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++) {   
+    for (int i = 0; i < arrlen(world->bodies); i++) {   
         frQuerySpatialHash(
             world->hash, 
             frGetBodyAABB(world->bodies[i]), 
             &world->queries
         );
         
-        for (int k = 0; k < frGetArrayLength(world->queries); k++) {
+        for (int k = 0; k < arrlen(world->queries); k++) {
             int j = world->queries[k];
             
             if (j <= i) continue;
@@ -208,21 +209,21 @@ static void frUpdateWorld(frWorld *world, double dt) {
                 collision.bodies[0] = b1;
                 collision.bodies[1] = b2;
                 
-                frAddToArray(world->collisions, collision);
+                arrput(world->collisions, collision);
             }
         }
         
-        frClearArray(world->queries);
+        arrdeln(world->queries, 0, arrlen(world->queries));
     }
     
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++) {
+    for (int i = 0; i < arrlen(world->bodies); i++) {
         frApplyGravity(world->bodies[i], world->gravity);
         frIntegrateForBodyVelocities(world->bodies[i], dt);
     }
     
     // 순차적으로 충격량을 반복 적용하여, 두 강체 사이의 충돌을 해결한다.
     for (int i = 0; i < FR_WORLD_MAX_ITERATIONS; i++) {
-        for (int j = 0; j < frGetArrayLength(world->collisions); j++) {
+        for (int j = 0; j < arrlen(world->collisions); j++) {
             frBody *b1 = world->collisions[j].bodies[0];
             frBody *b2 = world->collisions[j].bodies[1];
             
@@ -230,19 +231,20 @@ static void frUpdateWorld(frWorld *world, double dt) {
         }
     }
     
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++)
+    for (int i = 0; i < arrlen(world->bodies); i++)
         frIntegrateForBodyPosition(world->bodies[i], dt);
     
-    for (int i = 0; i < frGetArrayLength(world->collisions); i++) {
+    for (int i = 0; i < arrlen(world->collisions); i++) {
         frBody *b1 = world->collisions[i].bodies[0];
         frBody *b2 = world->collisions[i].bodies[1];
         
         frCorrectBodyPositions(b1, b2, world->collisions[i]);
     }
 
-    for (int i = 0; i < frGetArrayLength(world->bodies); i++)
+    for (int i = 0; i < arrlen(world->bodies); i++)
         frClearBodyForces(world->bodies[i]);
     
-    frClearArray(world->collisions);
+    arrdeln(world->collisions, 0, arrlen(world->collisions));
+    
     frClearSpatialHash(world->hash);
 }

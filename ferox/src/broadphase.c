@@ -21,6 +21,7 @@
 */
 
 #include "ferox.h"
+#include "stb_ds.h"
 
 /* | `broadphase` 모듈 구조체... | */
 
@@ -61,7 +62,7 @@ void frReleaseSpatialHash(frSpatialHash *hash) {
     if (hash == NULL) return; 
     
     for (int i = 0; i < hmlen(hash->map); i++)
-        frReleaseArray(hash->map[i].values);
+        arrfree(hash->map[i].values);
     
     hmfree(hash->map);
     free(hash);
@@ -82,10 +83,10 @@ void frAddToSpatialHash(frSpatialHash *hash, Rectangle rect, int value) {
             frSpatialHashEntry *entry = hmgetp_null(hash->map, x + y);
             
             if (entry != NULL) {
-                frAddToArray(entry->values, value);
+                arrput(entry->values, value);
             } else {
                 frSpatialHashEntry entry = (frSpatialHashEntry) { x + y, NULL };
-                frAddToArray(entry.values, value);
+                arrput(entry.values, value);
 
                 hmputs(hash->map, entry);
             }
@@ -98,7 +99,7 @@ void frClearSpatialHash(frSpatialHash *hash) {
     if (hash == NULL) return;
     
     for (int i = 0; i < hmlen(hash->map); i++)
-        frClearArray(hash->map[i].values);
+        arrdeln(hash->map[i].values, 0, arrlen(hash->map[i].values));
 }
 
 /* 공간 해시맵 `hash`의 경계 범위를 반환한다. */
@@ -111,7 +112,7 @@ void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
     if (hash == NULL) return;
     
     frSpatialHashEntry entry = hmgets(hash->map, key);
-    frReleaseArray(entry.values);
+    arrfree(entry.values);
     
     hmdel(hash->map, key);
 }
@@ -131,8 +132,8 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rect, int **result) {
             frSpatialHashEntry *entry = hmgetp_null(hash->map, x + y);
 
             if (entry != NULL) 
-                for (int j = 0; j < frGetArrayLength(entry->values); j++)
-                    frAddToArray(*result, entry->values[j]);
+                for (int j = 0; j < arrlen(entry->values); j++)
+                    arrput(*result, entry->values[j]);
         }
     }
     

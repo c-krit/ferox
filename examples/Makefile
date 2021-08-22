@@ -26,14 +26,12 @@ PROJECT_NAME := c-krit/ferox
 PROJECT_PATH := ../ferox
 PROJECT_PREFIX := $(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)
 
-RAYLIB_PATH := ../../raylib
+RAYLIB_PATH ?= ../../raylib
 
 BINARY_PATH := bin
 INCLUDE_PATH := $(PROJECT_PATH)/include
 LIBRARY_PATH := $(PROJECT_PATH)/lib
 SOURCE_PATH := src
-
-INCLUDE_PATH += $(PROJECT_PATH)/src/external
 
 EXAMPLES := \
 	example_broadphase \
