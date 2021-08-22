@@ -33,8 +33,6 @@ INCLUDE_PATH := $(PROJECT_PATH)/include
 LIBRARY_PATH := $(PROJECT_PATH)/lib
 SOURCE_PATH := src
 
-INCLUDE_PATH += $(PROJECT_PATH)/src/external
-
 EXAMPLES := \
 	example_broadphase \
 	example_collision \
