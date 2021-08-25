@@ -100,25 +100,16 @@ frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, 
     if (frGetShapeType(s) == FR_SHAPE_UNKNOWN) {
         return result;
     } else if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
-        result.check = frComputeIntersectionRayCircle(p, v, tx.position, frGetCircleRadius(s), &distance);
+        bool intersects = frComputeIntersectionRayCircle(p, v, tx.position, frGetCircleRadius(s), &distance);
         
-        if (distance < 0.0f) {
-            result.check = false;
-            result.inside = true;
-        } else if (distance > max_distance) {
-            result.check = false;
-        }
-        
-        if (distance < 0.0f || distance > max_distance) {
-            result.check = false;
-            if (distance < 0.0f) result.inside = true;
-        }
+        result.check = (distance >= 0.0f) && (distance <= max_distance);
+        result.inside = (distance < 0.0f);
         
         if (result.check) {
             result.distance = distance;
             
-            result.normal = frVec2LeftNormal(frVec2Subtract(p, result.point));
             result.point = frVec2Add(p, frVec2ScalarMultiply(v, result.distance));
+            result.normal = frVec2LeftNormal(frVec2Subtract(p, result.point));
         }
         
         return result;
@@ -141,22 +132,16 @@ frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, 
                 if (result.distance > distance) {
                     result.distance = distance;
                     
-                    result.normal = frVec2LeftNormal(e_v);
                     result.point = frVec2Add(p, frVec2ScalarMultiply(v, result.distance));
+                    result.normal = frVec2LeftNormal(e_v);
                 }
                 
                 intersection_count++;
             }
         }
         
-        if (intersection_count <= 0) {
-            result.check = false;
-        } else {
-            if (intersection_count & 1) result.inside = true;
-            else result.check = true;
-        }
-        
-        if (result.inside) result.distance = 0.0f;
+        result.check = (intersection_count > 0);
+        result.inside = (intersection_count & 1);
         
         return result;
     }
@@ -167,10 +152,11 @@ frShape *frSutherlandHodgman(frShape *s1, frShape *s2) {
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON) 
         return s1;
     
-    frShape *result = s1;
-    
     int vertex_count = -1;
+    
     Vector2 *vertices = frGetPolygonVertices(s2, &vertex_count);
+    
+    frShape *result = s1;
     
     // 다각형 `s1`에서 `s2`의 각 변의 바깥쪽에 위치한 모든 부분을 삭제한다.
     for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
