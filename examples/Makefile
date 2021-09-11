@@ -40,7 +40,7 @@ EXAMPLES := \
 	example_geometry
     
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
-RESULTS := $(EXAMPLES:%=$(BINARY_PATH)/%)
+TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)
 
 HOST_OS := LINUX
 TARGET_OS := $(HOST_OS)
@@ -61,7 +61,7 @@ LDFLAGS := -L$(LIBRARY_PATH)
 LDLIBS := -lferox -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 ifeq ($(TARGET_OS),WINDOWS)
-	RESULTS := $(EXAMPLES:%=$(BINARY_PATH)/%.exe)
+	TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%.exe)
 	CC := x86_64-w64-mingw32-gcc
 	CFLAGS += -I$(RAYLIB_PATH)/src
 	LDFLAGS += -L$(RAYLIB_PATH)/src 
@@ -73,7 +73,7 @@ all: pre-build build post-build
 pre-build:
 	@echo "$(PROJECT_PREFIX) Using: '$(CC)' to build examples."
     
-build: $(RESULTS)
+build: $(TARGETS)
 
 $(BINARY_PATH)/%: $(SOURCE_PATH)/%.c
 	@mkdir -p $(BINARY_PATH)

@@ -48,12 +48,12 @@ SOURCES := \
 	$(SOURCE_PATH)/world.c
     
 OBJECTS := $(SOURCES:.c=.o)
-RESULT := $(LIBRARY_PATH)/lib$(PROJECT_PATH)-standalone.a
+TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH)-standalone.a
 
 ifeq ($(BUILD),DEFAULT)
 	SOURCES += $(SOURCE_PATH)/debug.c
     OBJECTS += $(SOURCE_PATH)/debug.o
-    RESULT := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
+    TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
 endif
 
 HOST_OS := LINUX
@@ -88,16 +88,16 @@ all: pre-build build post-build
 pre-build:
 	@echo "$(PROJECT_PREFIX) Using: '$(CC)' and '$(AR)' to build a $(BUILD_TEXT)-mode static library."
     
-build: $(RESULT)
+build: $(TARGETS)
 
 $(SOURCE_PATH)/%.o: $(SOURCE_PATH)/%.c
 	@echo "$(PROJECT_PREFIX) Compiling: $@ (from $<)"
 	@$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
     
-$(RESULT): $(OBJECTS)
+$(TARGETS): $(OBJECTS)
 	@mkdir -p $(LIBRARY_PATH)
-	@echo "$(PROJECT_PREFIX) Linking: $(RESULT)"
-	@$(AR) rcs $(RESULT) $(OBJECTS)
+	@echo "$(PROJECT_PREFIX) Linking: $(TARGETS)"
+	@$(AR) rcs $(TARGETS) $(OBJECTS)
 
 post-build:
 	@echo "$(PROJECT_PREFIX) Build complete."
