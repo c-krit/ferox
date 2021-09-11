@@ -71,7 +71,7 @@ endif
 all: pre-build build post-build
 
 pre-build:
-	@echo "$(PROJECT_PREFIX) Using: '$(CC)' to build examples."
+	@echo "$(PROJECT_PREFIX) Using: '$(CC)' to build all examples."
     
 build: $(TARGETS)
 
@@ -90,4 +90,4 @@ post-build:
 
 clean:
 	@echo "$(PROJECT_PREFIX) Cleaning up."
-	@find . -type d -name bin -exec rm -rf {} +
+	@rm -rf $(BINARY_PATH)/*

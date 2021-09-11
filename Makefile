@@ -92,7 +92,7 @@ build: $(TARGETS)
 
 $(SOURCE_PATH)/%.o: $(SOURCE_PATH)/%.c
 	@echo "$(PROJECT_PREFIX) Compiling: $@ (from $<)"
-	@$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
+	@$(CC) -c $< -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
     
 $(TARGETS): $(OBJECTS)
 	@mkdir -p $(LIBRARY_PATH)
