@@ -17,9 +17,17 @@ Make sure you have installed [raylib](https://github.com/raysan5/raylib) to comp
 This project uses [GNU Make](https://www.gnu.org/software/make) as the build system.
 
 ```console
-$ make                    # Build a default-mode static library
-$ make BUILD=STANDALONE   # Build a standalone-mode static library 
-$ make TARGET_OS=WINDOWS  # Build a static library (for Windows)
+$ git clone https://github.com/c-krit/ferox
+$ cd ferox
+$ make
+```
+
+### Cross-compiling for Windows
+
+Make sure to set the value of `RAYLIB_PATH` variable to cross-compile for Windows:
+
+```console
+$ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
 ```
 
 ## Examples
