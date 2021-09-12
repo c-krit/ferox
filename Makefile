@@ -52,8 +52,8 @@ TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH)-standalone.a
 
 ifeq ($(BUILD),DEFAULT)
 	SOURCES += $(SOURCE_PATH)/debug.c
-    OBJECTS += $(SOURCE_PATH)/debug.o
-    TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
+	OBJECTS += $(SOURCE_PATH)/debug.o
+	TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
 endif
 
 HOST_OS := LINUX
@@ -80,7 +80,7 @@ endif
 ifeq ($(TARGET_OS),WINDOWS)
 	CC := x86_64-w64-mingw32-gcc
 	AR := x86_64-w64-mingw32-ar
-    CFLAGS += -I$(RAYLIB_PATH)/src
+	CFLAGS += -I$(RAYLIB_PATH)/src
 endif
 
 all: pre-build build post-build

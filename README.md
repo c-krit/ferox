@@ -1,4 +1,4 @@
-# ferox
+# ![c-krit/ferox](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/readme.png)
 
 ![pre-release version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
 ![repo-size badge](https://img.shields.io/github/repo-size/c-krit/ferox)
@@ -32,7 +32,7 @@ $ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
 
 ## Examples
 
-![example_dynamics](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/example_dynamics.png)
+![example_dynamics](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/example.png)
 
 The source code for all examples can be found in the `examples` directory.
 
