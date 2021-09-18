@@ -32,7 +32,7 @@ $ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
 
 ## Examples
 
-![example_dynamics](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/example.png)
+![example](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/example.png)
 
 The source code for all examples can be found in the `examples` directory.
 

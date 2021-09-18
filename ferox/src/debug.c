@@ -24,7 +24,7 @@
 
 /* | `debug` 모듈 함수... | */
 
-#ifdef HAVE_RAYLIB
+#ifndef FEROX_STANDALONE
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
     static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result);
 

@@ -28,7 +28,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#ifdef HAVE_RAYLIB
+#ifndef FEROX_STANDALONE
     #include "raylib.h"
 #else
     #ifndef PI
@@ -78,7 +78,7 @@
 
 #define FR_BROADPHASE_CELL_SIZE 8
 
-#ifdef HAVE_RAYLIB
+#ifndef FEROX_STANDALONE
     #define FR_DEBUG_BACKGROUND_COLOR (GetColor(0x111111FF))
 #endif
 
@@ -202,7 +202,7 @@ frShape *frSutherlandHodgman(frShape *s1, frShape *s2);
 
 /* | `debug` 모듈 함수... | */
 
-#ifdef HAVE_RAYLIB
+#ifndef FEROX_STANDALONE
     /* 게임 화면에 강체 `b`의 도형을 그린다. */
     void frDrawBody(frBody *b, Color color);
 
