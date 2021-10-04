@@ -1,12 +1,20 @@
-# ![c-krit/ferox](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/readme.png)
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/readme.png" alt="c-krit/ferox"><br>
 
 ![pre-release version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
 ![repo-size badge](https://img.shields.io/github/repo-size/c-krit/ferox)
 ![license badge](https://img.shields.io/github/license/c-krit/ferox)
 
-A simple 2D rigid body physics engine written in C.
+A 2D collision detection and physics library written in C.
 
 **WARNING: This library is in an early alpha stage, use it at your own risk.**
+
+[Documentation](https://github.com/c-krit/ferox/wiki) &mdash;
+[Examples](https://github.com/c-krit/ferox/tree/main/examples) &mdash;
+[Prerequisites](#prerequisites)
+
+</div>
 
 ## Prerequisites
 
@@ -29,12 +37,6 @@ Make sure to set the value of `RAYLIB_PATH` variable to cross-compile for Window
 ```console
 $ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
 ```
-
-## Examples
-
-![example](https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/example.png)
-
-The source code for all examples can be found in the `examples` directory.
 
 ## References
 
