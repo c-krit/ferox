@@ -18,7 +18,17 @@ A 2D collision detection and physics library written in C.
 
 ## Prerequisites
 
-Make sure you have installed [raylib](https://github.com/raysan5/raylib) to compile all examples.
+- GCC version 9.4.0+
+- GNU Make version 4.1+
+- Git version 2.17.1+
+
+```console
+$ sudo apt install build-essential git
+```
+
+### Optional
+
+Make sure you have installed [raylib 3.7.0+](https://github.com/raysan5/raylib) to compile all examples.
 
 ## Building
 
@@ -28,6 +38,12 @@ This project uses [GNU Make](https://www.gnu.org/software/make) as the build sys
 $ git clone https://github.com/c-krit/ferox
 $ cd ferox
 $ make
+```
+
+You can also build this library as standalone-mode to avoid `raylib.h` header inclusion and functions that depend on raylib:
+
+```console
+$ make BUILD=STANDALONE
 ```
 
 ### Cross-compiling for Windows
