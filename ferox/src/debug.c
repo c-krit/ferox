@@ -35,7 +35,11 @@
         frShape *s = frGetBodyShape(b);
         
         if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
-            DrawCircleV(FR_VECTOR_M2P(frGetBodyPosition(b)), FR_NUMBER_M2P(frGetCircleRadius(s)), color);
+            DrawCircleV(
+                frVec2MetersToPixels(frGetBodyPosition(b)), 
+                frNumberMetersToPixels(frGetCircleRadius(s)), 
+                color
+            );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
             Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
             int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
@@ -52,7 +56,13 @@
         
         if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
             Vector2 p = frGetBodyPosition(b);
-            DrawCircleLines(FR_NUMBER_M2P(p.x), FR_NUMBER_M2P(p.y), FR_NUMBER_M2P(frGetCircleRadius(s)), color);
+            
+            DrawCircleLines(
+                frNumberMetersToPixels(p.x), 
+                frNumberMetersToPixels(p.y), 
+                frNumberMetersToPixels(frGetCircleRadius(s)), 
+                color
+            );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
             Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
             int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
@@ -70,16 +80,16 @@
         
         DrawRectangleLinesEx(
             (Rectangle) { 
-                FR_NUMBER_M2P(aabb.x), 
-                FR_NUMBER_M2P(aabb.y),
-                FR_NUMBER_M2P(aabb.width),
-                FR_NUMBER_M2P(aabb.height)
+                frNumberMetersToPixels(aabb.x), 
+                frNumberMetersToPixels(aabb.y),
+                frNumberMetersToPixels(aabb.width),
+                frNumberMetersToPixels(aabb.height)
             }, 
             1, 
             color
         );
         
-        DrawCircleV(FR_VECTOR_M2P(frGetBodyPosition(b)), 2, BLACK);
+        DrawCircleV(frVec2MetersToPixels(frGetBodyPosition(b)), 2, BLACK);
     }
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
@@ -102,7 +112,7 @@
                 tx.position.x, tx.position.y, tx.rotation,
                 velocity.x, velocity.y, angular_velocity
             ), 
-            FR_VECTOR_M2P(frVec2Add(tx.position, (Vector2) { 1, 1 })),
+            frVec2MetersToPixels(frVec2Add(tx.position, (Vector2) { 1, 1 })),
             10, 
             1, 
             color
@@ -115,16 +125,16 @@
         
         for (int i = 0; i < (bounds.width / FR_BROADPHASE_CELL_SIZE); i++)
             DrawLineEx(
-                FR_VECTOR_M2P(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0 })),
-                FR_VECTOR_M2P(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height })),
+                frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0 })),
+                frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height })),
                 0.25f,
                 GRAY
             );
     
         for (int i = 0; i < (bounds.height / FR_BROADPHASE_CELL_SIZE); i++)
             DrawLineEx(
-                FR_VECTOR_M2P(((Vector2) { 0, FR_BROADPHASE_CELL_SIZE * i })), 
-                FR_VECTOR_M2P(((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i })),
+                frVec2MetersToPixels(((Vector2) { 0, FR_BROADPHASE_CELL_SIZE * i })), 
+                frVec2MetersToPixels(((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i })),
                 0.25f,
                 GRAY
             );
@@ -145,7 +155,7 @@
         
         if (vertices != NULL) {
             for (int i = 0; i < vertex_count; i++)
-                result[i] = FR_VECTOR_M2P(frGetWorldPoint(b, vertices[i]));
+                result[i] = frVec2MetersToPixels(frGetWorldPoint(b, vertices[i]));
         }
         
         return vertex_count;

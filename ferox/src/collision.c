@@ -160,9 +160,13 @@ frShape *frSutherlandHodgman(frShape *s1, frShape *s2) {
     
     // 다각형 `s1`에서 `s2`의 각 변의 바깥쪽에 위치한 모든 부분을 삭제한다.
     for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
-        if (result == NULL) break;
+        if (result == NULL) 
+            break;
         
-        result = frClipPolygon(result, (frEdge) { vertices[j], vertices[i], 2 });
+        result = frClipPolygon(
+            result, 
+            (frEdge) { vertices[j], vertices[i], 2 }
+        );
     }
     
     return result;
@@ -288,7 +292,7 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
     if (frGetShapeType(s1) != FR_SHAPE_CIRCLE || frGetShapeType(s2) != FR_SHAPE_CIRCLE)
         return FR_STRUCT_ZERO(frCollision);
     
-    Vector2 direction = frVec2Subtract(tx2.position, tx1.position);
+    Vector2 direction = frVec2Normalize(frVec2Subtract(tx2.position, tx1.position));
     float depth = (frGetCircleRadius(s1) + frGetCircleRadius(s2)) - frVec2Magnitude(direction);
     
     if (depth < 0.0f) return FR_STRUCT_ZERO(frCollision);

@@ -70,19 +70,6 @@ frShape *frCreateCircle(frMaterial material, float radius) {
     return result;
 }
 
-/* 시작점 `p1`과 끝점 `p2`로 구성된 직사각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
-frShape *frCreateRectangle(frMaterial material, Vector2 p1, Vector2 p2) {
-    frShape *result = frCreateShape();
-    
-    result->type = FR_SHAPE_POLYGON;
-    result->material = material;
-    result->area = -FLT_MAX;
-    
-    frSetRectangleVertices(result, p1, p2);
-    
-    return result;
-}
-
 /* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
 frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count) {
     frShape *result = frCreateShape();

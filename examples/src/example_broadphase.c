@@ -49,7 +49,7 @@ int main(void) {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             frBody *body = frCreateBodyFromShape(
                 FR_BODY_DYNAMIC, 
-                FR_VECTOR_P2M(GetMousePosition()),
+                frVec2PixelsToMeters(GetMousePosition()),
                 frCreateCircle(
                     BODY_MATERIAL,
                     0.1f * GetRandomValue(6, 12)

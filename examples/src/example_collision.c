@@ -63,7 +63,7 @@ int main(void) {
 
         ClearBackground(FR_DEBUG_BACKGROUND_COLOR);
         
-        frSetBodyPosition(ball, FR_VECTOR_P2M(GetMousePosition()));
+        frSetBodyPosition(ball, frVec2PixelsToMeters(GetMousePosition()));
         
         frDrawBody(platform, PLATFORM_COLOR);
         frDrawBodyAABB(platform, PLATFORM_COLOR);
@@ -78,7 +78,7 @@ int main(void) {
         
         if (collision.check) {
             for (int i = 0; i < collision.count; i++)
-                DrawCircleV(FR_VECTOR_M2P(collision.points[i]), 3, RED);
+                DrawCircleV(frVec2MetersToPixels(collision.points[i]), 3, RED);
         }
         
         DrawTextEx(

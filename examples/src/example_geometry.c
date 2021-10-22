@@ -58,13 +58,17 @@ int main(void) {
 
         ClearBackground(FR_DEBUG_BACKGROUND_COLOR);
         
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) frSetBodyPosition(triangle, FR_VECTOR_P2M(GetMousePosition()));
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) 
+            frSetBodyPosition(triangle, frVec2PixelsToMeters(GetMousePosition()));
         
         frSetBodyRotation(
             triangle, 
             frVec2Angle(
                 (Vector2) { 0, -1 }, 
-                frVec2Subtract(GetMousePosition(), FR_VECTOR_M2P(frGetBodyPosition(triangle)))
+                frVec2Subtract(
+                    GetMousePosition(), 
+                    frVec2MetersToPixels(frGetBodyPosition(triangle))
+                )
             )
         );
     

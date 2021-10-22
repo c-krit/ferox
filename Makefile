@@ -71,7 +71,7 @@ endif
 
 CC := gcc
 AR := ar
-CFLAGS := -c -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu99
+CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu99
 
 ifeq ($(BUILD),STANDALONE)
 	CFLAGS += -DFEROX_STANDALONE

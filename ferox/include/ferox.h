@@ -66,15 +66,11 @@
 #define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
 
-#define FR_NUMBER_P2M(v) ((float) (v) / FR_GLOBAL_PIXELS_PER_METER)
-#define FR_NUMBER_M2P(v) ((float) (v) * FR_GLOBAL_PIXELS_PER_METER)
-
-#define FR_VECTOR_P2M(v) frVec2PixelsToMeters(v)
-#define FR_VECTOR_M2P(v) frVec2MetersToPixels(v)
-
 /* | 매크로 값... | */
 
-#define FR_GLOBAL_PIXELS_PER_METER 16.0f
+#ifndef FR_GLOBAL_PIXELS_PER_METER
+    #define FR_GLOBAL_PIXELS_PER_METER 16.0f
+#endif
 
 #define FR_BROADPHASE_CELL_SIZE 8
 
@@ -343,9 +339,6 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision);
 /* 반지름이 `radius`인 원을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
 frShape *frCreateCircle(frMaterial material, float radius);
 
-/* 시작점 `p1`과 끝점 `p2`로 구성된 직사각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
-frShape *frCreateRectangle(frMaterial material, Vector2 p1, Vector2 p2);
-
 /* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
 frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count);
 
@@ -427,6 +420,12 @@ bool frApproxEquals(float f1, float f2);
 
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π/2, center + π/2]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center);
+
+/* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */
+float frNumberPixelsToMeters(float value);
+
+/* 주어진 미터 단위 거리를 픽셀 단위 거리로 변환한다. */
+float frNumberMetersToPixels(float value);
 
 /* | `vectors` 모듈 함수... | */
 
