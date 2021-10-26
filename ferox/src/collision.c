@@ -291,13 +291,13 @@ static int frGetSeparatingAxisIndex(
 static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
     if (frGetShapeType(s1) != FR_SHAPE_CIRCLE || frGetShapeType(s2) != FR_SHAPE_CIRCLE)
         return FR_STRUCT_ZERO(frCollision);
-    
-    Vector2 direction = frVec2Normalize(frVec2Subtract(tx2.position, tx1.position));
+        
+    Vector2 direction = frVec2Subtract(tx2.position, tx1.position);
     float depth = (frGetCircleRadius(s1) + frGetCircleRadius(s2)) - frVec2Magnitude(direction);
     
     if (depth < 0.0f) return FR_STRUCT_ZERO(frCollision);
     
-    return frComputeCollisionManifold(s1, tx1, s2, tx2, direction, depth);
+    return frComputeCollisionManifold(s1, tx1, s2, tx2, frVec2Normalize(direction), depth);
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 다각형 `s2`로의 충돌을 계산한다. */
@@ -366,23 +366,20 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
     float v1_dot = frVec2DotProduct(frVec2Subtract(circle_tx.position, p1), frVec2Subtract(p2, p1));
     float v2_dot = frVec2DotProduct(frVec2Subtract(circle_tx.position, p2), frVec2Subtract(p1, p2));
     
-    if (v1_dot <= 0.0f) direction = frVec2Normalize(frVec2Subtract(p1, circle_tx.position));
-    else if (v2_dot <= 0.0f) direction = frVec2Normalize(frVec2Subtract(p2, circle_tx.position));
-    else direction = frVec2Normalize(frVec2Negate(frVec2Rotate(normals[normal_index], polygon_tx.rotation)));
+    if (v1_dot <= 0.0f) direction = frVec2Subtract(p1, circle_tx.position);
+    else if (v2_dot <= 0.0f) direction = frVec2Subtract(p2, circle_tx.position);
+    else direction = frVec2Negate(frVec2Rotate(normals[normal_index], polygon_tx.rotation));
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
         direction = frVec2Negate(direction);
     
-    return frComputeCollisionManifold(s1, tx1, s2, tx2, direction, depth);
+    return frComputeCollisionManifold(s1, tx1, s2, tx2, frVec2Normalize(direction), depth);
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 다각형 `s1`에서 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON)
         return FR_STRUCT_ZERO(frCollision);
-        
-    Vector2 direction = FR_STRUCT_ZERO(Vector2);
-    float depth = -FLT_MAX;
     
     float distance1 = -FLT_MAX, distance2 = -FLT_MAX;
     
@@ -395,11 +392,11 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     Vector2 *s1_normals = frGetPolygonNormals(s1, NULL);
     Vector2 *s2_normals = frGetPolygonNormals(s2, NULL);
     
-    direction = (distance1 > distance2) 
+    Vector2 direction = (distance1 > distance2) 
         ? frVec2Rotate(s1_normals[index1], tx1.rotation) 
         : frVec2Rotate(s2_normals[index2], tx2.rotation);
         
-    depth = FR_NUMBER_MAX(distance1, distance2);
+    float depth = FR_NUMBER_MAX(distance1, distance2);
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
         direction = frVec2Negate(direction);

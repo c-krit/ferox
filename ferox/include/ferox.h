@@ -136,7 +136,7 @@ typedef struct frBody frBody;
 /* 도형 사이의 충돌을 나타내는 구조체. */
 typedef struct frCollision {
     bool check;
-    frBody *bodies[2];
+    frBody *_bodies[2];
     Vector2 direction;
     Vector2 points[2];
     float depths[2];
@@ -167,8 +167,8 @@ frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cell_size);
 /* 공간 해시맵 `hash`에 할당된 메모리를 해제한다. */
 void frReleaseSpatialHash(frSpatialHash *hash);
 
-/* 공간 해시맵 `hash`에 직사각형 `rect`로 생성한 키와 `value`를 추가한다. */
-void frAddToSpatialHash(frSpatialHash *hash, Rectangle rect, int value);
+/* 공간 해시맵 `hash`에 직사각형 `rec`로 생성한 키와 `value`를 추가한다. */
+void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value);
 
 /* 공간 해시맵 `hash`의 모든 키와 값을 제거한다. */
 void frClearSpatialHash(frSpatialHash *hash);
@@ -179,8 +179,8 @@ Rectangle frGetSpatialHashBounds(frSpatialHash *hash);
 /* 공간 해시맵 `hash`에서 키가 `key`인 값을 제거한다. */
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key);
 
-/* 공간 해시맵 `hash`에서 직사각형 `rect`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQuerySpatialHash(frSpatialHash *hash, Rectangle rect, int **result);
+/* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
+void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result);
 
 /* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */
 int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
@@ -383,9 +383,6 @@ frShapeType frGetShapeType(frShape *s);
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius);
-
-/* 직사각형 `s`의 시작점과 끝점을 각각 `p1`과 `p2`로 변경한다. */
-void frSetRectangleVertices(frShape *s, Vector2 p1, Vector2 p2);
 
 /* 다각형 `s`의 꼭짓점 배열을 꼭짓점 개수 `count`개의 배열 `vertices`로 변경한다. */
 void frSetPolygonVertices(frShape *s, Vector2 *vertices, int count);

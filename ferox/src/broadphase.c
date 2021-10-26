@@ -68,15 +68,15 @@ void frReleaseSpatialHash(frSpatialHash *hash) {
     free(hash);
 }
 
-/* 공간 해시맵 `hash`에 직사각형 `rect`로 생성한 키와 `value`를 추가한다. */
-void frAddToSpatialHash(frSpatialHash *hash, Rectangle rect, int value) {
+/* 공간 해시맵 `hash`에 직사각형 `rec`로 생성한 키와 `value`를 추가한다. */
+void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
     if (hash == NULL) return;
     
-    int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rect.x });    
-    int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rect.x + rect.width });
+    int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x });    
+    int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x + rec.width });
     
-    int y0 = frComputeSpatialHashKey(hash, (Vector2) { .y = rect.y });
-    int y1 = frComputeSpatialHashKey(hash, (Vector2) { .y = rect.y + rect.height });
+    int y0 = frComputeSpatialHashKey(hash, (Vector2) { .y = rec.y });
+    int y1 = frComputeSpatialHashKey(hash, (Vector2) { .y = rec.y + rec.height });
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
@@ -117,15 +117,15 @@ void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
     hmdel(hash->map, key);
 }
 
-/* 공간 해시맵 `hash`에서 직사각형 `rect`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQuerySpatialHash(frSpatialHash *hash, Rectangle rect, int **result) {
+/* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
+void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result) {
     if (hash == NULL || result == NULL) return;
     
-    int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rect.x });
-    int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rect.x + rect.width });
+    int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x });
+    int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x + rec.width });
     
-    int y0 = frComputeSpatialHashKey(hash, (Vector2) { .y = rect.y });
-    int y1 = frComputeSpatialHashKey(hash, (Vector2) { .y = rect.y + rect.height });
+    int y0 = frComputeSpatialHashKey(hash, (Vector2) { .y = rec.y });
+    int y1 = frComputeSpatialHashKey(hash, (Vector2) { .y = rec.y + rec.height });
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {

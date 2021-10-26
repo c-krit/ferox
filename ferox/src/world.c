@@ -206,8 +206,8 @@ static void frUpdateWorld(frWorld *world, double dt) {
             );
             
             if (collision.check) {
-                collision.bodies[0] = b1;
-                collision.bodies[1] = b2;
+                collision._bodies[0] = b1;
+                collision._bodies[1] = b2;
                 
                 arrput(world->collisions, collision);
             }
@@ -224,8 +224,8 @@ static void frUpdateWorld(frWorld *world, double dt) {
     // 순차적으로 충격량을 반복 적용하여, 두 강체 사이의 충돌을 해결한다.
     for (int i = 0; i < FR_WORLD_MAX_ITERATIONS; i++) {
         for (int j = 0; j < arrlen(world->collisions); j++) {
-            frBody *b1 = world->collisions[j].bodies[0];
-            frBody *b2 = world->collisions[j].bodies[1];
+            frBody *b1 = world->collisions[j]._bodies[0];
+            frBody *b2 = world->collisions[j]._bodies[1];
             
             frResolveCollision(b1, b2, world->collisions[j]);
         }
@@ -235,8 +235,8 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frIntegrateForBodyPosition(world->bodies[i], dt);
     
     for (int i = 0; i < arrlen(world->collisions); i++) {
-        frBody *b1 = world->collisions[i].bodies[0];
-        frBody *b2 = world->collisions[i].bodies[1];
+        frBody *b1 = world->collisions[i]._bodies[0];
+        frBody *b2 = world->collisions[i]._bodies[1];
         
         frCorrectBodyPositions(b1, b2, world->collisions[i]);
     }

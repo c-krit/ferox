@@ -243,30 +243,6 @@ void frSetCircleRadius(frShape *s, float radius) {
     if (s != NULL && s->type == FR_SHAPE_CIRCLE) s->circle.radius = radius;
 }
 
-/* 직사각형 `s`의 시작점과 끝점을 각각 `p1`과 `p2`로 변경한다. */
-void frSetRectangleVertices(frShape *s, Vector2 p1, Vector2 p2) {
-    if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
-    
-    s->polygon.vertices.count = 4;
-    s->polygon.normals.count = 4;
-    
-    for (int i = 0; i < 4; i++)
-        s->polygon.vertices.data[i] = (Vector2) {
-            (i == 0 || i == 1) ? p1.x : p2.x,
-            (i == 0 || i == 3) ? p1.y : p2.y
-        };
-    
-    frComputeCentroid(s);
-    
-    for (int i = 0; i < 4; i++)
-        s->polygon.normals.data[i] = frVec2LeftNormal(
-            frVec2Subtract(
-                s->polygon.vertices.data[i], 
-                s->polygon.vertices.data[i + 1]
-            )
-        );
-}
-
 /* 다각형 `s`의 꼭짓점 배열을 꼭짓점 개수 `count`개의 배열 `vertices`로 변경한다. */
 void frSetPolygonVertices(frShape *s, Vector2 *vertices, int count) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;

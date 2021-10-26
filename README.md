@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/readme.png" alt="c-krit/ferox"><br>
+<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
 
 ![pre-release version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
 ![repo-size badge](https://img.shields.io/github/repo-size/c-krit/ferox)
