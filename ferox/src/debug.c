@@ -150,7 +150,6 @@
         if (b == NULL || result == NULL) return 0;
         
         int vertex_count = 0;
-            
         Vector2 *vertices = frGetPolygonVertices(frGetBodyShape(b), &vertex_count);
         
         if (vertices != NULL) {

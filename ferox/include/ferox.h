@@ -74,19 +74,15 @@
 
 #define FR_BROADPHASE_CELL_SIZE 8
 
-#ifndef FEROX_STANDALONE
-    #define FR_DEBUG_BACKGROUND_COLOR (GetColor(0x111111FF))
-#endif
-
-#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE 0.25f
-#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.02f
-#define FR_DYNAMICS_DEFAULT_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE 0.35f
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.06f
+#define FR_DYNAMICS_DEFAULT_MATERIAL ((frMaterial) { 0.85f, 0.0f, 0.5f, 0.5f })
 
 #define FR_GEOMETRY_MAX_VERTEX_COUNT 8
 
 #define FR_WORLD_ACCUMULATOR_LIMIT 200.0
-#define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { 0.0f, 9.8f })
-#define FR_WORLD_MAX_OBJECT_COUNT 128
+#define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { .y = 9.8f })
+#define FR_WORLD_MAX_OBJECT_COUNT 256
 #define FR_WORLD_MAX_ITERATIONS 16
 
 /* | 전역 구조체... | */
@@ -98,13 +94,6 @@ typedef enum frBodyType {
     FR_BODY_KINEMATIC,
     FR_BODY_DYNAMIC
 } frBodyType;
-
-/* 강체의 상태를 나타내는 구조체. */
-typedef enum frBodyState {
-    FR_STATE_UNKNOWN = -1,
-    FR_STATE_AWAKE,
-    FR_STATE_SLEEPING
-} frBodyState;
 
 /* 도형의 종류를 나타내는 구조체. */
 typedef enum frShapeType {
@@ -238,9 +227,6 @@ void frDetachShapeFromBody(frBody *b);
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b);
 
-/* 강체 `b`의 상태를 반환한다. */
-frBodyType frGetBodyState(frBody *b);
-
 /* 강체 `b`의 질량을 반환한다. */
 float frGetBodyMass(frBody *b);
 
@@ -283,14 +269,8 @@ Vector2 frGetLocalPoint(frBody *b, Vector2 p);
 /* 강체 `b`를 기준으로 한 좌표 `p`를 세계 기준 좌표로 변환한다. */
 Vector2 frGetWorldPoint(frBody *b, Vector2 p);
 
-/* 강체 `b`의 상태를 반환한다. */
-frBodyType frGetBodyState(frBody *b);
-
 /* 강체 `b`의 종류를 `type`으로 설정한다. */
 void frSetBodyType(frBody *b, frBodyType type);
-
-/* 강체 `b`의 상태를 `state`으로 설정한다. */
-void frSetBodyState(frBody *b, frBodyState state);
 
 /* 강체 `b`의 위치를 `p`로 설정한다. */
 void frSetBodyPosition(frBody *b, Vector2 p);

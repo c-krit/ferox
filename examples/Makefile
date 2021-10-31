@@ -34,10 +34,8 @@ LIBRARY_PATH := $(PROJECT_PATH)/lib
 SOURCE_PATH := src
 
 EXAMPLES := \
-	example_broadphase \
-	example_collision \
-	example_dynamics \
-	example_geometry
+	arrow   \
+	bricks
     
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)
