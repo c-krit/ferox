@@ -63,7 +63,7 @@ int main(void) {
         FR_STRUCT_ZERO(Vector2),
         circle
     );
-    
+
     bool use_polygon_cursor = false;
 
     while (!WindowShouldClose()) {
@@ -94,7 +94,7 @@ int main(void) {
         );
         
         if (collision.check) {
-            for (int i = 0; i < collision.count; i++) {              
+            for (int i = 0; i < collision.count; i++) {         
                 DrawCircleLines(
                     frNumberMetersToPixels(collision.points[i].x), 
                     frNumberMetersToPixels(collision.points[i].y), 

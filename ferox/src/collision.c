@@ -45,7 +45,7 @@ static frEdge frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v);
 static int frGetSeparatingAxisIndex(
     frShape *s1, frTransform tx1, 
     frShape *s2, frTransform tx2, 
-    float *distance
+    float *depth
 );
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 `s2`로의 충돌을 계산한다. */
@@ -243,7 +243,7 @@ static frEdge frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v) {
 static int frGetSeparatingAxisIndex(
     frShape *s1, frTransform tx1, 
     frShape *s2, frTransform tx2, 
-    float *distance
+    float *depth
 ) {
     int result = -1;
 
@@ -273,7 +273,7 @@ static int frGetSeparatingAxisIndex(
         }
     }
     
-    *distance = max_distance;
+    *depth = max_distance;
     
     return result;
 }
@@ -319,21 +319,18 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         circle_tx = tx2, polygon_tx = tx1;
     }
     
-    int vertex_count = -1;
+    int normal_index = -1, vertex_count = -1;
     
     Vector2 *vertices = frGetPolygonVertices(polygon, &vertex_count);
     Vector2 *normals = frGetPolygonNormals(polygon, NULL);
     
-    int normal_index = -1;
     float max_distance = -FLT_MAX;
     
     for (int i = 0; i < vertex_count; i++) {
         Vector2 vertex = frVec2Transform(vertices[i], polygon_tx);
+        Vector2 normal = frVec2Rotate(normals[i], polygon_tx.rotation);
         
-        float distance = frVec2DotProduct(
-            frVec2Rotate(normals[i], polygon_tx.rotation), 
-            frVec2Subtract(circle_tx.position, vertex)
-        );
+        float distance = frVec2DotProduct(normal, frVec2Subtract(circle_tx.position, vertex));
         
         if (max_distance < distance) {
             max_distance = distance;
@@ -341,60 +338,99 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         }
     }
     
-    float depth = frGetCircleRadius(circle) - max_distance;
+    float radius = frGetCircleRadius(circle), depth = radius - max_distance;
     
-    // 원과 다각형은 서로 만나지 않는다.
-    if (depth < 0.0f) return result;
-    
-    Vector2 p1 = (normal_index > 0)
-        ? frVec2Transform(vertices[normal_index - 1], polygon_tx)
-        : frVec2Transform(vertices[vertex_count - 1], polygon_tx);
-    Vector2 p2 = frVec2Transform(vertices[normal_index], polygon_tx);
-    
-    /*
-        1. 원이 `p1`을 포함하는 선분과 만나는가?
-        2. 원이 `p1`과 `p2` 사이의 선분과 만나는가?
-        3. 원이 `p2`를 포함하는 선분과 만나는가?
-        
-        => 벡터의 내적을 통해 확인할 수 있다.
-    */
-    
-    float v1_dot = frVec2DotProduct(
-        frVec2Subtract(circle_tx.position, p1), 
-        frVec2Subtract(p2, p1)
-    );
-    
-    float v2_dot = frVec2DotProduct(
-        frVec2Subtract(circle_tx.position, p2), 
-        frVec2Subtract(p1, p2)
-    );
-    
-    result.check = true;
-    
-    if (v1_dot <= 0.0f) {
-        result.direction = frVec2Normalize(frVec2Subtract(p1, circle_tx.position));
-        result.points[0] = result.points[1] = p1;
-    } else if (v2_dot <= 0.0f) {
-        result.direction = frVec2Normalize(frVec2Subtract(p2, circle_tx.position));
-        result.points[0] = result.points[1] = p2;
-    } else {
-        result.direction = frVec2Negate(frVec2Rotate(normals[normal_index], polygon_tx.rotation));
-        result.points[0] = result.points[1] = frVec2Add(
-            circle_tx.position,
-            frVec2ScalarMultiply(
-                result.direction,
-                frGetCircleRadius(circle)
+    if (depth < 0.0f) {
+        return result;
+    } else if (depth > radius) {
+        Vector2 direction = frVec2Negate(
+            frVec2Rotate(
+                normals[normal_index], 
+                polygon_tx.rotation
             )
         );
+        
+        result.check = true;
+            
+        result.direction = direction;
+        result.points[0] = result.points[1] = frVec2Add(
+            circle_tx.position,
+            frVec2ScalarMultiply(result.direction, radius)
+        );
+        
+        // 다각형이 원의 중심을 포함하고 있다면, 충돌 깊이는 원의 반지름이 된다.
+        result.depths[0] = result.depths[1] = radius;
+        result.count = 1;
+        
+        return result;
+    } else {
+        Vector2 p1 = (normal_index > 0)
+            ? frVec2Transform(vertices[normal_index - 1], polygon_tx)
+            : frVec2Transform(vertices[vertex_count - 1], polygon_tx);
+        Vector2 p2 = frVec2Transform(vertices[normal_index], polygon_tx);
+
+        /*
+            1. 원이 `p1`을 포함하는 선분과 만나는가?
+            2. 원이 `p1`과 `p2` 사이의 선분과 만나는가?
+            3. 원이 `p2`를 포함하는 선분과 만나는가?
+
+            => 벡터의 내적을 통해 확인할 수 있다.
+        */
+
+        float v1_dot = frVec2DotProduct(
+            frVec2Subtract(circle_tx.position, p1), 
+            frVec2Subtract(p2, p1)
+        );
+
+        float v2_dot = frVec2DotProduct(
+            frVec2Subtract(circle_tx.position, p2), 
+            frVec2Subtract(p1, p2)
+        );
+        
+        result.direction = frVec2Negate(
+            frVec2Rotate(
+                normals[normal_index], 
+                polygon_tx.rotation
+            )
+        );
+        
+        Vector2 diff = frVec2Subtract(p1, circle_tx.position);
+
+        if (v1_dot <= 0.0f) {
+            // 원과 다각형이 서로 만나는지 확인한다.
+            if (frVec2MagnitudeSqr(diff) > radius * radius)
+                return result;
+                
+            result.points[0] = result.points[1] = p1;
+        } else if (v2_dot <= 0.0f) {
+            diff = frVec2Subtract(p2, circle_tx.position);
+        
+            // 원과 다각형이 서로 만나는지 확인한다.
+            if (frVec2MagnitudeSqr(diff) > radius * radius)
+                return result;
+
+            result.points[0] = result.points[1] = p2;
+        } else {
+            // 원과 다각형이 서로 만나는지 확인한다.
+            if (frVec2DotProduct(diff, result.direction) > radius)
+                return result;
+
+            result.points[0] = result.points[1] = frVec2Add(
+                circle_tx.position,
+                frVec2ScalarMultiply(result.direction, radius)
+            );
+        }
+
+        result.check = true;
+
+        result.depths[0] = result.depths[1] = depth;
+        result.count = 1;
+
+        if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
+            result.direction = frVec2Negate(result.direction);
+
+        return result;
     }
-    
-    result.depths[0] = result.depths[1] = depth;
-    result.count = 1;
-    
-    if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
-        result.direction = frVec2Negate(result.direction);
-    
-    return result;
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 다각형 `s1`에서 `s2`로의 충돌을 계산한다. */
@@ -404,22 +440,22 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON)
         return result;
     
-    float distance1 = -FLT_MAX, distance2 = -FLT_MAX;
+    float depth1 = -FLT_MAX, depth2 = -FLT_MAX;
     
-    int index1 = frGetSeparatingAxisIndex(s1, tx1, s2, tx2, &distance1);
-    if (distance1 >= 0.0f) return result;
+    int index1 = frGetSeparatingAxisIndex(s1, tx1, s2, tx2, &depth1);
+    if (depth1 >= 0.0f) return result;
     
-    int index2 = frGetSeparatingAxisIndex(s2, tx2, s1, tx1, &distance2);
-    if (distance2 >= 0.0f) return result;
+    int index2 = frGetSeparatingAxisIndex(s2, tx2, s1, tx1, &depth2);
+    if (depth2 >= 0.0f) return result;
 
     Vector2 *s1_normals = frGetPolygonNormals(s1, NULL);
     Vector2 *s2_normals = frGetPolygonNormals(s2, NULL);
     
-    Vector2 direction = (distance1 > distance2) 
+    Vector2 direction = (depth1 > depth2) 
         ? frVec2Rotate(s1_normals[index1], tx1.rotation)
         : frVec2Rotate(s2_normals[index2], tx2.rotation);
         
-    float depth = FR_NUMBER_MAX(distance1, distance2);
+    float depth = FR_NUMBER_MAX(depth1, depth2);
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
         direction = frVec2Negate(direction);
