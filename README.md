@@ -16,6 +16,17 @@ A 2D collision detection and physics library written in C.
 
 </div>
 
+## Features
+
+<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/bricks.gif" width="640" alt="Bricks!">
+
+**Since this project was made to learn how a physics engine works, I am not planning to add a lot of features to it.**
+
+- Broad-phase collision detection with spatial hashing algorithm
+- Narrow-phase collision detection with SAT (Separating Axis Theorem)
+- 'Sequential Impulse' iterative constraint solver
+- Semi-implicit (symplectic) Euler integrator
+
 ## Prerequisites
 
 - GCC version 9.4.0+

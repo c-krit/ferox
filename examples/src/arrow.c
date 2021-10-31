@@ -31,7 +31,7 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define EXAMPLE_STRING "LEFT-CLICK TO CHANGE THE SHAPE TYPE OF THE CURSOR"
+#define EXAMPLE_STRING "LEFT-CLICK TO CHANGE THE SHAPE TYPE OF THE CURSOR!"
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -99,7 +99,7 @@ int main(void) {
                     frNumberMetersToPixels(collision.points[i].x), 
                     frNumberMetersToPixels(collision.points[i].y), 
                     4, 
-                    GREEN
+                    RED
                 );
                 
                 DrawLineEx(
@@ -114,7 +114,7 @@ int main(void) {
                         )
                     ),
                     2,
-                    GREEN
+                    RED
                 );
             }
         }

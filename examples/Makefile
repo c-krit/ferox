@@ -35,7 +35,9 @@ SOURCE_PATH := src
 
 EXAMPLES := \
 	arrow   \
-	bricks
+	bouncy  \
+	bricks  \
+	laser
     
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)

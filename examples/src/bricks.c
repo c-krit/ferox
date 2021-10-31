@@ -99,7 +99,7 @@ int main(void) {
                 frRemoveFromWorld(world, body);
         }
         
-        frDrawBody(floor, DARKGRAY);
+        frDrawBody(floor, BLACK);
         
         for (int i = 2; i < frGetWorldBodyCount(world); i++)
             frDrawBody(frGetWorldBody(world, i), RED);
@@ -110,16 +110,21 @@ int main(void) {
         
         frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
         
+        const char *message = TextFormat(
+            "%d brick(s)!",
+            frGetWorldBodyCount(world) - 2
+        );
+        
         DrawTextEx(
             GetFontDefault(),
-            TextFormat(
-                "%d brick(s)!\n",
-                frGetWorldBodyCount(world) - 2
-            ),
-            (Vector2) { 8, 32 },
-            10, 
-            1, 
-            BLACK
+            message,
+            (Vector2) { 
+                (SCREEN_WIDTH - MeasureText(message, 40)) / 2, 
+                SCREEN_HEIGHT / 8
+            },
+            40,
+            2, 
+            Fade(GRAY, 0.85f)
         );
         
         DrawFPS(8, 8);
