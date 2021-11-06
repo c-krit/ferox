@@ -107,6 +107,11 @@ Rectangle frGetSpatialHashBounds(frSpatialHash *hash) {
     return (hash != NULL) ? hash->bounds : FR_STRUCT_ZERO(Rectangle);
 }
 
+/* 공간 해시맵 `hash`의 각 셀의 크기를 반환한다. */
+float frGetSpatialHashCellSize(frSpatialHash *hash) {
+    return (hash != NULL) ? hash->cell_size : 0.0f;
+}
+
 /* 공간 해시맵 `hash`에서 키가 `key`인 값을 제거한다. */
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
     if (hash == NULL) return;
@@ -142,6 +147,16 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result) {
     for (int i = 0; i < arrlen(*result); i++)
         while ((i + 1) < arrlen(*result) && (*result)[i + 1] == (*result)[i])
             arrdel(*result, i + 1);
+}
+
+/* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
+void frSetSpatialHashBounds(frSpatialHash *hash, Rectangle bounds) {
+    if (hash != NULL) hash->bounds = bounds;
+}
+
+/* 공간 해시맵 `hash`의 각 셀의 크기를 `cell_size`로 설정한다. */
+void frSetSpatialHashCellSize(frSpatialHash *hash, float cell_size) {
+    if (hash != NULL) hash->cell_size = cell_size;
 }
 
 /* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */

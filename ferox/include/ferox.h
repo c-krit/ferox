@@ -165,11 +165,20 @@ void frClearSpatialHash(frSpatialHash *hash);
 /* 공간 해시맵 `hash`의 경계 범위를 반환한다. */
 Rectangle frGetSpatialHashBounds(frSpatialHash *hash);
 
+/* 공간 해시맵 `hash`의 각 셀의 크기를 반환한다. */
+float frGetSpatialHashCellSize(frSpatialHash *hash);
+
 /* 공간 해시맵 `hash`에서 키가 `key`인 값을 제거한다. */
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key);
 
 /* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
 void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result);
+
+/* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
+void frSetSpatialHashBounds(frSpatialHash *hash, Rectangle bounds);
+
+/* 공간 해시맵 `hash`의 각 셀의 크기를 `cell_size`로 설정한다. */
+void frSetSpatialHashCellSize(frSpatialHash *hash, float cell_size);
 
 /* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */
 int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
@@ -503,6 +512,9 @@ Vector2 frGetWorldGravity(frWorld *world);
 
 /* 세계 `world`의 모든 강체와 충돌 처리용 도형에 할당된 메모리를 해제한다. */
 void frReleaseWorldBodies(frWorld *world);
+
+/* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
+void frSetWorldBounds(frWorld *world, Rectangle bounds);
 
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity);

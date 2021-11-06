@@ -146,6 +146,11 @@ void frReleaseWorldBodies(frWorld *world) {
     frClearWorld(world);
 }
 
+/* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
+void frSetWorldBounds(frWorld *world, Rectangle bounds) {
+    if (world != NULL) frSetSpatialHashBounds(world->hash, bounds);
+}
+
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity) {
     if (world != NULL) world->gravity = gravity;
