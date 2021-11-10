@@ -87,9 +87,9 @@ int main(void) {
         frSetBodyRotation(
             semo, 
             frVec2Angle(
-                (Vector2) { 0, -1 },
+                (Vector2) { .y = -1 },
                 frVec2Subtract(
-                    GetMousePosition(), 
+                    mouse_position, 
                     frVec2MetersToPixels(frGetBodyPosition(semo))
                 )
             )

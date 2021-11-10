@@ -48,8 +48,8 @@ typedef struct frShape {
 
 /* | `geometry` 모듈 함수... | */
 
-/* 다각형 `s`의 무게중심을 계산한다. */
-static void frComputeCentroid(frShape *s);
+/* 도형 `s`의 넓이를 계산한다. */
+static void frComputeArea(frShape *s);
 
 /* 다각형 `s`를 볼록 다각형으로 변형한다. */
 static void frComputeConvex(frShape *s);
@@ -62,10 +62,9 @@ frShape *frCreateCircle(frMaterial material, float radius) {
     frShape *result = frCreateShape();
     
     result->type = FR_SHAPE_CIRCLE;
-    result->area = PI * (radius * radius);
     result->material = material;
     
-    result->circle.radius = radius;
+    frSetCircleRadius(result, radius);
     
     return result;
 }
@@ -79,7 +78,6 @@ frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count) {
     
     result->type = FR_SHAPE_POLYGON;
     result->material = material;
-    result->area = -FLT_MAX;
     
     frSetPolygonVertices(result, vertices, count);
     
@@ -240,7 +238,11 @@ frShapeType frGetShapeType(frShape *s) {
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius) {
-    if (s != NULL && s->type == FR_SHAPE_CIRCLE) s->circle.radius = radius;
+    if (s == NULL || s->type != FR_SHAPE_CIRCLE) return; 
+        
+    s->circle.radius = radius;
+    
+    frComputeArea(s);
 }
 
 /* 다각형 `s`의 꼭짓점 배열을 꼭짓점 개수 `count`개의 배열 `vertices`로 변경한다. */
@@ -252,9 +254,9 @@ void frSetPolygonVertices(frShape *s, Vector2 *vertices, int count) {
 
     for (int i = 0; i < count; i++)
         s->polygon.vertices.data[i] = vertices[i];
-
+    
+    frComputeArea(s);
     frComputeConvex(s);
-    frComputeCentroid(s);
 
     for (int j = count - 1, i = 0; i < count; j = i, i++)
         s->polygon.normals.data[i] = frVec2LeftNormal(
@@ -300,43 +302,31 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
     }
 }
 
-/* 다각형 `s`의 무게중심을 계산한다. */
-static void frComputeCentroid(frShape *s) {
-    if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
-    
-    /*
-        1. 다각형에서 임의의 꼭짓점 `v[0]`을 선택한다.
-        2. `v[0]`와 다각형에서 연속하는 두 꼭짓점 (`v[i]`, `v[i + 1]`)을 선택한다.
-        3. 세 꼭짓점이 이루는 삼각형의 넓이 `A(0)`와 무게중심 `C(0)`를 계산한다.
-        4. 다각형의 무게중심은 `((A(0) * C(0)) + (A(1) + C(1)) + ...) / (A(0) + A(1) + ...)`이 된다.
-    */ 
-    
-    Vector2 result = FR_STRUCT_ZERO(Vector2);
-    
-    float twice_area_sum = 0.0f;
-    
-    for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
-        float twice_area = frVec2CrossProduct(
-            frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
-            frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
-        );
-        
-        Vector2 thrice_centroid = frVec2Add(
-            s->polygon.vertices.data[0],
-            frVec2Add(s->polygon.vertices.data[i], s->polygon.vertices.data[i + 1])
-        );
-        
-        result = frVec2Add(result, frVec2ScalarMultiply(thrice_centroid, twice_area));
-        
-        twice_area_sum += twice_area;
+/* 도형 `s`의 넓이를 계산한다. */
+static void frComputeArea(frShape *s) {
+    if (s == NULL || s->type == FR_SHAPE_UNKNOWN) {
+        s->area = 0.0f;
+    } else if (s->type == FR_SHAPE_CIRCLE) {
+        s->area = PI * (s->circle.radius * s->circle.radius);
+    } else if (s->type == FR_SHAPE_POLYGON) {
+        float twice_area_sum = 0.0f;
+
+        for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
+            float twice_area = frVec2CrossProduct(
+                frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
+                frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
+            );
+
+            Vector2 thrice_centroid = frVec2Add(
+                s->polygon.vertices.data[0],
+                frVec2Add(s->polygon.vertices.data[i], s->polygon.vertices.data[i + 1])
+            );
+
+            twice_area_sum += twice_area;
+        }
+
+        s->area = fabs(twice_area_sum / 2.0f);
     }
-    
-    result = frVec2ScalarMultiply(result, 1.0f / (3.0f * twice_area_sum));
-    
-    if (s->area < 0.0f) s->area = fabs(twice_area_sum / 2.0f);
-    
-    for (int i = 0; i < s->polygon.vertices.count; i++)
-        s->polygon.vertices.data[i] = frVec2Subtract(s->polygon.vertices.data[i], result);
 }
 
 /* 다각형 `s`를 볼록 다각형으로 변형한다. */

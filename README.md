@@ -2,8 +2,8 @@
 
 <img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
 
-![pre-release version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
-![repo-size badge](https://img.shields.io/github/repo-size/c-krit/ferox)
+![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
+![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)
 ![license badge](https://img.shields.io/github/license/c-krit/ferox)
 
 A 2D collision detection and physics library written in C.

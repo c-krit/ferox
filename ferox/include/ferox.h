@@ -66,7 +66,7 @@
 #define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
 
-/* | 매크로 값... | */
+/* | 매크로 변수... | */
 
 #ifndef FR_GLOBAL_PIXELS_PER_METER
     #define FR_GLOBAL_PIXELS_PER_METER 16.0f
@@ -354,9 +354,6 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx);
 
 /* 도형 `s`의 넓이를 반환한다. */
 float frGetShapeArea(frShape *s);
-
-/* 도형 `s`의 무게중심을 반환한다. */
-Vector2 frGetShapeCentroid(frShape *s);
 
 /* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
 float frGetShapeInertia(frShape *s);
