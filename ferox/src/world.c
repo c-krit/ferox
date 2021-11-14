@@ -59,6 +59,11 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
 void frReleaseWorld(frWorld *world) {
     if (world == NULL) return;
     
+    for (int i = 0; i < arrlen(world->bodies); i++) {
+        frReleaseShape(frGetBodyShape(world->bodies[i]));
+        frReleaseBody(world->bodies[i]);
+    }
+    
     frClearWorld(world);
     
     frReleaseSpatialHash(world->hash);
@@ -132,18 +137,6 @@ frSpatialHash *frGetWorldSpatialHash(frWorld *world){
 /* 세계 `world`의 중력 가속도를 반환한다. */
 Vector2 frGetWorldGravity(frWorld *world) {
     return (world != NULL) ? world->gravity : FR_STRUCT_ZERO(Vector2);
-}
-
-/* 세계 `world`의 모든 강체와 충돌 처리용 도형에 할당된 메모리를 해제한다. */
-void frReleaseWorldBodies(frWorld *world) {
-    if (world == NULL || world->bodies == NULL) return;
-    
-    for (int i = 0; i < arrlen(world->bodies); i++) {
-        frReleaseShape(frGetBodyShape(world->bodies[i]));
-        frReleaseBody(world->bodies[i]);
-    }
-    
-    frClearWorld(world);
 }
 
 /* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */

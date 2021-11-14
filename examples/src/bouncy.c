@@ -119,7 +119,6 @@ int main(void) {
         EndDrawing();
     }
     
-    frReleaseWorldBodies(world);
     frReleaseWorld(world);
     
     CloseWindow();

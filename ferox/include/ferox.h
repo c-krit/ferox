@@ -511,9 +511,6 @@ frSpatialHash *frGetWorldSpatialHash(frWorld *world);
 /* 세계 `world`의 중력 가속도를 반환한다. */
 Vector2 frGetWorldGravity(frWorld *world);
 
-/* 세계 `world`의 모든 강체와 충돌 처리용 도형에 할당된 메모리를 해제한다. */
-void frReleaseWorldBodies(frWorld *world);
-
 /* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
 void frSetWorldBounds(frWorld *world, Rectangle bounds);
 
