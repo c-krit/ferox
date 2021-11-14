@@ -59,18 +59,9 @@
     }
 #endif
 
-/* | 매크로 함수... | */
-
-#define FR_STRUCT_ZERO(T) ((T) { 0 })
-
-#define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
-
 /* | 매크로 변수... | */
 
-#ifndef FR_GLOBAL_PIXELS_PER_METER
-    #define FR_GLOBAL_PIXELS_PER_METER 16.0f
-#endif
+#define FR_GLOBAL_PIXELS_PER_METER 16.0f
 
 #define FR_BROADPHASE_CELL_SIZE 8
 
@@ -84,6 +75,13 @@
 #define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_OBJECT_COUNT 256
 #define FR_WORLD_MAX_ITERATIONS 16
+
+/* | 매크로 함수... | */
+
+#define FR_STRUCT_ZERO(T) ((T) { 0 })
+
+#define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 /* | 전역 구조체... | */
 
@@ -272,6 +270,9 @@ frShape *frGetBodyShape(frBody *b);
 /* 강체 `b`의 AABB를 반환한다. */
 Rectangle frGetBodyAABB(frBody *b);
 
+/* 강체 `b`의 사용자 데이터를 반환한다. */
+void *frGetBodyUserData(frBody *b);
+
 /* 세계 기준 좌표 `p`를 강체 `b`를 기준으로 한 좌표로 변환한다. */
 Vector2 frGetLocalPoint(frBody *b, Vector2 p);
 
@@ -281,15 +282,6 @@ Vector2 frGetWorldPoint(frBody *b, Vector2 p);
 /* 강체 `b`의 종류를 `type`으로 설정한다. */
 void frSetBodyType(frBody *b, frBodyType type);
 
-/* 강체 `b`의 위치를 `p`로 설정한다. */
-void frSetBodyPosition(frBody *b, Vector2 p);
-
-/* 강체 `b`의 회전 각도를 `rotation`으로 설정한다. */
-void frSetBodyRotation(frBody *b, float rotation);
-
-/* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
-void frSetBodyTransform(frBody *b, frTransform tx);
-
 /* 강체 `b`의 속도를 `v`로 설정한다. */
 void frSetBodyVelocity(frBody *b, Vector2 v);
 
@@ -298,6 +290,18 @@ void frSetBodyAngularVelocity(frBody *b, double a);
 
 /* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
 void frSetBodyGravityScale(frBody *b, float gravity_scale);
+
+/* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
+void frSetBodyTransform(frBody *b, frTransform tx);
+
+/* 강체 `b`의 위치를 `p`로 설정한다. */
+void frSetBodyPosition(frBody *b, Vector2 p);
+
+/* 강체 `b`의 회전 각도를 `rotation`으로 설정한다. */
+void frSetBodyRotation(frBody *b, float rotation);
+
+/* 강체 `b`의 사용자 데이터를 `data`로 설정한다. */
+void *frSetBodyUserData(frBody *b, void *data);
 
 /* 강체 `b`에 작용하는 모든 힘을 제거한다. */
 void frClearBodyForces(frBody *b);

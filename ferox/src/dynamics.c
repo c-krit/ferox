@@ -45,6 +45,7 @@ typedef struct frBody {
     frTransform tx;
     frShape *shape;
     Rectangle aabb;
+    void *data;
 } frBody;
 
 /* | `dynamics` 모듈 함수... | */
@@ -171,6 +172,11 @@ Rectangle frGetBodyAABB(frBody *b) {
     return (b != NULL && b->shape != NULL) ? b->aabb : FR_STRUCT_ZERO(Rectangle);
 }
 
+/* 강체 `b`의 사용자 데이터를 반환한다. */
+void *frGetBodyUserData(frBody *b) {
+    return (b != NULL) ? b->data : NULL;
+}
+
 /* 세계 기준 좌표 `p`를 강체 `b`를 기준으로 한 좌표로 변환한다. */
 Vector2 frGetLocalPoint(frBody *b, Vector2 p) {
     return frVec2Transform(p, (frTransform) { frVec2Negate(b->tx.position), -(b->tx.rotation)});
@@ -189,32 +195,6 @@ void frSetBodyType(frBody *b, frBodyType type) {
     b->type = type;
     
     frResetBodyMass(b);
-}
-
-/* 강체 `b`의 위치를 `p`로 설정한다. */
-void frSetBodyPosition(frBody *b, Vector2 p) {
-    if (b == NULL) return;
-    
-    b->tx.position = p;
-    b->aabb = frGetShapeAABB(b->shape, b->tx);
-}
-
-/* 강체 `b`의 회전 각도 (단위: rad.)를 `rotation`으로 설정한다. */
-void frSetBodyRotation(frBody *b, float rotation) {
-    if (b == NULL) return;
-    
-    b->tx.rotation = frNormalizeAngle(rotation, PI);
-    b->aabb = frGetShapeAABB(b->shape, b->tx);
-}
-
-/* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
-void frSetBodyTransform(frBody *b, frTransform tx) {
-    if (b == NULL) return;
-    
-    b->tx.position = tx.position;
-    b->tx.rotation = frNormalizeAngle(tx.rotation, PI);
-    
-    b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
 
 /* 강체 `b`의 속도를 `v`로 설정한다. */
@@ -236,6 +216,37 @@ void frSetBodyGravityScale(frBody *b, float gravity_scale) {
     if (b == NULL || b->type == FR_BODY_STATIC || b->type == FR_BODY_KINEMATIC) return;
     
     b->motion.gravity_scale = gravity_scale;
+}
+
+/* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
+void frSetBodyTransform(frBody *b, frTransform tx) {
+    if (b == NULL) return;
+    
+    b->tx.position = tx.position;
+    b->tx.rotation = frNormalizeAngle(tx.rotation, PI);
+    
+    b->aabb = frGetShapeAABB(b->shape, b->tx);
+}
+
+/* 강체 `b`의 위치를 `p`로 설정한다. */
+void frSetBodyPosition(frBody *b, Vector2 p) {
+    if (b == NULL) return;
+    
+    b->tx.position = p;
+    b->aabb = frGetShapeAABB(b->shape, b->tx);
+}
+
+/* 강체 `b`의 회전 각도 (단위: rad.)를 `rotation`으로 설정한다. */
+void frSetBodyRotation(frBody *b, float rotation) {
+    if (b == NULL) return;
+    
+    b->tx.rotation = frNormalizeAngle(rotation, PI);
+    b->aabb = frGetShapeAABB(b->shape, b->tx);
+}
+
+/* 강체 `b`의 사용자 데이터를 `data`로 설정한다. */
+void *frSetBodyUserData(frBody *b, void *data) {
+    if (b != NULL) b->data = data;
 }
 
 /* 강체 `b`에 중력 가속도 `gravity`를 적용한다. */
