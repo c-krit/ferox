@@ -140,29 +140,6 @@ frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, 
     }
 }
 
-/* Sutherland-Hodgman 다각형 절단 알고리즘을 이용하여, 다각형 `s1`을 `s2`에 맞게 절단한다. */
-frShape *frSutherlandHodgman(frShape *s1, frShape *s2) {
-    if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON) 
-        return s1;
-    
-    int vertex_count = -1;
-    Vector2 *vertices = frGetPolygonVertices(s2, &vertex_count);
-    
-    frShape *result = s1;
-    
-    // 다각형 `s1`에서 `s2`의 각 변의 바깥쪽에 위치한 모든 부분을 삭제한다.
-    for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
-        if (result == NULL) break;
-        
-        result = frClipPolygon(
-            result, 
-            (frEdge) { vertices[j], vertices[i], 2 }
-        );
-    }
-    
-    return result;
-}
-
 /* 도형 `s1`의 AABB가 `s2`의 AABB와 충돌하는지 확인한다. */
 static bool frCheckCollisionAABB(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
     return CheckCollisionRecs(frGetShapeAABB(s1, tx1), frGetShapeAABB(s2, tx2));
@@ -650,18 +627,27 @@ static frShape *frClipPolygon(frShape *s, frEdge e) {
 static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector2 v2, float *distance) {
     bool result = true;
     
-    Vector2 o1_to_o2 = frVec2Subtract(o2, o1);
-    
     float cross = frVec2CrossProduct(v1, v2);
     
-    float t = frVec2CrossProduct(o1_to_o2, v2) / cross;
-    float u = frVec2CrossProduct(o1_to_o2, v1) / cross;
+    // 두 광선은 평행하거나 일직선 상에 있다.
+    if (frNumberApproxEquals(cross, 0.0f)) {
+        *distance = 0.0f;
+        
+        return false;
+    }
     
-    // 두 광선은 서로 만나지 않는다.
-    if (frApproxEquals(cross, 0.0f) || (t < 0.0f || u < 0.0f || u > 1.0f)) result = false;
-    
+    Vector2 diff = frVec2Subtract(o2, o1);
+
+    float inverse_cross = 1.0f / cross;
+
+    float t = frVec2CrossProduct(diff, v2) * inverse_cross;
+    float u = frVec2CrossProduct(diff, v1) * inverse_cross;
+
+    // 두 광선은 평행하지 않으면서 서로 만나지 않는다.
+    if (t < 0.0f || u < 0.0f || u > 1.0f) result = false;
+
     *distance = t;
-    
+
     return result;
 }
 
@@ -669,15 +655,17 @@ static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector
 static bool frComputeIntersectionRayCircle(Vector2 o, Vector2 v, Vector2 c, float r, float *distance) {
     bool result = true;
     
-    Vector2 o_to_c = frVec2Subtract(c, o);
+    Vector2 diff = frVec2Subtract(c, o);
     
-    float dot = frVec2DotProduct(o_to_c, v);
-    float base_sqr = frVec2MagnitudeSqr(o_to_c) - (dot * dot);
+    float dot = frVec2DotProduct(diff, v);
+    
+    float height_sqr = frVec2MagnitudeSqr(diff) - (dot * dot);
+    float base_sqr = (r * r) - height_sqr;
     
     // 광선과 원은 서로 만나지 않는다.
-    if (dot < 0.0f || (r * r) < base_sqr) result = false;
+    if (dot < 0.0f || base_sqr < 0) result = false;
     
-    *distance = dot - (sqrtf((r * r) - base_sqr));
+    *distance = dot - sqrtf(base_sqr);
     
     return result;
 }

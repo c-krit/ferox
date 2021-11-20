@@ -196,9 +196,6 @@ frCollision frComputeCollision(frShape *s1, frTransform tx1, frShape *s2, frTran
 /* `p`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 도형 `s`에 투사한다. */
 frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, float max_distance);
 
-/* Sutherland-Hodgman 다각형 절단 알고리즘을 이용하여, 다각형 `s1`을 `s2`에 맞게 절단한다. */
-frShape *frSutherlandHodgman(frShape *s1, frShape *s2);
-
 /* | `debug` 모듈 함수... | */
 
 #ifndef FEROX_STANDALONE
@@ -410,7 +407,7 @@ double frGetTimeSince(double old_time);
 /* | `utils` 모듈 함수... | */
 
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
-bool frApproxEquals(float f1, float f2);
+bool frNumberApproxEquals(float f1, float f2);
 
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π/2, center + π/2]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center);

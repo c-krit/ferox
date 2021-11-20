@@ -27,16 +27,16 @@
 
 /* | `utils` 모듈 함수... | */
 
-/* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
-bool frApproxEquals(float f1, float f2) {
-    float f_max = (f1 > f2) ? f1 : f2;
-    
-    return fabs(f1 - f2) <= f_max * FLT_EPSILON;
-}
-
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π, center + π]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center) {
     return angle - ((2 * PI) * floor((angle + PI - center) / (2 * PI)));
+}
+
+/* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
+bool frNumberApproxEquals(float f1, float f2) {
+    float f_max = (f1 > f2) ? f1 : f2;
+    
+    return fabs(f1 - f2) <= f_max * FLT_EPSILON;
 }
 
 /* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */
