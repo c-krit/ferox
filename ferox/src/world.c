@@ -28,11 +28,12 @@
 /* 물리 법칙이 존재하는 세계를 나타내는 구조체. */
 typedef struct frWorld {
     Vector2 gravity;
-    frSpatialHash *hash;
     frBody **bodies;
+    frSpatialHash *hash;
     frCollision *collisions;
+    frCollisionHandler handler;
+    double timestamp;
     int *queries;
-    double last_time;
 } frWorld;
 
 /* | `world` 모듈 함수... | */
@@ -46,7 +47,7 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     
     result->gravity = gravity;
     result->hash = frCreateSpatialHash(bounds, FR_BROADPHASE_CELL_SIZE);
-    result->last_time = frGetCurrentTime();
+    result->timestamp = frGetCurrentTime();
     
     arrsetcap(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
     arrsetcap(result->collisions, FR_WORLD_MAX_OBJECT_COUNT);
@@ -117,6 +118,11 @@ frBody *frGetWorldBody(frWorld *world, int index) {
         : NULL;
 }
 
+/* 세계 `world`의 충돌 핸들러를 반환한다. */
+frCollisionHandler frGetWorldCollisionHandler(frWorld *world) {
+    return (world != NULL) ? world->handler : FR_STRUCT_ZERO(frCollisionHandler);
+}
+
 /* 세계 `world`의 강체 배열의 크기를 반환한다. */
 int frGetWorldBodyCount(frWorld *world) {
     return (world != NULL) ? arrlen(world->bodies) : 0;
@@ -144,6 +150,11 @@ void frSetWorldBounds(frWorld *world, Rectangle bounds) {
     if (world != NULL) frSetSpatialHashBounds(world->hash, bounds);
 }
 
+/* 세계 `world`의 충돌 핸들러를 `handler`로 설정한다. */
+void frSetWorldCollisionHandler(frWorld *world, frCollisionHandler handler) {
+    if (world != NULL) world->handler = handler;
+}
+
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity) {
     if (world != NULL) world->gravity = gravity;
@@ -151,10 +162,10 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity) {
 
 /* 세계 `scene`의 시간을 `dt` (단위: ms)만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt) {
-    if (world == NULL) return;
+    if (world == NULL || dt == 0.0f) return;
     
     double current_time = frGetCurrentTime();
-    double elapsed_time = frGetTimeDifference(current_time, world->last_time);
+    double elapsed_time = frGetTimeDifference(current_time, world->timestamp);
     
     double accumulator = elapsed_time;
     
@@ -164,19 +175,20 @@ void frSimulateWorld(frWorld *world, double dt) {
     for (; accumulator >= dt; accumulator -= dt)
         frUpdateWorld(world, dt);
     
-    world->last_time = current_time;
+    world->timestamp = current_time;
 }
 
 /* 세계 `world`를 시간 `dt` (단위: ms)만큼 업데이트한다. */
 static void frUpdateWorld(frWorld *world, double dt) {
     if (world == NULL || world->hash == NULL || world->bodies == NULL) return;
 	
-	double current_time = frGetCurrentTime();
-	double start_time = current_time;
+    double current_time = frGetCurrentTime();
+    double start_time = current_time;
 
     for (int i = 0; i < arrlen(world->bodies); i++)
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
     
+    // 공간 해시맵에서 다른 강체와 충돌할 가능성이 높은 모든 강체를 찾는다.
     for (int i = 0; i < arrlen(world->bodies); i++) {   
         frQuerySpatialHash(
             world->hash, 
@@ -214,6 +226,14 @@ static void frUpdateWorld(frWorld *world, double dt) {
         arrdeln(world->queries, 0, arrlen(world->queries));
     }
     
+    // 강체 사이의 충돌 해결 직전에 사전 정의된 함수를 호출한다. 
+    for (int i = 0; i < arrlen(world->collisions); i++) {
+        frCollisionCallback pre_solve_cb = world->handler.pre_solve;
+        
+        if (pre_solve_cb != NULL) pre_solve_cb(&world->collisions[i]);
+    }
+    
+    // 강체에 중력을 적용하고, 강체의 속도와 각속도를 계산한다.
     for (int i = 0; i < arrlen(world->bodies); i++) {
         frApplyGravity(world->bodies[i], world->gravity);
         frIntegrateForBodyVelocities(world->bodies[i], dt);
@@ -229,16 +249,26 @@ static void frUpdateWorld(frWorld *world, double dt) {
         }
     }
     
+    // 강체의 현재 위치를 계산한다.
     for (int i = 0; i < arrlen(world->bodies); i++)
         frIntegrateForBodyPosition(world->bodies[i], dt);
     
+    // 강체의 위치를 적절하게 보정한다.
     for (int i = 0; i < arrlen(world->collisions); i++) {
         frBody *b1 = world->collisions[i]._bodies[0];
         frBody *b2 = world->collisions[i]._bodies[1];
         
         frCorrectBodyPositions(b1, b2, world->collisions[i]);
     }
-
+    
+    // 강체 사이의 충돌 해결 직후에 사전 정의된 함수를 호출한다. 
+    for (int i = 0; i < arrlen(world->collisions); i++) {
+        frCollisionCallback post_solve_cb = world->handler.post_solve;
+        
+        if (post_solve_cb != NULL) post_solve_cb(&world->collisions[i]);
+    }
+    
+    // 강체에 작용하는 모든 힘을 제거한다.
     for (int i = 0; i < arrlen(world->bodies); i++)
         frClearBodyForces(world->bodies[i]);
     

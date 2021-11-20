@@ -59,7 +59,7 @@
     }
 #endif
 
-/* | 매크로 변수... | */
+/* | 매크로 정의... | */
 
 #define FR_GLOBAL_PIXELS_PER_METER 16.0f
 
@@ -76,14 +76,12 @@
 #define FR_WORLD_MAX_OBJECT_COUNT 256
 #define FR_WORLD_MAX_ITERATIONS 16
 
-/* | 매크로 함수... | */
-
 #define FR_STRUCT_ZERO(T) ((T) { 0 })
 
 #define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
 
-/* | 전역 구조체... | */
+/* | 자료형 정의... | */
 
 /* 강체의 종류를 나타내는 구조체. */
 typedef enum frBodyType {
@@ -129,6 +127,15 @@ typedef struct frCollision {
     float depths[2];
     int count;
 } frCollision;
+
+/* 강체 사이의 충돌 이벤트 발생 시에 호출되는 함수를 가리키는 포인터. */
+typedef void (*frCollisionCallback)(frCollision *collision);
+
+/* 강체 사이의 충돌 이벤트 처리에 사용되는 핸들러를 나타내는 구조체. */
+typedef struct frCollisionHandler {
+    frCollisionCallback pre_solve;
+    frCollisionCallback post_solve;
+} frCollisionHandler;
 
 /* 도형에 광선을 투사했을 때의 결과를 나타내는 구조체. */
 typedef struct frRaycastHit {
@@ -499,6 +506,9 @@ bool frRemoveFromWorld(frWorld *world, frBody *body);
 /* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
 frBody *frGetWorldBody(frWorld *world, int index);
 
+/* 세계 `world`의 충돌 핸들러를 반환한다. */
+frCollisionHandler frGetWorldCollisionHandler(frWorld *world);
+
 /* 세계 `world`의 강체 배열의 크기를 반환한다. */
 int frGetWorldBodyCount(frWorld *world);
 
@@ -513,6 +523,9 @@ Vector2 frGetWorldGravity(frWorld *world);
 
 /* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
 void frSetWorldBounds(frWorld *world, Rectangle bounds);
+
+/* 세계 `world`의 충돌 핸들러를 `handler`로 설정한다. */
+void frSetWorldCollisionHandler(frWorld *world, frCollisionHandler handler);
 
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity);

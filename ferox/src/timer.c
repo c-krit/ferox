@@ -22,6 +22,8 @@
 
 #include "ferox.h"
 
+/* | `timer` 모듈 매크로 정의... | */
+
 #if defined(_WIN32)
     #define NOGDI
     #define NOUSER
