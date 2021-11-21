@@ -296,7 +296,7 @@ void frClearBodyForces(frBody *b) {
 
 /* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
 void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
-    if (b1 == NULL || b2 == NULL) return;
+    if (b1 == NULL || b2 == NULL || !collision.check) return;
     
     // 두 강체의 질량이 0에 수렴하면 위치를 보정하지 않는다.
     if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {

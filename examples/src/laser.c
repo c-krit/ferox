@@ -89,8 +89,8 @@ int main(void) {
             frVec2Angle(
                 (Vector2) { .y = -1 },
                 frVec2Subtract(
-                    mouse_position, 
-                    frVec2MetersToPixels(frGetBodyPosition(semo))
+                    frVec2PixelsToMeters(mouse_position),
+                    frGetBodyPosition(semo)
                 )
             )
         );
