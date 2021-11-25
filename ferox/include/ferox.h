@@ -527,7 +527,7 @@ void frSetWorldCollisionHandler(frWorld *world, frCollisionHandler handler);
 /* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity);
 
-/* 세계 `scene`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
+/* 세계 `world`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt);
 
 #endif

@@ -160,7 +160,7 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity) {
     if (world != NULL) world->gravity = gravity;
 }
 
-/* 세계 `scene`의 시간을 `dt` (단위: ms)만큼 흐르게 한다. */
+/* 세계 `world`의 시간을 `dt` (단위: ms)만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt) {
     if (world == NULL || dt == 0.0f) return;
     
