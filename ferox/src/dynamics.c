@@ -107,6 +107,11 @@ void frDetachShapeFromBody(frBody *b) {
     frResetBodyMass(b);
 }
 
+/* 구조체 `frBody`의 크기를 반환한다. */
+size_t frGetBodyStructSize(void) {
+    return sizeof(frBody);
+}
+
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b) {
     return (b != NULL) ? b->type : FR_BODY_UNKNOWN;

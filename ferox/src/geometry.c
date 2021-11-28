@@ -72,9 +72,9 @@ frShape *frCreateCircle(frMaterial material, float radius) {
 /* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
 frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count) {
     frShape *result = frCreateShape();
-    
-    if (vertices == NULL || count < 2 || count > FR_GEOMETRY_MAX_VERTEX_COUNT) 
-        return NULL;
+
+    if (count > FR_GEOMETRY_MAX_VERTEX_COUNT)
+        count = FR_GEOMETRY_MAX_VERTEX_COUNT;
     
     result->type = FR_SHAPE_POLYGON;
     result->material = material;
@@ -124,25 +124,58 @@ void frReleaseShape(frShape *s) {
     if (s != NULL) free(s);
 }
 
-/* 원 `s`의 반지름을 반환한다. */
-float frGetCircleRadius(frShape *s) {
-    return (s != NULL && s->type == FR_SHAPE_CIRCLE) ? s->circle.radius : 0.0f;
+/* 구조체 `frShape`의 크기를 반환한다. */
+size_t frGetShapeStructSize(void) {
+    return sizeof(frShape);
 }
 
-/* 다각형 `s`의 꼭짓점 배열의 메모리 주소를 반환한다. */
-Vector2 *frGetPolygonVertices(frShape *s, int *vertex_count) {
-    if (s == NULL) return NULL;
-    
-    if (vertex_count != NULL) *vertex_count = s->polygon.vertices.count;
-    return s->polygon.vertices.data;
+/* 도형 `s`의 종류를 반환한다. */
+frShapeType frGetShapeType(frShape *s) {
+    return (s != NULL) ? s->type : FR_SHAPE_UNKNOWN;
 }
 
-/* 다각형 `s`의 각 변과 수직인 모든 변이 저장된 배열의 메모리 주소를 반환한다. */
-Vector2 *frGetPolygonNormals(frShape *s, int *normal_count) {
-    if (s == NULL) return NULL;
+/* 도형 `s`의 재질을 반환한다. */
+frMaterial frGetShapeMaterial(frShape *s) {
+    return (s != NULL) ? s->material : FR_STRUCT_ZERO(frMaterial);
+}
+
+/* 도형 `s`의 넓이를 반환한다. */
+float frGetShapeArea(frShape *s) {
+    return (s != NULL && s->area >= 0.0f) ? s->area : 0.0f;
+}
+
+/* 도형 `s`의 질량을 반환한다. */
+float frGetShapeMass(frShape *s) {
+    return (s != NULL) ? s->material.density * frGetShapeArea(s) : 0.0f;
+}
+
+/* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
+float frGetShapeInertia(frShape *s) {
+    if (s == NULL || s->type == FR_SHAPE_UNKNOWN) return 0.0f;
     
-    if (normal_count != NULL) *normal_count = s->polygon.normals.count;
-    return s->polygon.normals.data;
+    float result = 0.0f;
+    
+    if (s->type == FR_SHAPE_CIRCLE) {
+        result = 0.5f * frGetShapeMass(s) * (frGetCircleRadius(s) * frGetCircleRadius(s));
+    } else if (s->type == FR_SHAPE_POLYGON) {
+        float x_inertia = 0.0f;
+        float y_inertia = 0.0f;
+        
+        // https://en.wikipedia.org/wiki/Second_moment_of_area#Any_polygon
+        for (int j = s->polygon.vertices.count - 1, i = 0; i < s->polygon.vertices.count; j = i, i++) {
+            Vector2 v1 = s->polygon.vertices.data[j];
+            Vector2 v2 = s->polygon.vertices.data[i];
+            
+            float cross = frVec2CrossProduct(v1, v2);
+            
+            x_inertia += cross * ((v1.y * v1.y) + (v1.y * v2.y) + (v2.y * v2.y));
+            y_inertia += cross * ((v1.x * v1.x) + (v1.x * v2.x) + (v2.x * v2.x));
+        }
+        
+        result = fabs((x_inertia + y_inertia) / 12.0f);
+    }
+    
+    return s->material.density * result;
 }
 
 /* 도형 `s`의 AABB를 반환한다. */
@@ -187,53 +220,29 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx) {
     }
 }
 
-/* 도형 `s`의 넓이를 반환한다. */
-float frGetShapeArea(frShape *s) {
-    return (s != NULL && s->area >= 0.0f) ? s->area : 0.0f;
+/* 원 `s`의 반지름을 반환한다. */
+float frGetCircleRadius(frShape *s) {
+    return (s != NULL && s->type == FR_SHAPE_CIRCLE) ? s->circle.radius : 0.0f;
 }
 
-/* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
-float frGetShapeInertia(frShape *s) {
-    if (s == NULL || s->type == FR_SHAPE_UNKNOWN) return 0.0f;
+/* 다각형 `s`의 꼭짓점 배열의 메모리 주소를 반환한다. */
+Vector2 *frGetPolygonVertices(frShape *s, int *vertex_count) {
+    if (s == NULL) return NULL;
     
-    float result = 0.0f;
+    if (vertex_count != NULL) 
+        *vertex_count = s->polygon.vertices.count;
     
-    if (s->type == FR_SHAPE_CIRCLE) {
-        result = 0.5f * frGetShapeMass(s) * (frGetCircleRadius(s) * frGetCircleRadius(s));
-    } else if (s->type == FR_SHAPE_POLYGON) {
-        float x_inertia = 0.0f;
-        float y_inertia = 0.0f;
-        
-        // https://en.wikipedia.org/wiki/Second_moment_of_area#Any_polygon
-        for (int j = s->polygon.vertices.count - 1, i = 0; i < s->polygon.vertices.count; j = i, i++) {
-            Vector2 v1 = s->polygon.vertices.data[j];
-            Vector2 v2 = s->polygon.vertices.data[i];
-            
-            float cross = frVec2CrossProduct(v1, v2);
-            
-            x_inertia += cross * ((v1.y * v1.y) + (v1.y * v2.y) + (v2.y * v2.y));
-            y_inertia += cross * ((v1.x * v1.x) + (v1.x * v2.x) + (v2.x * v2.x));
-        }
-        
-        result = fabs((x_inertia + y_inertia) / 12.0f);
-    }
+    return s->polygon.vertices.data;
+}
+
+/* 다각형 `s`의 각 변과 수직인 모든 변이 저장된 배열의 메모리 주소를 반환한다. */
+Vector2 *frGetPolygonNormals(frShape *s, int *normal_count) {
+    if (s == NULL) return NULL;
     
-    return s->material.density * result;
-}
-
-/* 도형 `s`의 질량을 반환한다. */
-float frGetShapeMass(frShape *s) {
-    return (s != NULL) ? s->material.density * frGetShapeArea(s) : 0.0f;
-}
-
-/* 도형 `s`의 재질을 반환한다. */
-frMaterial frGetShapeMaterial(frShape *s) {
-    return (s != NULL) ? s->material : FR_STRUCT_ZERO(frMaterial);
-}
-
-/* 도형 `s`의 종류를 반환한다. */
-frShapeType frGetShapeType(frShape *s) {
-    return (s != NULL) ? s->type : FR_SHAPE_UNKNOWN;
+    if (normal_count != NULL) 
+        *normal_count = s->polygon.normals.count;
+    
+    return s->polygon.normals.data;
 }
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */

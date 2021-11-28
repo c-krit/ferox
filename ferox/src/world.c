@@ -111,6 +111,11 @@ bool frRemoveFromWorld(frWorld *world, frBody *body) {
     return false;
 }
 
+/* 구조체 `frWorld`의 크기를 반환한다. */
+size_t frGetWorldStructSize(void) {
+    return sizeof(frWorld);
+}
+
 /* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
 frBody *frGetWorldBody(frWorld *world, int index) {
     return (world != NULL && index >= 0 && index < arrlen(world->bodies)) 

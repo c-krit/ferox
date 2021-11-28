@@ -235,6 +235,9 @@ void frAttachShapeToBody(frBody *b, frShape *s);
 /* 강체 `b`에서 충돌 처리용 도형을 제거한다. */ 
 void frDetachShapeFromBody(frBody *b);
 
+/* 구조체 `frBody`의 크기를 반환한다. */
+size_t frGetBodyStructSize(void);
+
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b);
 
@@ -348,6 +351,27 @@ frShape *frCloneShape(frShape *s);
 /* 도형 `s`에 할당된 메모리를 해제한다. */
 void frReleaseShape(frShape *s);
 
+/* 구조체 `frShape`의 크기를 반환한다. */
+size_t frGetShapeStructSize(void);
+
+/* 도형 `s`의 종류를 반환한다. */
+frShapeType frGetShapeType(frShape *s);
+
+/* 도형 `s`의 재질을 반환한다. */
+frMaterial frGetShapeMaterial(frShape *s);
+
+/* 도형 `s`의 넓이를 반환한다. */
+float frGetShapeArea(frShape *s);
+
+/* 도형 `s`의 질량을 반환한다. */
+float frGetShapeMass(frShape *s);
+
+/* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
+float frGetShapeInertia(frShape *s);
+
+/* 도형 `s`의 AABB를 반환한다. */
+Rectangle frGetShapeAABB(frShape *s, frTransform tx);
+
 /* 원 `s`의 반지름을 반환한다. */
 float frGetCircleRadius(frShape *s);
 
@@ -356,24 +380,6 @@ Vector2 *frGetPolygonVertices(frShape *s, int *vertex_count);
 
 /* 다각형 `s`의 각 변과 수직인 모든 변이 저장된 배열의 메모리 주소를 반환한다. */
 Vector2 *frGetPolygonNormals(frShape *s, int *normal_count);
-
-/* 도형 `s`의 AABB를 반환한다. */
-Rectangle frGetShapeAABB(frShape *s, frTransform tx);
-
-/* 도형 `s`의 넓이를 반환한다. */
-float frGetShapeArea(frShape *s);
-
-/* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
-float frGetShapeInertia(frShape *s);
-
-/* 도형 `s`의 질량을 반환한다. */
-float frGetShapeMass(frShape *s);
-
-/* 도형 `s`의 재질을 반환한다. */
-frMaterial frGetShapeMaterial(frShape *s);
-
-/* 도형 `s`의 종류를 반환한다. */
-frShapeType frGetShapeType(frShape *s);
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius);
@@ -499,6 +505,9 @@ void frClearWorld(frWorld *world);
 
 /* 세계 `world`에서 강체 `body`를 제거한다. */
 bool frRemoveFromWorld(frWorld *world, frBody *body);
+
+/* 구조체 `frWorld`의 크기를 반환한다. */
+size_t frGetWorldStructSize(void);
 
 /* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
 frBody *frGetWorldBody(frWorld *world, int index);
