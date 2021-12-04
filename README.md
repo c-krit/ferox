@@ -2,9 +2,10 @@
 
 <img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
 
-![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
-![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)
-![license badge](https://img.shields.io/github/license/c-krit/ferox)
+[![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)](https://github.com/c-krit/ferox/releases)
+[![codefactor badge](https://www.codefactor.io/repository/github/c-krit/ferox/badge)](https://www.codefactor.io/repository/github/c-krit/ferox)
+[![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)](https://github.com/c-krit/ferox)
+[![license badge](https://img.shields.io/github/license/c-krit/ferox)](https://github.com/c-krit/ferox/blob/main/LICENSE)
 
 A 2D collision detection and physics library written in C.
 
@@ -58,6 +59,13 @@ $ make BUILD=STANDALONE
 ```
 
 ### Cross-compiling for Windows
+
+You may need to recompile raylib for Windows before building this library.
+
+```console
+$ git clone https://github.com/raysan5/raylib && cd raylib/src
+$ make -j`nproc` CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar OS=Windows_NT
+```
 
 Make sure to set the value of `RAYLIB_PATH` variable to cross-compile for Windows:
 

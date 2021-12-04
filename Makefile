@@ -22,9 +22,6 @@
 
 .PHONY: all clean
 
-BUILD := DEFAULT
-BUILD_TEXT := "$(shell echo $(BUILD) | tr '[:upper:]' '[:lower:]')"
-
 PROJECT_NAME := c-krit/ferox
 PROJECT_PATH := ferox
 PROJECT_PREFIX := $(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)
@@ -37,20 +34,20 @@ SOURCE_PATH := $(PROJECT_PATH)/src
 
 INCLUDE_PATH += $(SOURCE_PATH)/external
 
-SOURCES := \
+SOURCES :=                      \
 	$(SOURCE_PATH)/broadphase.c \
-	$(SOURCE_PATH)/collision.c \
-	$(SOURCE_PATH)/dynamics.c \
-	$(SOURCE_PATH)/geometry.c \
-	$(SOURCE_PATH)/timer.c \
-	$(SOURCE_PATH)/utils.c \
-	$(SOURCE_PATH)/vector.c \
+	$(SOURCE_PATH)/collision.c  \
+	$(SOURCE_PATH)/dynamics.c   \
+	$(SOURCE_PATH)/geometry.c   \
+	$(SOURCE_PATH)/timer.c      \
+	$(SOURCE_PATH)/utils.c      \
+	$(SOURCE_PATH)/vector.c     \
 	$(SOURCE_PATH)/world.c
-    
+
 OBJECTS := $(SOURCES:.c=.o)
 TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH)-standalone.a
 
-ifeq ($(BUILD),DEFAULT)
+ifneq ($(BUILD),STANDALONE)
 	SOURCES += $(SOURCE_PATH)/debug.c
 	OBJECTS += $(SOURCE_PATH)/debug.o
 	TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
@@ -86,7 +83,7 @@ endif
 all: pre-build build post-build
 
 pre-build:
-	@echo "$(PROJECT_PREFIX) Using: '$(CC)' and '$(AR)' to build a $(BUILD_TEXT)-mode static library."
+	@echo "$(PROJECT_PREFIX) Using: '$(CC)' and '$(AR)' to build a static library."
     
 build: $(TARGETS)
 
