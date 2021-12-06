@@ -250,7 +250,7 @@ void frSetBodyRotation(frBody *b, float rotation) {
 }
 
 /* 강체 `b`의 사용자 데이터를 `data`로 설정한다. */
-void *frSetBodyUserData(frBody *b, void *data) {
+void frSetBodyUserData(frBody *b, void *data) {
     if (b != NULL) b->data = data;
 }
 

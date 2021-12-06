@@ -308,7 +308,7 @@ void frSetBodyPosition(frBody *b, Vector2 p);
 void frSetBodyRotation(frBody *b, float rotation);
 
 /* 강체 `b`의 사용자 데이터를 `data`로 설정한다. */
-void *frSetBodyUserData(frBody *b, void *data);
+void frSetBodyUserData(frBody *b, void *data);
 
 /* 강체 `b`에 작용하는 모든 힘을 제거한다. */
 void frClearBodyForces(frBody *b);
