@@ -364,6 +364,14 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
 /* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
     if (b1 == NULL || b2 == NULL || !collision.check) return;
+
+    // 두 강체의 질량이 0에 수렴하면 충돌을 해결하지 않는다.
+    if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
+        b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        
+        return;
+    }
     
     float epsilon = FR_NUMBER_MAX(0.0f, FR_NUMBER_MIN(b1->material.restitution, b2->material.restitution));
     

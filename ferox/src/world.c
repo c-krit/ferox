@@ -209,10 +209,6 @@ static void frUpdateWorld(frWorld *world, double dt) {
             frBody *b1 = world->bodies[i];
             frBody *b2 = world->bodies[j];
             
-            // 두 강체의 질량의 역수의 합이 0이면 충돌 처리 과정에서 제외한다.
-            if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
-                continue;
-            
             frCollision collision = frComputeCollision(
                 frGetBodyShape(b1),
                 frGetBodyTransform(b1),

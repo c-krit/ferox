@@ -40,6 +40,7 @@ EXAMPLES := \
 	bouncy  \
 	bricks  \
 	bullet  \
+	jump    \
 	laser
     
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
