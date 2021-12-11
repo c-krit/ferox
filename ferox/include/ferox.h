@@ -471,10 +471,10 @@ float frVec2Distance(Vector2 v1, Vector2 v2);
 /* 벡터 `v1`과 `v2` 사이의 거리의 제곱을 반환한다. */
 float frVec2DistanceSqr(Vector2 v1, Vector2 v2);
 
-/* 평면 위의 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
+/* 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
 float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v);
 
-/* 영점을 기준으로 벡터 `v2`를 `angle` (단위: rad.)만큼 회전시킨 벡터를 반환한다. */
+/* 영점을 기준으로 벡터 `v`를 `angle` (단위: rad.)만큼 회전시킨 벡터를 반환한다. */
 Vector2 frVec2Rotate(Vector2 v, float angle);
 
 /* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */

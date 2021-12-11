@@ -104,7 +104,7 @@ float frVec2DistanceSqr(Vector2 v1, Vector2 v2) {
     return frVec2MagnitudeSqr(frVec2Subtract(v1, v2));
 }
 
-/* 평면 위의 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
+/* 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
 float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v) {
     return frVec2DotProduct(frVec2Subtract(q, p), frVec2LeftNormal(v));
 }
