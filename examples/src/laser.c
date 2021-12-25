@@ -34,6 +34,7 @@
 })
 
 #define SEMO_MATERIAL ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
+#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -71,7 +72,7 @@ int main(void) {
         frBody *ball = frCreateBodyFromShape(
             FR_BODY_STATIC, 
             frVec2PixelsToMeters(position),
-            frCreateCircle(FR_DYNAMICS_DEFAULT_MATERIAL, GetRandomValue(1, 3))
+            frCreateCircle(ENEMY_MATERIAL, GetRandomValue(1, 3))
         );
         
         frAddToWorld(world, ball);
@@ -98,7 +99,7 @@ int main(void) {
         for (int i = 1; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
-            frDrawBodyLines(body, BLACK);
+            frDrawBodyLines(body, 2, BLACK);
             
             Vector2 position_diff = frVec2Subtract(
                 frVec2PixelsToMeters(mouse_position), 

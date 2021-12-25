@@ -59,7 +59,7 @@ frBody *frCreateBody(frBodyType type, Vector2 p) {
     
     frBody *result = calloc(1, sizeof(frBody));
     
-    result->material = FR_DYNAMICS_DEFAULT_MATERIAL;
+    result->material = FR_STRUCT_ZERO(frMaterial);
     
     frSetBodyType(result, type);
     frSetBodyGravityScale(result, 1.0f);
@@ -101,7 +101,7 @@ void frDetachShapeFromBody(frBody *b) {
     if (b == NULL) return;
     
     b->shape = NULL;
-    b->material = FR_DYNAMICS_DEFAULT_MATERIAL;
+    b->material = FR_STRUCT_ZERO(frMaterial);
     b->aabb = FR_STRUCT_ZERO(Rectangle);
     
     frResetBodyMass(b);

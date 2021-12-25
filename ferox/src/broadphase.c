@@ -86,8 +86,8 @@ void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
                 arrput(entry->values, value);
             } else {
                 frSpatialHashEntry entry = (frSpatialHashEntry) { x + y, NULL };
-                arrput(entry.values, value);
 
+                arrput(entry.values, value);
                 hmputs(hash->map, entry);
             }
         }

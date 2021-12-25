@@ -49,7 +49,7 @@
     }
 
     /* 게임 화면에 강체 `b`의 도형 테두리를 그린다. */
-    void frDrawBodyLines(frBody *b, Color color) {
+    void frDrawBodyLines(frBody *b, float thick, Color color) {
         if (b == NULL || frGetBodyShape(b) == NULL) return;
         
         frShape *s = frGetBodyShape(b);
@@ -68,7 +68,7 @@
             int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
                 
             for (int j = world_vertex_count - 1, i = 0; i < world_vertex_count; j = i, i++)
-                DrawLineEx(world_vertices[j], world_vertices[i], 2, color);
+                DrawLineEx(world_vertices[j], world_vertices[i], thick, color);
         }
     }
 
@@ -94,11 +94,7 @@
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
     void frDrawBodyProperties(frBody *b, Color color) {
-        float mass = frGetBodyMass(b);
-        float inertia = frGetBodyInertia(b);
-        
         Vector2 velocity = frGetBodyVelocity(b);
-        float angular_velocity = frGetBodyAngularVelocity(b);
         
         frTransform tx = frGetBodyTransform(b);
         
@@ -108,9 +104,9 @@
                 "m: %fkg, I: %fkg*m²\n"
                 "(x, y) [theta]: (%f, %f) [%f rad.]\n"
                 "v [omega]: (%f, %f) [%f rad.]\n",
-                mass, inertia,
+                frGetBodyMass(b), frGetBodyInertia(b),
                 tx.position.x, tx.position.y, tx.rotation,
-                velocity.x, velocity.y, angular_velocity
+                velocity.x, velocity.y, frGetBodyAngularVelocity(b)
             ), 
             frVec2MetersToPixels(frVec2Add(tx.position, (Vector2) { 1, 1 })),
             10, 
@@ -149,8 +145,8 @@
     static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result) {
         if (b == NULL || result == NULL) return 0;
         
-        int vertex_count = 0;
-        Vector2 *vertices = frGetPolygonVertices(frGetBodyShape(b), &vertex_count);
+        Vector2 *vertices = NULL;
+        int vertex_count = frGetPolygonVertices(frGetBodyShape(b), &vertices);
         
         if (vertices != NULL) {
             for (int i = 0; i < vertex_count; i++)

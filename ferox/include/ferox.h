@@ -61,25 +61,24 @@
 
 /* | 매크로 정의... | */
 
-#define FR_GLOBAL_PIXELS_PER_METER 16.0f
+#define FR_GLOBAL_PIXELS_PER_METER             16.0f
 
-#define FR_BROADPHASE_CELL_SIZE 8
+#define FR_BROADPHASE_CELL_SIZE                4
 
-#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE 0.35f
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE     0.35f
 #define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.06f
-#define FR_DYNAMICS_DEFAULT_MATERIAL ((frMaterial) { 0.85f, 0.0f, 0.5f, 0.5f })
 
-#define FR_GEOMETRY_MAX_VERTEX_COUNT 16
+#define FR_GEOMETRY_MAX_VERTEX_COUNT           16
 
-#define FR_WORLD_ACCUMULATOR_LIMIT 200.0
-#define FR_WORLD_DEFAULT_GRAVITY ((Vector2) { .y = 9.8f })
-#define FR_WORLD_MAX_OBJECT_COUNT 256
-#define FR_WORLD_MAX_ITERATIONS 16
+#define FR_WORLD_ACCUMULATOR_LIMIT             200.0
+#define FR_WORLD_DEFAULT_GRAVITY               ((Vector2) { .y = 9.8f })
+#define FR_WORLD_MAX_BODY_COUNT                128
+#define FR_WORLD_MAX_ITERATIONS                4
 
-#define FR_STRUCT_ZERO(T) ((T) { 0 })
+#define FR_STRUCT_ZERO(T)                     ((T) { 0 })
 
-#define FR_NUMBER_MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define FR_NUMBER_MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define FR_NUMBER_MIN(x, y)                   (((x) < (y)) ? (x) : (y))
+#define FR_NUMBER_MAX(x, y)                   (((x) > (y)) ? (x) : (y))
 
 /* | 자료형 정의... | */
 
@@ -93,7 +92,7 @@ typedef enum frBodyType {
 
 /* 도형의 종류를 나타내는 구조체. */
 typedef enum frShapeType {
-    FR_SHAPE_UNKNOWN = -1,
+    FR_SHAPE_UNKNOWN,
     FR_SHAPE_CIRCLE,
     FR_SHAPE_POLYGON
 } frShapeType;
@@ -203,7 +202,7 @@ frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, 
     void frDrawBody(frBody *b, Color color);
 
     /* 게임 화면에 강체 `b`의 도형 테두리를 그린다. */
-    void frDrawBodyLines(frBody *b, Color color);
+    void frDrawBodyLines(frBody *b, float thick, Color color);
 
     /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
     void frDrawBodyAABB(frBody *b, Color color);
@@ -375,11 +374,11 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx);
 /* 원 `s`의 반지름을 반환한다. */
 float frGetCircleRadius(frShape *s);
 
-/* 다각형 `s`의 꼭짓점 배열의 메모리 주소를 반환한다. */
-Vector2 *frGetPolygonVertices(frShape *s, int *vertex_count);
+/* 다각형 `s`의 꼭짓점 배열의 메모리 주소와 꼭짓점 개수를 반환한다. */
+int frGetPolygonVertices(frShape *s, Vector2 **vertices);
 
-/* 다각형 `s`의 각 변과 수직인 모든 변이 저장된 배열의 메모리 주소를 반환한다. */
-Vector2 *frGetPolygonNormals(frShape *s, int *normal_count);
+/* 다각형 `s`의 각 변의 법선 벡터 배열의 메모리 주소와 법선의 개수를 반환한다. */
+int frGetPolygonNormals(frShape *s, Vector2 **normals);
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius);
@@ -471,10 +470,10 @@ float frVec2Distance(Vector2 v1, Vector2 v2);
 /* 벡터 `v1`과 `v2` 사이의 거리의 제곱을 반환한다. */
 float frVec2DistanceSqr(Vector2 v1, Vector2 v2);
 
-/* 평면 위의 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
+/* 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
 float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v);
 
-/* 영점을 기준으로 벡터 `v2`를 `angle` (단위: rad.)만큼 회전시킨 벡터를 반환한다. */
+/* 영점을 기준으로 벡터 `v`를 `angle` (단위: rad.)만큼 회전시킨 벡터를 반환한다. */
 Vector2 frVec2Rotate(Vector2 v, float angle);
 
 /* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */
