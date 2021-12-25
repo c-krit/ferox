@@ -31,9 +31,9 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.75f, 0.75f })
-#define CURSOR_MATERIAL ((frMaterial) { 2.5f, 0.0f, 0.75f, 0.75f })
-#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.5f })
+#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.75f, 1.0f })
+#define CURSOR_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.75f, 0.75f })
+#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.65f, 0.75f })
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -101,8 +101,12 @@ int main(void) {
         
         frDrawBody(floor, BLACK);
         
-        for (int i = 2; i < frGetWorldBodyCount(world); i++)
-            frDrawBody(frGetWorldBody(world, i), RED);
+        for (int i = 2; i < frGetWorldBodyCount(world); i++) {
+            frBody *body = frGetWorldBody(world, i);
+
+            frDrawBody(body, RED);
+            // frDrawBodyLines(body, 1, GREEN);
+        }
         
         frDrawBody(cursor, Fade(RED, 0.5f));
         

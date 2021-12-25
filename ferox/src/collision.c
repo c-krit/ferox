@@ -60,14 +60,8 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
 /* 최적화된 분리 축 정리를 이용하여, 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
 
-/* 선분 `e1`에서 선분 `e2`의 바깥쪽 영역에 해당되는 부분을 모두 잘라낸다. */
-static frEdge frClipEdge(frEdge e1, frEdge e2);
-
 /* 선분 `e`에서 벡터 `v`와의 내적이 `min_dot`보다 작은 부분을 모두 잘라낸다. */
 static frEdge frClipEdgeWithAxis(frEdge e, Vector2 v, float min_dot);
-
-/* 다각형 `s`에서 선분 `e`의 바깥쪽 영역에 해당되는 부분을 모두 잘라낸다. */
-static frShape *frClipPolygon(frShape *s, frEdge e);
 
 /* `o1`에서 `v1` 방향으로 진행하는 광선이 `o2`에서 `v2` 방향으로 진행하는 광선과 만나는지 계산한다. */
 static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector2 v2, float *distance);
@@ -109,8 +103,8 @@ frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, 
     } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
         int intersection_count = 0;
         
-        int vertex_count = -1;
-        Vector2 *vertices = frGetPolygonVertices(s, &vertex_count);
+        Vector2 *vertices = NULL;
+        int vertex_count = frGetPolygonVertices(s, &vertices);
         
         // 다각형의 변 중에 광선과 교차하는 변이 존재하는지 확인한다.
         for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
@@ -153,8 +147,8 @@ static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
     
     v = frVec2Rotate(v, -tx.rotation);
     
-    int vertex_count = -1;
-    Vector2 *vertices = frGetPolygonVertices(s, &vertex_count);
+    Vector2 *vertices = NULL;
+    int vertex_count = frGetPolygonVertices(s, &vertices);
     
     float max_dot = -FLT_MAX;
     
@@ -188,8 +182,8 @@ static frEdge frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v) {
     } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
         int furthest_index = frGetPolygonFurthestIndex(s, tx, v);
         
-        int vertex_count = -1;
-        Vector2 *vertices = frGetPolygonVertices(s, &vertex_count);
+        Vector2 *vertices = NULL;
+        int vertex_count = frGetPolygonVertices(s, &vertices);
 
         int prev_index = (furthest_index == 0) ? vertex_count - 1 : furthest_index - 1;
         int next_index = (furthest_index == vertex_count - 1) ? 0 : furthest_index + 1;
@@ -226,12 +220,13 @@ static int frGetSeparatingAxisIndex(
 
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON) 
         return result;
+
+    Vector2 *s1_vertices = NULL, *s2_vertices = NULL, *s1_normals = NULL;
+
+    int s1_vertex_count = frGetPolygonVertices(s1, &s1_vertices);
+    int s2_vertex_count = frGetPolygonVertices(s2, &s2_vertices);
     
-    Vector2 *s1_vertices = frGetPolygonVertices(s1, NULL);
-    Vector2 *s2_vertices = frGetPolygonVertices(s2, NULL);
-    
-    int s1_normal_count = -1;
-    Vector2 *s1_normals = frGetPolygonNormals(s1, &s1_normal_count);
+    int s1_normal_count = frGetPolygonNormals(s1, &s1_normals);
     
     float max_distance = -FLT_MAX;
     
@@ -295,11 +290,13 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         circle = s2, polygon = s1;
         circle_tx = tx2, polygon_tx = tx1;
     }
-    
-    int normal_index = -1, vertex_count = -1;
-    
-    Vector2 *vertices = frGetPolygonVertices(polygon, &vertex_count);
-    Vector2 *normals = frGetPolygonNormals(polygon, NULL);
+
+    int vertex_count = -1, normal_count = -1, normal_index = -1;
+
+    Vector2 *vertices = NULL, *normals = NULL;
+
+    vertex_count = frGetPolygonVertices(polygon, &vertices);
+    normal_count = frGetPolygonNormals(polygon, &normals);
     
     float max_distance = -FLT_MAX;
     
@@ -374,7 +371,6 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         Vector2 diff = frVec2Subtract(p1, circle_tx.position);
 
         if (v1_dot <= 0.0f) {
-            // 원과 다각형이 서로 만나는지 확인한다.
             if (frVec2MagnitudeSqr(diff) > radius * radius)
                 return result;
                 
@@ -382,13 +378,11 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         } else if (v2_dot <= 0.0f) {
             diff = frVec2Subtract(p2, circle_tx.position);
         
-            // 원과 다각형이 서로 만나는지 확인한다.
             if (frVec2MagnitudeSqr(diff) > radius * radius)
                 return result;
 
             result.points[0] = result.points[1] = p2;
         } else {
-            // 원과 다각형이 서로 만나는지 확인한다.
             if (frVec2DotProduct(diff, result.direction) > radius)
                 return result;
 
@@ -417,7 +411,7 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON)
         return result;
     
-    float depth1 = -FLT_MAX, depth2 = -FLT_MAX;
+    float depth1 = FLT_MAX, depth2 = FLT_MAX;
     
     int index1 = frGetSeparatingAxisIndex(s1, tx1, s2, tx2, &depth1);
     if (depth1 >= 0.0f) return result;
@@ -425,8 +419,10 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     int index2 = frGetSeparatingAxisIndex(s2, tx2, s1, tx1, &depth2);
     if (depth2 >= 0.0f) return result;
 
-    Vector2 *s1_normals = frGetPolygonNormals(s1, NULL);
-    Vector2 *s2_normals = frGetPolygonNormals(s2, NULL);
+    Vector2 *s1_normals = NULL, *s2_normals = NULL;
+
+    int s1_normal_count = frGetPolygonNormals(s1, &s1_normals);
+    int s2_normal_count = frGetPolygonNormals(s2, &s2_normals);
     
     Vector2 direction = (depth1 > depth2) 
         ? frVec2Rotate(s1_normals[index1], tx1.rotation)
@@ -510,51 +506,6 @@ static frCollision frComputeCollisionSAT(frShape *s1, frTransform tx1, frShape *
         return frComputeCollisionPolysSAT(s1, tx1, s2, tx2);
 }
 
-/* 선분 `e1`에서 선분 `e2`의 바깥쪽 영역에 해당되는 부분을 모두 잘라낸다. */
-static frEdge frClipEdge(frEdge e1, frEdge e2) {
-    frEdge result = FR_STRUCT_ZERO(frEdge);
-    
-    // `e1`의 시작점과 끝점이 선분 `e2`의 안쪽에 있는지 확인한다.
-    bool inside_p1 = frVec2CCW(e1.points[0], e2.points[0], e2.points[1]);
-    bool inside_p2 = frVec2CCW(e1.points[1], e2.points[0], e2.points[1]);
-        
-    if (inside_p1 && inside_p2) {
-        result.points[0] = e1.points[1];
-        result.points[1] = e1.points[1];
-        
-        result.count = 1;
-    } else {
-        Vector2 e1_v = frVec2Subtract(e1.points[1], e1.points[0]);
-        Vector2 e2_v = frVec2Subtract(e2.points[1], e2.points[0]);
-        
-        float distance = FLT_MAX;
-        
-        frComputeIntersectionRays(e1.points[0], e1_v, e2.points[0], e2_v, &distance);
-
-        Vector2 midpoint = frVec2Add(
-            e1.points[0], 
-            frVec2ScalarMultiply(
-                e1_v,
-                distance
-            )
-        );
-        
-        if (inside_p1 && !inside_p2) {
-            result.points[0] = midpoint;
-            result.points[1] = midpoint;
-
-            result.count = 1;
-        } else if (!inside_p1 && inside_p2) {
-            result.points[0] = midpoint;
-            result.points[1] = e1.points[1];
-
-            result.count = 2;
-        }
-    }
-    
-    return result;
-}
-
 /* 선분 `e`에서 벡터 `v`와의 내적이 `min_dot`보다 작은 부분을 모두 잘라낸다. */
 static frEdge frClipEdgeWithAxis(frEdge e, Vector2 v, float min_dot) {
     frEdge result = FR_STRUCT_ZERO(frEdge);
@@ -595,30 +546,6 @@ static frEdge frClipEdgeWithAxis(frEdge e, Vector2 v, float min_dot) {
             result.count = 2;
         }
     }
-    
-    return result;
-}
-
-/* 다각형 `s`에서 선분 `e`의 바깥쪽 영역에 해당되는 부분을 모두 잘라낸다. */
-static frShape *frClipPolygon(frShape *s, frEdge e) {
-    if (frGetShapeType(s) != FR_SHAPE_POLYGON || e.count < 2) return NULL;
-    
-    frShape *result = frCreateShape();
-    frSetShapeType(result, FR_SHAPE_POLYGON);
-    
-    int vertex_count = -1, new_vertex_count = 0;
-    
-    Vector2 *vertices = frGetPolygonVertices(s, &vertex_count);
-    Vector2 new_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT];
-    
-    for (int j = vertex_count - 1, i = 0; i < vertex_count; j = i, i++) {
-        frEdge new_e = frClipEdge((frEdge) { vertices[j], vertices[i], 2 }, e);
-        
-        for (int k = 0; k < new_e.count; k++)
-            new_vertices[new_vertex_count++] = new_e.points[i];
-    }
-    
-    frSetPolygonVertices(result, new_vertices, new_vertex_count);
     
     return result;
 }

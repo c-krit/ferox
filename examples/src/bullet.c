@@ -35,6 +35,7 @@
 
 #define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 0.75f, 0.75f })
 #define BULLET_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.5f, 0.5f })
+#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
 static const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
 
@@ -95,7 +96,7 @@ int main(void) {
         frBody *enemy = frCreateBodyFromShape(
             FR_BODY_DYNAMIC, 
             frVec2PixelsToMeters(position),
-            frCreateCircle(FR_DYNAMICS_DEFAULT_MATERIAL, GetRandomValue(1, 3))
+            frCreateCircle(ENEMY_MATERIAL, GetRandomValue(1, 3))
         );
         
         frSetBodyUserData(enemy, (void *) &ENEMY_DATA);
@@ -130,7 +131,7 @@ int main(void) {
             frSetBodyRotation(body, frVec2Angle((Vector2) { .y = -1 }, direction));
             frSetBodyUserData(body, (void *) &BULLET_DATA);
             
-            frApplyImpulse(body, frVec2ScalarMultiply(frVec2Normalize(direction), 0.003f));
+            frApplyImpulse(body, frVec2ScalarMultiply(frVec2Normalize(direction), 0.005f));
             
             frAddToWorld(world, body);
         }
@@ -149,7 +150,7 @@ int main(void) {
             
             if (*user_data == SEMO_DATA) frDrawBody(body, DARKGRAY);
             else if (*user_data == BULLET_DATA) frDrawBody(body, RED);
-            else frDrawBodyLines(body, BLACK);
+            else frDrawBodyLines(body, 2, BLACK);
         }
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));

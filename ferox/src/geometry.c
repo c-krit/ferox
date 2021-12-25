@@ -225,24 +225,24 @@ float frGetCircleRadius(frShape *s) {
     return (s != NULL && s->type == FR_SHAPE_CIRCLE) ? s->circle.radius : 0.0f;
 }
 
-/* 다각형 `s`의 꼭짓점 배열의 메모리 주소를 반환한다. */
-Vector2 *frGetPolygonVertices(frShape *s, int *vertex_count) {
-    if (s == NULL) return NULL;
+/* 다각형 `s`의 꼭짓점 배열의 메모리 주소와 꼭짓점 개수를 반환한다. */
+int frGetPolygonVertices(frShape *s, Vector2 **vertices) {
+    if (s == NULL) return 0;
     
-    if (vertex_count != NULL) 
-        *vertex_count = s->polygon.vertices.count;
+    if (vertices != NULL)
+        *vertices = s->polygon.vertices.data;
     
-    return s->polygon.vertices.data;
+    return s->polygon.vertices.count;
 }
 
-/* 다각형 `s`의 각 변과 수직인 모든 변이 저장된 배열의 메모리 주소를 반환한다. */
-Vector2 *frGetPolygonNormals(frShape *s, int *normal_count) {
-    if (s == NULL) return NULL;
+/* 다각형 `s`의 각 변의 법선 벡터 배열의 메모리 주소와 법선의 개수를 반환한다. */
+int frGetPolygonNormals(frShape *s, Vector2 **normals) {
+    if (s == NULL) return 0;
     
-    if (normal_count != NULL) 
-        *normal_count = s->polygon.normals.count;
+    if (normals != NULL)
+        *normals = s->polygon.normals.data;
     
-    return s->polygon.normals.data;
+    return s->polygon.normals.count;
 }
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */

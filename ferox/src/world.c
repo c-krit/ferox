@@ -32,6 +32,7 @@ typedef struct frWorld {
     frSpatialHash *hash;
     frCollision *collisions;
     frCollisionHandler handler;
+    double accumulator;
     double timestamp;
     int *queries;
 } frWorld;
@@ -49,9 +50,9 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     result->hash = frCreateSpatialHash(bounds, FR_BROADPHASE_CELL_SIZE);
     result->timestamp = frGetCurrentTime();
     
-    arrsetcap(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
-    arrsetcap(result->collisions, FR_WORLD_MAX_OBJECT_COUNT);
-    arrsetcap(result->queries, FR_WORLD_MAX_OBJECT_COUNT);
+    arrsetcap(result->bodies, FR_WORLD_MAX_BODY_COUNT);
+    arrsetcap(result->collisions, FR_WORLD_MAX_BODY_COUNT);
+    arrsetcap(result->queries, FR_WORLD_MAX_BODY_COUNT);
     
     return result;
 }
@@ -78,7 +79,7 @@ void frReleaseWorld(frWorld *world) {
 
 /* 세계 `world`에 강체 `body`를 추가한다. */
 bool frAddToWorld(frWorld *world, frBody *body) {
-    if (world == NULL || arrlen(world->bodies) >= FR_WORLD_MAX_OBJECT_COUNT) 
+    if (world == NULL || arrlen(world->bodies) >= FR_WORLD_MAX_BODY_COUNT) 
         return false;
     
     arrput(world->bodies, body);
@@ -171,16 +172,15 @@ void frSimulateWorld(frWorld *world, double dt) {
     
     double current_time = frGetCurrentTime();
     double elapsed_time = frGetTimeDifference(current_time, world->timestamp);
-    
-    double accumulator = elapsed_time;
-    
-    if (elapsed_time > FR_WORLD_ACCUMULATOR_LIMIT) 
-        elapsed_time = FR_WORLD_ACCUMULATOR_LIMIT;
-    
-    for (; accumulator >= dt; accumulator -= dt)
-        frUpdateWorld(world, dt);
-    
+
+    world->accumulator += elapsed_time;
     world->timestamp = current_time;
+    
+    if (world->accumulator > FR_WORLD_ACCUMULATOR_LIMIT)
+        world->accumulator = FR_WORLD_ACCUMULATOR_LIMIT;
+    
+    for (; world->accumulator >= dt; world->accumulator -= dt)
+        frUpdateWorld(world, dt);
 }
 
 /* 세계 `world`를 시간 `dt` (단위: ms)만큼 업데이트한다. */
@@ -194,7 +194,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
     
     // 공간 해시맵에서 다른 강체와 충돌할 가능성이 높은 모든 강체를 찾는다.
-    for (int i = 0; i < arrlen(world->bodies); i++) {   
+    for (int i = 0; i < arrlen(world->bodies); i++) {
         frQuerySpatialHash(
             world->hash, 
             frGetBodyAABB(world->bodies[i]), 

@@ -27,6 +27,7 @@ A 2D collision detection and physics library written in C.
 - Narrow-phase collision detection with SAT (Separating Axis Theorem)
 - 'Sequential Impulse' iterative constraint solver
 - Semi-implicit (symplectic) Euler integrator
+- Support for collision event callbacks
 
 ## Prerequisites
 
