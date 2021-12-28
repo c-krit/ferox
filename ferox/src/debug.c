@@ -57,10 +57,13 @@
         if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
             Vector2 p = frGetBodyPosition(b);
             
-            DrawCircleLines(
-                frNumberMetersToPixels(p.x), 
-                frNumberMetersToPixels(p.y), 
-                frNumberMetersToPixels(frGetCircleRadius(s)), 
+            DrawRing(
+                frVec2MetersToPixels(p),
+                frNumberMetersToPixels(frGetCircleRadius(s)) - thick,
+                frNumberMetersToPixels(frGetCircleRadius(s)),
+                0,
+                360,
+                64,
                 color
             );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {

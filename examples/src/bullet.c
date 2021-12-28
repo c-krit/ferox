@@ -37,6 +37,8 @@
 #define BULLET_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.5f, 0.5f })
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
+#define MAX_ENEMY_COUNT 32
+
 static const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
 
 static void DrawCustomCursor(Vector2 position);
@@ -82,7 +84,7 @@ int main(void) {
     
     frAddToWorld(world, semo);
     
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < MAX_ENEMY_COUNT; i++) {
         Vector2 position = FR_STRUCT_ZERO(Vector2);
         
         position.x = GetRandomValue(0, 1) 
