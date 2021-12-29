@@ -87,7 +87,6 @@ frRaycastHit frComputeBodyRaycast(frBody *b, Vector2 o, Vector2 v, float max_dis
         );
 
         result.body = b;
-        result.shape = NULL;
 
         return result;
     }

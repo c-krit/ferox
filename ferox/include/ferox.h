@@ -207,9 +207,6 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, Vector2 o, Vector
 /* 강체 `b`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
 frRaycastHit frComputeBodyRaycast(frBody *b, Vector2 o, Vector2 v, float max_distance);
 
-/* 세계 `world`의 모든 강체에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-// int frComputeWorldRaycast(frWorld *world, Vector2 o, Vector2 v, float max_distance, frRaycastHit *result);
-
 /* | `debug` 모듈 함수... | */
 
 #ifndef FEROX_STANDALONE
@@ -432,6 +429,9 @@ double frGetTimeSince(double old_time);
 
 /* | `utils` 모듈 함수... | */
 
+/* 두 점 `p1`과 `p2`로 만든 직사각형 구조체를 반환한다. */
+Rectangle frCreateRectangle(Vector2 p1, Vector2 p2);
+
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frNumberApproxEquals(float f1, float f2);
 
@@ -558,5 +558,8 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity);
 
 /* 세계 `world`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt);
+
+/* 세계 `world`의 모든 강체에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
+int frComputeWorldRaycast(frWorld *world, Vector2 o, Vector2 v, float max_distance, frRaycastHit *result);
 
 #endif

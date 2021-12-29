@@ -36,7 +36,7 @@
 #define SEMO_MATERIAL ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
-#define MAX_ENEMY_COUNT 32
+#define MAX_ENEMY_COUNT 100
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -80,6 +80,8 @@ int main(void) {
         frAddToWorld(world, ball);
     }
 
+    frRaycastHit hits[MAX_ENEMY_COUNT];
+
     while (!WindowShouldClose()) {
         BeginDrawing();
         
@@ -97,33 +99,27 @@ int main(void) {
                 )
             )
         );
-        
-        for (int i = 1; i < frGetWorldBodyCount(world); i++) {
-            frBody *body = frGetWorldBody(world, i);
-            
-            frDrawBodyLines(body, 2, BLACK);
-            
-            Vector2 position_diff = frVec2Subtract(
-                frVec2PixelsToMeters(mouse_position), 
-                frVec2PixelsToMeters(SCREEN_CENTER)
-            );
-            
-            frRaycastHit raycast = frComputeBodyRaycast(
-                body,
-                frVec2PixelsToMeters(SCREEN_CENTER),
-                position_diff,
-                frVec2Magnitude(position_diff)
-            );
-            
-            if (!raycast.check) continue;
-            
+
+        Vector2 v = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
+
+        int count = frComputeWorldRaycast(
+            world, 
+            frVec2PixelsToMeters(SCREEN_CENTER), 
+            v, 
+            frVec2Magnitude(v),
+            hits
+        );
+
+        for (int i = 0; i < count; i++)
             DrawCircleLines(
-                frNumberMetersToPixels(raycast.point.x),
-                frNumberMetersToPixels(raycast.point.y),
-                6, 
+                frNumberMetersToPixels(hits[i].point.x),
+                frNumberMetersToPixels(hits[i].point.y),
+                6,
                 RED
             );
-        }
+        
+        for (int i = 1; i < frGetWorldBodyCount(world); i++)
+            frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
         
         DrawLineEx(SCREEN_CENTER, mouse_position, 1, RED);
         

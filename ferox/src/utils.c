@@ -27,6 +27,16 @@
 
 /* | `utils` 모듈 함수... | */
 
+/* 두 점 `p1`과 `p2`로 만든 직사각형 구조체를 반환한다. */
+Rectangle frCreateRectangle(Vector2 p1, Vector2 p2) {
+    return (Rectangle) {
+        .x = FR_NUMBER_MIN(p1.x, p2.x),
+        .y = FR_NUMBER_MIN(p1.y, p2.y),
+        .width = FR_NUMBER_MAX(p2.x - p1.x, p1.x - p2.x),
+        .height = FR_NUMBER_MAX(p2.y - p1.y, p1.y - p2.y)
+    };
+}
+
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π, center + π]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center) {
     return angle - ((2 * PI) * floor((angle + PI - center) / (2 * PI)));
