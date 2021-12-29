@@ -121,8 +121,13 @@
     /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
     void frDrawSpatialHash(frSpatialHash *hm) {
         Rectangle bounds = frGetSpatialHashBounds(hm);
+
+        const float inverse_cell_size = 1.0f / FR_BROADPHASE_CELL_SIZE;
+
+        const int v_count = bounds.width * inverse_cell_size;
+        const int h_count = bounds.height * inverse_cell_size;
         
-        for (int i = 0; i < (bounds.width / FR_BROADPHASE_CELL_SIZE); i++)
+        for (int i = 0; i <= v_count; i++)
             DrawLineEx(
                 frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0 })),
                 frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height })),
@@ -130,7 +135,7 @@
                 GRAY
             );
     
-        for (int i = 0; i < (bounds.height / FR_BROADPHASE_CELL_SIZE); i++)
+        for (int i = 0; i <= h_count; i++)
             DrawLineEx(
                 frVec2MetersToPixels(((Vector2) { 0, FR_BROADPHASE_CELL_SIZE * i })), 
                 frVec2MetersToPixels(((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i })),
@@ -148,14 +153,11 @@
     static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result) {
         if (b == NULL || result == NULL) return 0;
         
-        Vector2 *vertices = NULL;
-        int vertex_count = frGetPolygonVertices(frGetBodyShape(b), &vertices);
+        frVertices vertices = frGetPolygonVertices(frGetBodyShape(b));
         
-        if (vertices != NULL) {
-            for (int i = 0; i < vertex_count; i++)
-                result[i] = frVec2MetersToPixels(frGetWorldPoint(b, vertices[i]));
-        }
+        for (int i = 0; i < vertices.count; i++)
+            result[i] = frVec2MetersToPixels(frGetWorldPoint(b, vertices.data[i]));
         
-        return vertex_count;
+        return vertices.count;
     }
 #endif

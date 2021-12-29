@@ -73,7 +73,7 @@
 #define FR_WORLD_ACCUMULATOR_LIMIT             200.0
 #define FR_WORLD_DEFAULT_GRAVITY               ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_BODY_COUNT                128
-#define FR_WORLD_MAX_ITERATIONS                6
+#define FR_WORLD_MAX_ITERATIONS                4
 
 #define FR_STRUCT_ZERO(T)                     ((T) { 0 })
 
@@ -111,6 +111,12 @@ typedef struct frTransform {
     float rotation;
 } frTransform;
 
+/* 다각형의 꼭짓점 배열을 나타내는 구조체. */
+typedef struct frVertices {
+    Vector2 data[FR_GEOMETRY_MAX_VERTEX_COUNT];
+    int count;
+} frVertices;
+
 /* 도형을 나타내는 구조체. */
 typedef struct frShape frShape;
 
@@ -136,10 +142,13 @@ typedef struct frCollisionHandler {
     frCollisionCallback post_solve;
 } frCollisionHandler;
 
-/* 도형에 광선을 투사했을 때의 결과를 나타내는 구조체. */
+/* 도형 또는 강체에 광선을 투사했을 때의 결과를 나타내는 구조체. */
 typedef struct frRaycastHit {
     bool check;
-    frShape *shape;
+    union {
+        frShape *shape;
+        frBody *body;
+    };
     Vector2 point;
     Vector2 normal;
     float distance;
@@ -192,8 +201,14 @@ int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
 /* 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
 frCollision frComputeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
 
-/* `p`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 도형 `s`에 투사한다. */
-frRaycastHit frComputeRaycast(frShape *s, frTransform tx, Vector2 p, Vector2 v, float max_distance);
+/* 도형 `s`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
+frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, Vector2 o, Vector2 v, float max_distance);
+
+/* 강체 `b`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
+frRaycastHit frComputeBodyRaycast(frBody *b, Vector2 o, Vector2 v, float max_distance);
+
+/* 세계 `world`의 모든 강체에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
+// int frComputeWorldRaycast(frWorld *world, Vector2 o, Vector2 v, float max_distance, frRaycastHit *result);
 
 /* | `debug` 모듈 함수... | */
 
@@ -294,8 +309,8 @@ void frSetBodyVelocity(frBody *b, Vector2 v);
 /* 강체 `b`의 각속도를 `a`로 설정한다. */
 void frSetBodyAngularVelocity(frBody *b, double a);
 
-/* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
-void frSetBodyGravityScale(frBody *b, float gravity_scale);
+/* 강체 `b`의 중력 가속률을 `scale`로 설정한다. */
+void frSetBodyGravityScale(frBody *b, float scale);
 
 /* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
 void frSetBodyTransform(frBody *b, frTransform tx);
@@ -374,11 +389,17 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx);
 /* 원 `s`의 반지름을 반환한다. */
 float frGetCircleRadius(frShape *s);
 
-/* 다각형 `s`의 꼭짓점 배열의 메모리 주소와 꼭짓점 개수를 반환한다. */
-int frGetPolygonVertices(frShape *s, Vector2 **vertices);
+/* 다각형 `s`의 `index + 1`번째 꼭짓점을 반환한다. */
+Vector2 frGetPolygonVertex(frShape *s, int index);
 
-/* 다각형 `s`의 각 변의 법선 벡터 배열의 메모리 주소와 법선의 개수를 반환한다. */
-int frGetPolygonNormals(frShape *s, Vector2 **normals);
+/* 다각형 `s`의 `index + 1`번째 법선 벡터를 반환한다. */
+Vector2 frGetPolygonNormal(frShape *s, int index);
+
+/* 다각형 `s`의 꼭짓점 배열을 반환한다. */
+frVertices frGetPolygonVertices(frShape *s);
+
+/* 다각형 `s`의 법선 벡터 배열을 반환한다. */
+frVertices frGetPolygonNormals(frShape *s);
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius);

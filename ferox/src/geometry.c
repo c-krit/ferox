@@ -34,14 +34,8 @@ typedef struct frShape {
             float radius;
         } circle;
         struct {
-            struct {
-                Vector2 data[FR_GEOMETRY_MAX_VERTEX_COUNT];
-                int count;
-            } vertices;
-            struct {
-                Vector2 data[FR_GEOMETRY_MAX_VERTEX_COUNT];
-                int count;
-            } normals;
+            frVertices vertices;
+            frVertices normals;
         } polygon;
     };
 } frShape;
@@ -225,24 +219,42 @@ float frGetCircleRadius(frShape *s) {
     return (s != NULL && s->type == FR_SHAPE_CIRCLE) ? s->circle.radius : 0.0f;
 }
 
-/* 다각형 `s`의 꼭짓점 배열의 메모리 주소와 꼭짓점 개수를 반환한다. */
-int frGetPolygonVertices(frShape *s, Vector2 **vertices) {
-    if (s == NULL) return 0;
-    
-    if (vertices != NULL)
-        *vertices = s->polygon.vertices.data;
-    
-    return s->polygon.vertices.count;
+/* 다각형 `s`의 `index + 1`번째 꼭짓점을 반환한다. */
+Vector2 frGetPolygonVertex(frShape *s, int index) {
+    return (s != NULL && index >= 0 && index < s->polygon.vertices.count)
+        ? s->polygon.vertices.data[index]
+        : FR_STRUCT_ZERO(Vector2);
 }
 
-/* 다각형 `s`의 각 변의 법선 벡터 배열의 메모리 주소와 법선의 개수를 반환한다. */
-int frGetPolygonNormals(frShape *s, Vector2 **normals) {
-    if (s == NULL) return 0;
+/* 다각형 `s`의 `index + 1`번째 법선 벡터를 반환한다. */
+Vector2 frGetPolygonNormal(frShape *s, int index) {
+    return (s != NULL && index >= 0 && index < s->polygon.normals.count)
+        ? s->polygon.normals.data[index]
+        : FR_STRUCT_ZERO(Vector2);
+}
+
+/* 다각형 `s`의 꼭짓점 배열을 반환한다. */
+frVertices frGetPolygonVertices(frShape *s) {
+    if (s == NULL) return FR_STRUCT_ZERO(frVertices);
+
+    frVertices result = { .count = s->polygon.vertices.count };
     
-    if (normals != NULL)
-        *normals = s->polygon.normals.data;
+    for (int i = 0; i < result.count; i++)
+        result.data[i] = s->polygon.vertices.data[i];
     
-    return s->polygon.normals.count;
+    return result;
+}
+
+/* 다각형 `s`의 법선 벡터 배열을 반환한다. */
+frVertices frGetPolygonNormals(frShape *s) {
+    if (s == NULL) return FR_STRUCT_ZERO(frVertices);
+
+    frVertices result = { .count = s->polygon.normals.count };
+    
+    for (int i = 0; i < result.count; i++)
+        result.data[i] = s->polygon.normals.data[i];
+    
+    return result;
 }
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
@@ -305,7 +317,7 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
         
         return (delta_x * delta_x) + (delta_y * delta_y) <= r * r;
     } else if (s->type == FR_SHAPE_POLYGON) {
-        frRaycastHit raycast = frComputeRaycast(s, tx, p, (Vector2) { .x = 1.0f }, FLT_MAX);
+        frRaycastHit raycast = frComputeShapeRaycast(s, tx, p, (Vector2) { .x = 1.0f }, FLT_MAX);
         
         return raycast.inside;
     }

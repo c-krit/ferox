@@ -216,11 +216,11 @@ void frSetBodyAngularVelocity(frBody *b, double a) {
     b->motion.angular_velocity = a;
 }
 
-/* 강체 `b`의 중력 가속률을 `gravity_scale`로 설정한다. */
-void frSetBodyGravityScale(frBody *b, float gravity_scale) {
+/* 강체 `b`의 중력 가속률을 `scale`로 설정한다. */
+void frSetBodyGravityScale(frBody *b, float scale) {
     if (b == NULL || b->type == FR_BODY_STATIC || b->type == FR_BODY_KINEMATIC) return;
     
-    b->motion.gravity_scale = gravity_scale;
+    b->motion.gravity_scale = scale;
 }
 
 /* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 

@@ -108,9 +108,8 @@ int main(void) {
                 frVec2PixelsToMeters(SCREEN_CENTER)
             );
             
-            frRaycastHit raycast = frComputeRaycast(
-                frGetBodyShape(body),
-                frGetBodyTransform(body),
+            frRaycastHit raycast = frComputeBodyRaycast(
+                body,
                 frVec2PixelsToMeters(SCREEN_CENTER),
                 position_diff,
                 frVec2Magnitude(position_diff)
@@ -130,6 +129,8 @@ int main(void) {
         
         frDrawBody(semo, DARKGRAY);
         frDrawBodyAABB(semo, GREEN);
+
+        frDrawSpatialHash(frGetWorldSpatialHash(world));
         
         frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
         
