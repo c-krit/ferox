@@ -41,7 +41,7 @@ $ sudo apt install build-essential git
 
 ### Optional
 
-Make sure you have installed [raylib 3.7.0+](https://github.com/raysan5/raylib) to compile all examples.
+Make sure you have installed [raylib 4.0.0+](https://github.com/raysan5/raylib) to compile all examples.
 
 ## Building
 

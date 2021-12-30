@@ -39,7 +39,7 @@ $ sudo apt install build-essential git
 
 ### 선택 조건
 
-이 프로젝트에 포함된 예제 프로그램을 빌드하시려면 [raylib 3.7.0 이상의 버전](https://github.com/raysan5/raylib)이 필요합니다.
+이 프로젝트에 포함된 예제 프로그램을 빌드하시려면 [raylib 4.0.0 이상의 버전](https://github.com/raysan5/raylib)이 필요합니다.
 
 ## 빌드 방법
 
