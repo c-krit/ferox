@@ -317,7 +317,10 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
         
         return (delta_x * delta_x) + (delta_y * delta_y) <= r * r;
     } else if (s->type == FR_SHAPE_POLYGON) {
-        frRaycastHit raycast = frComputeShapeRaycast(s, tx, p, (Vector2) { .x = 1.0f }, FLT_MAX);
+        frRaycastHit raycast = frComputeShapeRaycast(
+            s, tx, 
+            (frRay) { p, (Vector2) { .x = 1.0f }, FLT_MAX }
+        );
         
         return raycast.inside;
     }

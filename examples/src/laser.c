@@ -88,6 +88,7 @@ int main(void) {
         ClearBackground(RAYWHITE);
         
         Vector2 mouse_position = GetMousePosition();
+        Vector2 difference = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
         
         frSetBodyRotation(
             semo, 
@@ -100,15 +101,12 @@ int main(void) {
             )
         );
 
-        Vector2 v = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
+        frRay ray = { frVec2PixelsToMeters(SCREEN_CENTER), difference, frVec2Magnitude(difference) };
 
-        int count = frComputeWorldRaycast(
-            world, 
-            frVec2PixelsToMeters(SCREEN_CENTER), 
-            v, 
-            frVec2Magnitude(v),
-            hits
-        );
+        int count = frComputeWorldRaycast(world, ray, hits);
+
+        for (int i = 1; i < frGetWorldBodyCount(world); i++)
+            frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
 
         for (int i = 0; i < count; i++)
             DrawCircleLines(
@@ -117,9 +115,6 @@ int main(void) {
                 6,
                 RED
             );
-        
-        for (int i = 1; i < frGetWorldBodyCount(world); i++)
-            frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
         
         DrawLineEx(SCREEN_CENTER, mouse_position, 1, RED);
         

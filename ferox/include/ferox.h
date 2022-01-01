@@ -61,24 +61,27 @@
 
 /* | 매크로 정의... | */
 
-#define FR_GLOBAL_PIXELS_PER_METER             16.0f
+#define FR_GLOBAL_PIXELS_PER_METER                16.0f
 
-#define FR_BROADPHASE_CELL_SIZE                4
+#define FR_BROADPHASE_CELL_SIZE                   4
 
-#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE     0.35f
-#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD 0.06f
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.35f
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.06f
+#define FR_DYNAMICS_SLEEP_ANGULAR_THRESHOLD       0.1f
+#define FR_DYNAMICS_SLEEP_LINEAR_THRESHOLD        0.1f
+#define FR_DYNAMICS_SLEEP_WAKE_COUNTER            1000.0
 
-#define FR_GEOMETRY_MAX_VERTEX_COUNT           16
+#define FR_GEOMETRY_MAX_VERTEX_COUNT              16
 
-#define FR_WORLD_ACCUMULATOR_LIMIT             200.0
-#define FR_WORLD_DEFAULT_GRAVITY               ((Vector2) { .y = 9.8f })
-#define FR_WORLD_MAX_BODY_COUNT                128
-#define FR_WORLD_MAX_ITERATIONS                4
+#define FR_WORLD_ACCUMULATOR_LIMIT                200.0
+#define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
+#define FR_WORLD_MAX_BODY_COUNT                   128
+#define FR_WORLD_MAX_ITERATIONS                   4
 
-#define FR_STRUCT_ZERO(T)                     ((T) { 0 })
+#define FR_STRUCT_ZERO(T)                         ((T) { 0 })
 
-#define FR_NUMBER_MIN(x, y)                   (((x) < (y)) ? (x) : (y))
-#define FR_NUMBER_MAX(x, y)                   (((x) > (y)) ? (x) : (y))
+#define FR_NUMBER_MIN(x, y)                       (((x) < (y)) ? (x) : (y))
+#define FR_NUMBER_MAX(x, y)                       (((x) > (y)) ? (x) : (y))
 
 /* | 자료형 정의... | */
 
@@ -142,7 +145,14 @@ typedef struct frCollisionHandler {
     frCollisionCallback post_solve;
 } frCollisionHandler;
 
-/* 도형 또는 강체에 광선을 투사했을 때의 결과를 나타내는 구조체. */
+/* 광선을 나타내는 구조체. */
+typedef struct frRay {
+    Vector2 origin;
+    Vector2 direction;
+    float max_distance;
+} frRay;
+
+/* 광선 투사의 결과를 나타내는 구조체. */
 typedef struct frRaycastHit {
     bool check;
     union {
@@ -201,11 +211,11 @@ int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
 /* 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
 frCollision frComputeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
 
-/* 도형 `s`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, Vector2 o, Vector2 v, float max_distance);
+/* 도형 `s`에 광선을 투사한다. */
+frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray);
 
-/* 강체 `b`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-frRaycastHit frComputeBodyRaycast(frBody *b, Vector2 o, Vector2 v, float max_distance);
+/* 강체 `b`에 광선을 투사한다. */
+frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray);
 
 /* | `debug` 모듈 함수... | */
 
@@ -559,7 +569,7 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity);
 /* 세계 `world`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt);
 
-/* 세계 `world`의 모든 강체에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-int frComputeWorldRaycast(frWorld *world, Vector2 o, Vector2 v, float max_distance, frRaycastHit *result);
+/* 세계 `world`의 모든 강체에 광선을 투사한다. */
+int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *result);
 
 #endif

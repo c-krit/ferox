@@ -183,8 +183,8 @@ void frSimulateWorld(frWorld *world, double dt) {
         frUpdateWorld(world, dt);
 }
 
-/* 세계 `world`의 모든 강체에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-int frComputeWorldRaycast(frWorld *world, Vector2 o, Vector2 v, float max_distance, frRaycastHit *result) {
+/* 세계 `world`의 모든 강체에 광선을 투사한다. */
+int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *result) {
     if (world == NULL || result == NULL) return -1;
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
@@ -192,15 +192,21 @@ int frComputeWorldRaycast(frWorld *world, Vector2 o, Vector2 v, float max_distan
 
     frQuerySpatialHash(
         world->hash, 
-        frCreateRectangle(o, frVec2Add(o, frVec2ScalarMultiply(frVec2Normalize(v), max_distance))),
+        frCreateRectangle(
+            ray.origin, 
+            frVec2Add(
+                ray.origin, 
+                frVec2ScalarMultiply(frVec2Normalize(ray.direction), ray.max_distance)
+            )
+        ),
         &world->queries
     );
 
     int count = 0;
 
     for (int i = 0; i < arrlen(world->queries); i++) {
-        frRaycastHit raycast = frComputeBodyRaycast(world->bodies[world->queries[i]], o, v, max_distance);
-
+        frRaycastHit raycast = frComputeBodyRaycast(world->bodies[world->queries[i]], ray);
+        
         if (raycast.check) result[count++] = raycast;
     }
 
