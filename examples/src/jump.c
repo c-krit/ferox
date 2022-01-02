@@ -33,11 +33,13 @@
 
 #define EXAMPLE_STRING "PRESS SPACE TO JUMP!"
 
-#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.5f })
-#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.75f, 0.75f })
+#define BOX_MATERIAL    ((frMaterial) { 1.75f, 0.0f, 1.0f, 1.0f })
+#define BRICK_MATERIAL  ((frMaterial) { 1.85f, 0.0f, 1.05f, 1.05f })
+#define FLOOR_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.0f, 1.0f })
+#define GROUND_MATERIAL ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.25f })
 
-#define BRICK_HORIZONTAL_SPEED 0.018f
-#define BRICK_VERTICAL_SPEED 0.035f
+#define BRICK_HORIZONTAL_SPEED 0.016f
+#define BRICK_VERTICAL_SPEED 0.02f
 
 typedef struct Brick {
     int width;
@@ -49,7 +51,11 @@ typedef struct Brick {
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100;
 
+static Brick brick = { .width = 40, .height = 80 };
+
 static void HandleBrickMovement(frWorld *world, Brick *brick);
+
+static void onCollisionPreSolve(frCollision *collision);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -58,16 +64,32 @@ int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | jump.c");
     
     frWorld *world = frCreateWorld(
-        frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.0001f),
+        frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
     );
 
-    Brick brick = {
-        .width = 40,
-        .height = 80
+    frSetWorldCollisionHandler(
+        world,
+        (frCollisionHandler) {
+            .pre_solve = onCollisionPreSolve
+        }
+    );
+
+    Vector2 box_vertices[4] = {
+        frVec2PixelsToMeters((Vector2) { -25, -20 }),
+        frVec2PixelsToMeters((Vector2) { -25, 20 }),
+        frVec2PixelsToMeters((Vector2) { 25, 20 }),
+        frVec2PixelsToMeters((Vector2) { 25, -20 })
     };
 
     Vector2 floor_vertices[4] = {
+        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, -20 }),
+        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, 20 }),
+        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, 20 }),
+        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, -20 })
+    };
+
+    Vector2 ground_vertices[4] = {
         frVec2PixelsToMeters((Vector2) { -0.5f * SCREEN_WIDTH, -60 }),
         frVec2PixelsToMeters((Vector2) { -0.5f * SCREEN_WIDTH, 60 }),
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 60 }),
@@ -81,20 +103,41 @@ int main(void) {
         frVec2PixelsToMeters((Vector2) { (brick.width / 2), -(brick.height / 2) })
     };
 
-    frBody *floor = frCreateBodyFromShape(
-        FR_BODY_STATIC, 
-        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 60 }),
-        frCreatePolygon(FLOOR_MATERIAL, floor_vertices, 4)
-    );
-
     brick.body = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC,
-        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 300 }),
+        FR_BODY_DYNAMIC,
+        FR_FLAG_INFINITE_INERTIA,
+        frVec2PixelsToMeters((Vector2) { 0.35f * SCREEN_WIDTH, SCREEN_HEIGHT / 3 }),
         frCreatePolygon(BRICK_MATERIAL, brick_vertices, 4)
     );
 
-    frAddToWorld(world, floor);
+    frSetBodyUserData(brick.body, (void *) &brick);
+
+    frBody *box = frCreateBodyFromShape(
+        FR_BODY_DYNAMIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, 0.25f * SCREEN_HEIGHT}),
+        frCreatePolygon(BOX_MATERIAL, box_vertices, 4)
+    );
+
+    frBody *floor = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, 0.7f * SCREEN_HEIGHT }),
+        frCreatePolygon(FLOOR_MATERIAL, floor_vertices, 4)
+    );
+
+    frBody *ground = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 60 }),
+        frCreatePolygon(GROUND_MATERIAL, ground_vertices, 4)
+    );
+
     frAddToWorld(world, brick.body);
+
+    frAddToWorld(world, box);
+    frAddToWorld(world, floor);
+    frAddToWorld(world, ground);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -103,7 +146,10 @@ int main(void) {
 
         HandleBrickMovement(world, &brick);
 
+        frDrawBody(ground, BLACK);
         frDrawBody(floor, BLACK);
+        frDrawBody(box, DARKGRAY);
+
         frDrawBody(brick.body, RED);
 
         frDrawSpatialHash(frGetWorldSpatialHash(world));
@@ -112,28 +158,6 @@ int main(void) {
         
         Vector2 position = frGetBodyPosition(brick.body);
         Vector2 velocity = frGetBodyVelocity(brick.body);
-
-        /*
-        DrawTextEx(
-            GetFontDefault(),
-            TextFormat(
-                "is_jumping: %s\n"
-                "on_ground: %s\n"
-                "position: (%f, %f)\n"
-                "velocity: (%f, %f)",
-                brick.is_jumping ? "true" : "false",
-                brick.on_ground ? "true" : "false",
-                position.x, position.y,
-                velocity.x, velocity.y
-            ),
-            (Vector2) { 8, 8 },
-            10,
-            2,
-            DARKGRAY
-        );
-        */
-
-        DrawFPS(8, 8);
 
         DrawTextEx(
             GetFontDefault(),
@@ -146,6 +170,8 @@ int main(void) {
             2, 
             Fade(GRAY, 0.85f)
         );
+
+        DrawFPS(8, 8);
 
         EndDrawing();
     }
@@ -164,16 +190,10 @@ static void HandleBrickMovement(frWorld *world, Brick *brick) {
     float half_brick_width = frNumberPixelsToMeters(brick->width) / 2;
     float half_brick_height = frNumberPixelsToMeters(brick->height) / 2;
 
-    if (position.x <= half_brick_width)
+    if (position.x <= half_brick_width) 
         position.x = half_brick_width;
-
-    if (position.x >= SCREEN_WIDTH_IN_METERS - half_brick_width)
+    else if (position.x >= SCREEN_WIDTH_IN_METERS - half_brick_width)
         position.x = SCREEN_WIDTH_IN_METERS - half_brick_width;
-    
-    if (position.y >= SCREEN_HEIGHT_IN_METERS - (half_brick_height + frNumberPixelsToMeters(2 * 60))) {
-        position.y = SCREEN_HEIGHT_IN_METERS - (half_brick_height + frNumberPixelsToMeters(2 * 60));
-        brick->on_ground = true;
-    }
 
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)) {
         if (IsKeyDown(KEY_LEFT)) velocity.x = -BRICK_HORIZONTAL_SPEED;
@@ -189,19 +209,34 @@ static void HandleBrickMovement(frWorld *world, Brick *brick) {
         velocity.y = -BRICK_VERTICAL_SPEED;
     }
 
-    if (!brick->on_ground) {
-        velocity = frVec2Add(
-            velocity,
-            frVec2ScalarMultiply(
-                frGetWorldGravity(world), 
-                DELTA_TIME
-            )
-        );
-    } else {
-        brick->is_jumping = false;
-        velocity.y = 0.0f;
-    }
+    if (brick->on_ground) brick->is_jumping = false;
 
     frSetBodyPosition(brick->body, position);
     frSetBodyVelocity(brick->body, velocity);
+}
+
+static void onCollisionPreSolve(frCollision *collision) {
+    frBody *brick_body = NULL;
+
+    frBody *body1 = collision->_bodies[0];
+    frBody *body2 = collision->_bodies[1];
+    
+    frBodyType type1 = frGetBodyType(body1);
+    frBodyType type2 = frGetBodyType(body2);
+
+    Brick *data1 = frGetBodyUserData(body1);
+    Brick *data2 = frGetBodyUserData(body2);
+
+    if (data1 != NULL && data2 == NULL) {
+        if (type2 == FR_BODY_STATIC) brick_body = body1;
+    } else if (data1 == NULL && data2 != NULL) {
+        if (type1 == FR_BODY_STATIC) brick_body = body2;
+    }
+
+    if (brick_body == NULL) return;
+
+    Brick *brick = frGetBodyUserData(brick_body);
+
+    if (collision->check) brick->on_ground = true;
+    else brick->on_ground = false;
 }

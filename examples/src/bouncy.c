@@ -33,9 +33,9 @@
 
 #define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 1.25f, 0.25f, 0.25f })
 
-#define BALL1_MATERIAL ((frMaterial) { 0.3f, 0.85f, 0.65f, 0.5f })
-#define BALL2_MATERIAL ((frMaterial) { 0.2f, 0.65f, 0.65f, 0.5f })
-#define BALL3_MATERIAL ((frMaterial) { 0.1f, 0.5f, 0.65f, 0.5f })
+#define BALL1_MATERIAL  ((frMaterial) { 0.3f, 0.85f, 0.65f, 0.5f })
+#define BALL2_MATERIAL  ((frMaterial) { 0.2f, 0.65f, 0.65f, 0.5f })
+#define BALL3_MATERIAL  ((frMaterial) { 0.1f, 0.5f, 0.65f, 0.5f })
 
 #define CURSOR_MATERIAL ((frMaterial) { 2.5f, 0.5f, 0.75f, 0.75f })
 
@@ -58,7 +58,8 @@ int main(void) {
     };
     
     frBody *floor = frCreateBodyFromShape(
-        FR_BODY_STATIC, 
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 80 }),
         frCreatePolygon(FLOOR_MATERIAL, floor_vertices, 4)
     );
@@ -66,19 +67,22 @@ int main(void) {
     frAddToWorld(world, floor);
     
     frBody *ball1 = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC, 
+        FR_BODY_DYNAMIC,
+        FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, SCREEN_HEIGHT / 4 }),
         frCreateCircle(BALL1_MATERIAL, 1.5f)
     );
     
     frBody *ball2 = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC, 
+        FR_BODY_DYNAMIC,
+        FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT / 4 }),
         frCreateCircle(BALL2_MATERIAL, 2.0f)
     );
     
     frBody *ball3 = frCreateBodyFromShape(
         FR_BODY_DYNAMIC, 
+        FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.75f * SCREEN_WIDTH, SCREEN_HEIGHT / 4 }),
         frCreateCircle(BALL3_MATERIAL, 2.75f)
     );
@@ -89,6 +93,7 @@ int main(void) {
     
     frBody *cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
+        FR_FLAG_NONE,
         FR_STRUCT_ZERO(Vector2),
         frCreateCircle(CURSOR_MATERIAL, 0.5f)
     );

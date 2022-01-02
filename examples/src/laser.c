@@ -33,7 +33,7 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define SEMO_MATERIAL ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
+#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
 #define MAX_ENEMY_COUNT 100
@@ -53,7 +53,8 @@ int main(void) {
     };
     
     frBody *semo = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC, 
+        FR_BODY_KINEMATIC,
+        FR_FLAG_NONE,
         frVec2PixelsToMeters(SCREEN_CENTER),
         frCreatePolygon(SEMO_MATERIAL, semo_vertices, 3)
     );
@@ -72,7 +73,8 @@ int main(void) {
             : GetRandomValue(0.55f * SCREEN_HEIGHT, SCREEN_HEIGHT);
         
         frBody *ball = frCreateBodyFromShape(
-            FR_BODY_STATIC, 
+            FR_BODY_STATIC,
+            FR_FLAG_NONE,
             frVec2PixelsToMeters(position),
             frCreateCircle(ENEMY_MATERIAL, GetRandomValue(1, 3))
         );

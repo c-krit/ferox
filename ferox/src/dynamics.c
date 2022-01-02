@@ -40,6 +40,7 @@ typedef struct frMotionData {
 /* 강체를 나타내는 구조체. */
 typedef struct frBody {
     frBodyType type;
+    frBodyFlags flags;
     frMaterial material;
     frMotionData motion;
     frTransform tx;
@@ -54,7 +55,7 @@ typedef struct frBody {
 static void frResetBodyMass(frBody *b);
 
 /* 종류가 `type`이고 위치가 `p`인 강체를 생성한다. */
-frBody *frCreateBody(frBodyType type, Vector2 p) {
+frBody *frCreateBody(frBodyType type, frBodyFlags flags, Vector2 p) {
     if (type == FR_BODY_UNKNOWN) return NULL;
     
     frBody *result = calloc(1, sizeof(frBody));
@@ -62,17 +63,18 @@ frBody *frCreateBody(frBodyType type, Vector2 p) {
     result->material = FR_STRUCT_ZERO(frMaterial);
     
     frSetBodyType(result, type);
+    frSetBodyFlags(result, flags);
     frSetBodyGravityScale(result, 1.0f);
     frSetBodyPosition(result, p);
     
     return result;
 }
 
-/* 종류가 `type`이고 위치가 `p`이며 충돌 처리용 도형이 `shape`인 강체를 생성한다. */
-frBody *frCreateBodyFromShape(frBodyType type, Vector2 p, frShape *s) {
+/* 종류가 `type`이고 위치가 `p`이며 충돌 처리용 도형이 `s`인 강체를 생성한다. */
+frBody *frCreateBodyFromShape(frBodyType type, frBodyFlags flags, Vector2 p, frShape *s) {
     if (type == FR_BODY_UNKNOWN) return NULL;
     
-    frBody *result = frCreateBody(type, p);
+    frBody *result = frCreateBody(type, flags, p);
     frAttachShapeToBody(result, s);
     
     return result;
@@ -115,6 +117,11 @@ size_t frGetBodyStructSize(void) {
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b) {
     return (b != NULL) ? b->type : FR_BODY_UNKNOWN;
+}
+
+/* 강체 `b`의 비트 플래그 조합을 반환한다. */
+frBodyFlags frGetBodyFlags(frBody *b) {
+    return (b != NULL) ? b->flags : 0;
 }
 
 /* 강체 `b`의 질량을 반환한다. */
@@ -202,23 +209,28 @@ void frSetBodyType(frBody *b, frBodyType type) {
     frResetBodyMass(b);
 }
 
+/* 강체 `b`의 비트 플래그 조합을 `flags`으로 설정한다. */
+void frSetBodyFlags(frBody *b, frBodyFlags flags) {
+    if (b == NULL || b->flags == flags) return;
+
+    b->flags = flags;
+
+    frResetBodyMass(b);
+}
+
 /* 강체 `b`의 속도를 `v`로 설정한다. */
 void frSetBodyVelocity(frBody *b, Vector2 v) {
-    if (b == NULL || b->motion.inverse_mass > 0.0f) return;
-    
-    b->motion.velocity = v;
+    if (b != NULL) b->motion.velocity = v;
 }
 
 /* 강체 `b`의 각속도를 `a`로 설정한다. */
 void frSetBodyAngularVelocity(frBody *b, double a) {
-    if (b == NULL || b->motion.inverse_mass > 0.0f) return;
-    
-    b->motion.angular_velocity = a;
+    if (b != NULL) b->motion.angular_velocity = a;
 }
 
 /* 강체 `b`의 중력 가속률을 `scale`로 설정한다. */
 void frSetBodyGravityScale(frBody *b, float scale) {
-    if (b == NULL || b->type == FR_BODY_STATIC || b->type == FR_BODY_KINEMATIC) return;
+    if (b == NULL || b->type != FR_BODY_DYNAMIC) return;
     
     b->motion.gravity_scale = scale;
 }
@@ -303,10 +315,9 @@ void frClearBodyForces(frBody *b) {
 void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
     if (b1 == NULL || b2 == NULL || !collision.check) return;
     
-    // 두 강체의 질량이 0에 수렴하면 위치를 보정하지 않는다.
     if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
-        b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
-        b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        if (frGetBodyType(b1) == FR_BODY_STATIC) b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        if (frGetBodyType(b2) == FR_BODY_STATIC) b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
         
         return;
     }
@@ -365,10 +376,9 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
     if (b1 == NULL || b2 == NULL || !collision.check) return;
 
-    // 두 강체의 질량이 0에 수렴하면 충돌을 해결하지 않는다.
     if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
-        b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
-        b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        if (frGetBodyType(b1) == FR_BODY_STATIC) b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        if (frGetBodyType(b2) == FR_BODY_STATIC) b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
         
         return;
     }
@@ -468,8 +478,11 @@ static void frResetBodyMass(frBody *b) {
         b->motion.angular_velocity = 0.0f;
     } else if (b->type == FR_BODY_DYNAMIC) {
         if (b->shape != NULL) {
-            b->motion.mass = frGetShapeMass(b->shape);
-            b->motion.inertia = frGetShapeInertia(b->shape);
+            if (!(b->flags & FR_FLAG_INFINITE_MASS))
+                b->motion.mass = frGetShapeMass(b->shape);
+            
+            if (!(b->flags & FR_FLAG_INFINITE_INERTIA))
+                b->motion.inertia = frGetShapeInertia(b->shape);
         }
     }
     

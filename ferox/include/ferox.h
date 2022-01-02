@@ -26,6 +26,7 @@
 #include <float.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #ifndef FEROX_STANDALONE
@@ -66,10 +67,10 @@
 #define FR_BROADPHASE_CELL_SIZE                   4
 
 #define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.35f
-#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.06f
-#define FR_DYNAMICS_SLEEP_ANGULAR_THRESHOLD       0.1f
-#define FR_DYNAMICS_SLEEP_LINEAR_THRESHOLD        0.1f
-#define FR_DYNAMICS_SLEEP_WAKE_COUNTER            1000.0
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.04f
+// #define FR_DYNAMICS_SLEEP_ANGULAR_THRESHOLD       0.1f
+// #define FR_DYNAMICS_SLEEP_LINEAR_THRESHOLD        0.1f
+// #define FR_DYNAMICS_SLEEP_WAKE_COUNTER            1000.0
 
 #define FR_GEOMETRY_MAX_VERTEX_COUNT              16
 
@@ -93,7 +94,17 @@ typedef enum frBodyType {
     FR_BODY_DYNAMIC
 } frBodyType;
 
-/* 도형의 종류를 나타내는 구조체. */
+/* 강체의 비트 플래그를 나타내는 열거형. */
+typedef enum frBodyFlag {
+    FR_FLAG_NONE = 0x00,
+    FR_FLAG_INFINITE_MASS = 0x01,
+    FR_FLAG_INFINITE_INERTIA = 0x02
+} frBodyFlag;
+
+/* 강체의 비트 플래그 조합을 나타내는 자료형. */
+typedef uint8_t frBodyFlags;
+
+/* 도형의 종류를 나타내는 열거형. */
 typedef enum frShapeType {
     FR_SHAPE_UNKNOWN,
     FR_SHAPE_CIRCLE,
@@ -242,10 +253,10 @@ frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray);
 /* | `dynamics` 모듈 함수... | */
 
 /* 종류가 `type`이고 위치가 `p`인 강체를 생성한다. */
-frBody *frCreateBody(frBodyType type, Vector2 p);
+frBody *frCreateBody(frBodyType type, frBodyFlags flags, Vector2 p);
 
-/* 종류가 `type`이고 위치가 `p`이며 충돌 처리용 도형이 `shape`인 강체를 생성한다. */
-frBody *frCreateBodyFromShape(frBodyType type, Vector2 p, frShape *s);
+/* 종류가 `type`이고 위치가 `p`이며 충돌 처리용 도형이 `s`인 강체를 생성한다. */
+frBody *frCreateBodyFromShape(frBodyType type, frBodyFlags flags, Vector2 p, frShape *s);
 
 /* 강체 `b`에 할당된 메모리를 해제한다. */
 void frReleaseBody(frBody *b);
@@ -262,22 +273,25 @@ size_t frGetBodyStructSize(void);
 /* 강체 `b`의 종류를 반환한다. */
 frBodyType frGetBodyType(frBody *b);
 
+/* 강체 `b`의 비트 플래그 조합을 반환한다. */
+frBodyFlags frGetBodyFlags(frBody *b);
+
 /* 강체 `b`의 질량을 반환한다. */
 float frGetBodyMass(frBody *b);
 
 /* 강체 `b`의 질량의 역수를 반환한다. */
 float frGetBodyInverseMass(frBody *b);
 
-/* 강체 `b`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
+/* 강체 `b`의 관성 모멘트를 반환한다. */
 float frGetBodyInertia(frBody *b);
 
-/* 강체 `b`의 Z축을 기준으로 한 관성 모멘트의 역수를 반환한다. */
+/* 강체 `b`의 관성 모멘트의 역수를 반환한다. */
 float frGetBodyInverseInertia(frBody *b);
 
 /* 강체 `b`의 속도를 반환한다. */
 Vector2 frGetBodyVelocity(frBody *b);
 
-/* 강체 `b`의 각속를 반환한다. */
+/* 강체 `b`의 각속도를 반환한다. */
 float frGetBodyAngularVelocity(frBody *b);
 
 /* 강체 `b`의 중력 가속률을 반환한다. */
@@ -309,6 +323,9 @@ Vector2 frGetWorldPoint(frBody *b, Vector2 p);
 
 /* 강체 `b`의 종류를 `type`으로 설정한다. */
 void frSetBodyType(frBody *b, frBodyType type);
+
+/* 강체 `b`의 비트 플래그 조합을 `flags`으로 설정한다. */
+void frSetBodyFlags(frBody *b, frBodyFlags flags);
 
 /* 강체 `b`의 속도를 `v`로 설정한다. */
 void frSetBodyVelocity(frBody *b, Vector2 v);
@@ -387,7 +404,7 @@ float frGetShapeArea(frShape *s);
 /* 도형 `s`의 질량을 반환한다. */
 float frGetShapeMass(frShape *s);
 
-/* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
+/* 도형 `s`의 관성 모멘트를 반환한다. */
 float frGetShapeInertia(frShape *s);
 
 /* 도형 `s`의 AABB를 반환한다. */

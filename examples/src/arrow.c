@@ -51,6 +51,7 @@ int main(void) {
     
     frBody *large_circle = frCreateBodyFromShape(
         FR_BODY_STATIC,
+        FR_FLAG_NONE,
         (Vector2) { 
             SCREEN_WIDTH_IN_METERS * 0.5f, 
             SCREEN_HEIGHT_IN_METERS * 0.5f
@@ -60,6 +61,7 @@ int main(void) {
     
     frBody *cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
+        FR_FLAG_NONE,
         FR_STRUCT_ZERO(Vector2),
         circle
     );
