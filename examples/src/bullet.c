@@ -44,7 +44,6 @@ static const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
 static void DrawCustomCursor(Vector2 position);
 
 static void onCollisionPreSolve(frCollision *collision);
-static void onCollisionPostSolve(frCollision *collision);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -57,8 +56,7 @@ int main(void) {
     frSetWorldCollisionHandler(
         world,
         (frCollisionHandler) { 
-            .pre_solve = onCollisionPreSolve, 
-            .post_solve = onCollisionPostSolve 
+            .pre_solve = onCollisionPreSolve
         }
     );
     
@@ -75,7 +73,8 @@ int main(void) {
     };
     
     frBody *semo = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC, 
+        FR_BODY_KINEMATIC,
+        FR_FLAG_NONE,
         frVec2PixelsToMeters(SCREEN_CENTER),
         frCreatePolygon(SEMO_MATERIAL, semo_vertices, 3)
     );
@@ -96,7 +95,8 @@ int main(void) {
             : GetRandomValue(0.55f * SCREEN_HEIGHT, SCREEN_HEIGHT);
         
         frBody *enemy = frCreateBodyFromShape(
-            FR_BODY_DYNAMIC, 
+            FR_BODY_DYNAMIC,
+            FR_FLAG_NONE,
             frVec2PixelsToMeters(position),
             frCreateCircle(ENEMY_MATERIAL, GetRandomValue(1, 3))
         );
@@ -126,6 +126,7 @@ int main(void) {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             frBody *body = frCreateBodyFromShape(
                 FR_BODY_DYNAMIC,
+                FR_FLAG_NONE,
                 frGetWorldPoint(semo, semo_vertices[0]),
                 frCreatePolygon(BULLET_MATERIAL, bullet_vertices, 3)
             );
@@ -214,8 +215,4 @@ static void onCollisionPreSolve(frCollision *collision) {
             }
         );
     }
-}
-
-static void onCollisionPostSolve(frCollision *collision) {
-    // TODO: ...
 }

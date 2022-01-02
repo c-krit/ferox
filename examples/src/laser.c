@@ -33,7 +33,7 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define SEMO_MATERIAL ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
+#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
 #define MAX_ENEMY_COUNT 100
@@ -53,7 +53,8 @@ int main(void) {
     };
     
     frBody *semo = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC, 
+        FR_BODY_KINEMATIC,
+        FR_FLAG_NONE,
         frVec2PixelsToMeters(SCREEN_CENTER),
         frCreatePolygon(SEMO_MATERIAL, semo_vertices, 3)
     );
@@ -72,7 +73,8 @@ int main(void) {
             : GetRandomValue(0.55f * SCREEN_HEIGHT, SCREEN_HEIGHT);
         
         frBody *ball = frCreateBodyFromShape(
-            FR_BODY_STATIC, 
+            FR_BODY_STATIC,
+            FR_FLAG_NONE,
             frVec2PixelsToMeters(position),
             frCreateCircle(ENEMY_MATERIAL, GetRandomValue(1, 3))
         );
@@ -88,6 +90,7 @@ int main(void) {
         ClearBackground(RAYWHITE);
         
         Vector2 mouse_position = GetMousePosition();
+        Vector2 difference = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
         
         frSetBodyRotation(
             semo, 
@@ -100,15 +103,12 @@ int main(void) {
             )
         );
 
-        Vector2 v = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
+        frRay ray = { frVec2PixelsToMeters(SCREEN_CENTER), difference, frVec2Magnitude(difference) };
 
-        int count = frComputeWorldRaycast(
-            world, 
-            frVec2PixelsToMeters(SCREEN_CENTER), 
-            v, 
-            frVec2Magnitude(v),
-            hits
-        );
+        int count = frComputeWorldRaycast(world, ray, hits);
+
+        for (int i = 1; i < frGetWorldBodyCount(world); i++)
+            frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
 
         for (int i = 0; i < count; i++)
             DrawCircleLines(
@@ -117,9 +117,6 @@ int main(void) {
                 6,
                 RED
             );
-        
-        for (int i = 1; i < frGetWorldBodyCount(world); i++)
-            frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
         
         DrawLineEx(SCREEN_CENTER, mouse_position, 1, RED);
         

@@ -76,14 +76,14 @@ frCollision frComputeCollision(frShape *s1, frTransform tx1, frShape *s2, frTran
         : FR_STRUCT_ZERO(frCollision);
 }
 
-/* 강체 `b`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-frRaycastHit frComputeBodyRaycast(frBody *b, Vector2 o, Vector2 v, float max_distance) {
+/* 강체 `b`에 광선을 투사한다. */
+frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray) {
     if (b == NULL || frGetBodyShape(b) == NULL) {
         return FR_STRUCT_ZERO(frRaycastHit);
     } else {
         frRaycastHit result = frComputeShapeRaycast(
-            frGetBodyShape(b), frGetBodyTransform(b),
-            o, v, max_distance
+            frGetBodyShape(b), frGetBodyTransform(b), 
+            ray
         );
 
         result.body = b;
@@ -92,32 +92,36 @@ frRaycastHit frComputeBodyRaycast(frBody *b, Vector2 o, Vector2 v, float max_dis
     }
 }
 
-/* 도형 `s`에 `o`에서 `v` 방향으로 최대 `max_distance`의 거리까지 진행하는 광선을 투사한다. */
-frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, Vector2 o, Vector2 v, float max_distance) {
+/* 도형 `s`에 광선을 투사한다. */
+frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
     if (s == NULL || frGetShapeType(s) == FR_SHAPE_UNKNOWN) {
         return FR_STRUCT_ZERO(frRaycastHit);
     } else {
         frRaycastHit result = { .shape = s, .distance = FLT_MAX };
-        
-        float distance = FLT_MAX;
 
-        v = frVec2Normalize(v);
+        ray.direction = frVec2Normalize(ray.direction);
+
+        float distance = FLT_MAX;
         
         if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
             bool intersects = frComputeIntersectionRayCircle(
-                o, v,
+                ray.origin, ray.direction,
                 tx.position, frGetCircleRadius(s),
                 &distance
             );
             
-            result.check = (distance >= 0.0f) && (distance <= max_distance);
+            result.check = (distance >= 0.0f) && (distance <= ray.max_distance);
             result.inside = (distance < 0.0f);
             
             if (result.check) {
                 result.distance = distance;
                 
-                result.point = frVec2Add(o, frVec2ScalarMultiply(v, result.distance));
-                result.normal = frVec2LeftNormal(frVec2Subtract(o, result.point));
+                result.point = frVec2Add(
+                    ray.origin, 
+                    frVec2ScalarMultiply(ray.direction, result.distance)
+                );
+
+                result.normal = frVec2LeftNormal(frVec2Subtract(ray.origin, result.point));
             }
             
             return result;
@@ -134,16 +138,20 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, Vector2 o, Vector
                 );
                 
                 bool intersects = frComputeIntersectionRays(
-                    o, v, 
+                    ray.origin, ray.direction, 
                     frVec2Transform(vertices.data[j], tx), e_v, 
                     &distance
                 );
                 
-                if (intersects && distance <= max_distance) {
+                if (intersects && distance <= ray.max_distance) {
                     if (result.distance > distance) {
                         result.distance = distance;
                         
-                        result.point = frVec2Add(o, frVec2ScalarMultiply(v, result.distance));
+                        result.point = frVec2Add(
+                            ray.origin, 
+                            frVec2ScalarMultiply(ray.direction, result.distance)
+                        );
+
                         result.normal = frVec2LeftNormal(e_v);
                     }
                     

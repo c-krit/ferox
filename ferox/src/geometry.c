@@ -143,7 +143,7 @@ float frGetShapeMass(frShape *s) {
     return (s != NULL) ? s->material.density * frGetShapeArea(s) : 0.0f;
 }
 
-/* 도형 `s`의 Z축을 기준으로 한 관성 모멘트를 반환한다. */
+/* 도형 `s`의 관성 모멘트를 반환한다. */
 float frGetShapeInertia(frShape *s) {
     if (s == NULL || s->type == FR_SHAPE_UNKNOWN) return 0.0f;
     
@@ -152,8 +152,7 @@ float frGetShapeInertia(frShape *s) {
     if (s->type == FR_SHAPE_CIRCLE) {
         result = 0.5f * frGetShapeMass(s) * (frGetCircleRadius(s) * frGetCircleRadius(s));
     } else if (s->type == FR_SHAPE_POLYGON) {
-        float x_inertia = 0.0f;
-        float y_inertia = 0.0f;
+        float x_inertia = 0.0f, y_inertia = 0.0f;
         
         // https://en.wikipedia.org/wiki/Second_moment_of_area#Any_polygon
         for (int j = s->polygon.vertices.count - 1, i = 0; i < s->polygon.vertices.count; j = i, i++) {
@@ -317,7 +316,10 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
         
         return (delta_x * delta_x) + (delta_y * delta_y) <= r * r;
     } else if (s->type == FR_SHAPE_POLYGON) {
-        frRaycastHit raycast = frComputeShapeRaycast(s, tx, p, (Vector2) { .x = 1.0f }, FLT_MAX);
+        frRaycastHit raycast = frComputeShapeRaycast(
+            s, tx, 
+            (frRay) { p, (Vector2) { .x = 1.0f }, FLT_MAX }
+        );
         
         return raycast.inside;
     }
