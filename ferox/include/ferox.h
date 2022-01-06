@@ -66,18 +66,15 @@
 
 #define FR_BROADPHASE_CELL_SIZE                   4
 
-#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.35f
-#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.04f
-// #define FR_DYNAMICS_SLEEP_ANGULAR_THRESHOLD       0.1f
-// #define FR_DYNAMICS_SLEEP_LINEAR_THRESHOLD        0.1f
-// #define FR_DYNAMICS_SLEEP_WAKE_COUNTER            1000.0
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.25f
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.02f
 
-#define FR_GEOMETRY_MAX_VERTEX_COUNT              16
+#define FR_GEOMETRY_MAX_VERTEX_COUNT              10
 
 #define FR_WORLD_ACCUMULATOR_LIMIT                200.0
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_BODY_COUNT                   128
-#define FR_WORLD_MAX_ITERATIONS                   4
+#define FR_WORLD_MAX_ITERATIONS                   32
 
 #define FR_STRUCT_ZERO(T)                         ((T) { 0 })
 

@@ -50,6 +50,7 @@ void frInitClock(void) {
 /* 단조 시계의 현재 시각 (단위: ms)을 반환한다. */
 double frGetCurrentTime(void) {
     if (!initialized) frInitClock();
+    
     return stm_ms(stm_now());
 }
 

@@ -33,8 +33,8 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.25f })
-#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
+#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 1.0f, 0.75f })
+#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
 #define MAX_ENEMY_COUNT 100
 

@@ -22,7 +22,7 @@
 
 #include "ferox.h"
 
-/* | `geometry` 모듈 구조체... | */
+/* | `geometry` 모듈 자료형 정의... | */
 
 /* 충돌 감지용 도형을 나타내는 구조체. */
 typedef struct frShape {
@@ -49,7 +49,7 @@ static void frComputeArea(frShape *s);
 static void frComputeConvex(frShape *s);
 
 /* 꼭짓점 배열 `vertices`로 만들 수 있는 가장 큰 볼록 다각형의 꼭짓점 배열을 반환한다. */
-static Vector2 *frJarvisMarch(Vector2 *vertices, int count, int *new_count);
+static frVertices frJarvisMarch(Vector2 *vertices, int count);
 
 /* 반지름이 `radius`인 원을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
 frShape *frCreateCircle(frMaterial material, float radius) {
@@ -165,7 +165,7 @@ float frGetShapeInertia(frShape *s) {
             y_inertia += cross * ((v1.x * v1.x) + (v1.x * v2.x) + (v2.x * v2.x));
         }
         
-        result = fabs((x_inertia + y_inertia) / 12.0f);
+        result = fabsf((x_inertia + y_inertia) / 12.0f);
     }
     
     return s->material.density * result;
@@ -275,8 +275,8 @@ void frSetPolygonVertices(frShape *s, Vector2 *vertices, int count) {
     for (int i = 0; i < count; i++)
         s->polygon.vertices.data[i] = vertices[i];
     
-    frComputeArea(s);
     frComputeConvex(s);
+    frComputeArea(s);
 
     for (int j = count - 1, i = 0; i < count; j = i, i++)
         s->polygon.normals.data[i] = frVec2LeftNormal(
@@ -312,9 +312,9 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
         float delta_x = p.x - tx.position.x;
         float delta_y = p.y - tx.position.y;
         
-        float r = frGetCircleRadius(s);
+        float radius = frGetCircleRadius(s);
         
-        return (delta_x * delta_x) + (delta_y * delta_y) <= r * r;
+        return (delta_x * delta_x) + (delta_y * delta_y) <= radius * radius;
     } else if (s->type == FR_SHAPE_POLYGON) {
         frRaycastHit raycast = frComputeShapeRaycast(
             s, tx, 
@@ -348,45 +348,39 @@ static void frComputeArea(frShape *s) {
             twice_area_sum += twice_area;
         }
 
-        s->area = fabs(twice_area_sum / 2.0f);
+        s->area = fabsf(twice_area_sum / 2.0f);
     }
 }
 
 /* 다각형 `s`를 볼록 다각형으로 변형한다. */
 static void frComputeConvex(frShape *s) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
-    
-    int new_count = 0;
         
-    Vector2 *vertices = frJarvisMarch(
+    frVertices result = frJarvisMarch(
         s->polygon.vertices.data,
-        s->polygon.vertices.count,
-        &new_count
+        s->polygon.vertices.count
     );
     
-    for (int i = 0; i < new_count; i++)
-        s->polygon.vertices.data[i] = vertices[i];
+    for (int i = 0; i < result.count; i++)
+        s->polygon.vertices.data[i] = result.data[i];
     
-    s->polygon.vertices.count = new_count;
-    
-    free(vertices);
+    s->polygon.vertices.count = result.count;
 }
 
 /* 꼭짓점 배열 `vertices`로 만들 수 있는 가장 큰 볼록 다각형의 꼭짓점 배열을 반환한다. */
-static Vector2 *frJarvisMarch(Vector2 *vertices, int count, int *new_count) {
-    int leftmost_index = 0, pivot_index = 0, next_index = 0;
-    int vertex_index = 0;
-    
-    if (vertices == NULL || count == 0 || new_count == NULL) return NULL;
-    
-    Vector2 *result = calloc(FR_GEOMETRY_MAX_VERTEX_COUNT, sizeof(Vector2));
+static frVertices frJarvisMarch(Vector2 *vertices, int count) {
+    frVertices result = FR_STRUCT_ZERO(frVertices);
+
+    if (vertices == NULL || count == 0) return result;
+
+    int leftmost_index = 0, pivot_index = 0, next_index = 0, vertex_index = 0;
     
     // 주어진 꼭짓점 배열에서 X좌표 값이 가장 작은 꼭짓점 L을 찾는다.
     for (int i = 1; i < count; i++)
         if (vertices[leftmost_index].x > vertices[i].x)
             leftmost_index = i;
     
-    result[vertex_index++] = vertices[leftmost_index];
+    result.data[vertex_index++] = vertices[leftmost_index];
     
     // 기준점 P를 방금 찾은 꼭짓점 L로 설정한다.
     pivot_index = leftmost_index;
@@ -419,10 +413,10 @@ static Vector2 *frJarvisMarch(Vector2 *vertices, int count, int *new_count) {
         pivot_index = next_index;
         
         // 새로 찾은 꼭짓점을 배열에 저장한다.
-        result[vertex_index++] = vertices[next_index];
+        result.data[vertex_index++] = vertices[next_index];
     }
     
-    *new_count = vertex_index;
+    result.count = vertex_index;
     
     return result;
 }

@@ -22,7 +22,7 @@
 
 #include "ferox.h"
 
-/* | `dynamics` 모듈 구조체... | */
+/* | `dynamics` 모듈 자료형 정의... | */
 
 /* 강체의 물리량을 나타내는 구조체. */
 typedef struct frMotionData {
@@ -407,10 +407,10 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
             )
         );
         
-        float relative_normal_velocity = frVec2DotProduct(relative_velocity, collision.direction);
+        float relative_velocity_dot = frVec2DotProduct(relative_velocity, collision.direction);
         
         // 두 강체가 서로 충돌하는 방향으로 진행하고 있지 않으면 계산을 종료한다.
-        if (relative_normal_velocity > 0.0f) return;
+        if (relative_velocity_dot > 0.0f) return;
         
         float r1_normal_dot = frVec2DotProduct(r1_normal, collision.direction);
         float r2_normal_dot = frVec2DotProduct(r2_normal, collision.direction);
@@ -418,9 +418,11 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
         float inverse_mass_sum = (b1->motion.inverse_mass + b2->motion.inverse_mass)
             + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
             + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
-            
-        float impulse_magnitude = (-(1.0f + epsilon) * relative_normal_velocity) 
-            / (collision.count * inverse_mass_sum);
+
+        float inverse_denominator = 1.0f / (collision.count * inverse_mass_sum);
+
+        float impulse_magnitude = (-(1.0f + epsilon) * relative_velocity_dot) 
+            * inverse_denominator;
 
         Vector2 impulse = frVec2ScalarMultiply(collision.direction, impulse_magnitude);
 
@@ -441,20 +443,20 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
                 frVec2ScalarMultiply(r1_normal, b1->motion.angular_velocity)
             )
         );
-        
-        relative_normal_velocity = frVec2DotProduct(relative_velocity, collision.direction);
+
+        relative_velocity_dot = frVec2DotProduct(relative_velocity, collision.direction);
         
         Vector2 tangent = frVec2Normalize(
             frVec2Subtract(
                 relative_velocity,
-                frVec2ScalarMultiply(collision.direction, relative_normal_velocity)
+                frVec2ScalarMultiply(collision.direction, relative_velocity_dot)
             )
         );
+
+        float friction_magnitude = -frVec2DotProduct(relative_velocity, tangent) 
+            * inverse_denominator;
         
-        float friction_magnitude = -frVec2DotProduct(relative_velocity, tangent)
-            / (collision.count * inverse_mass_sum);
-        
-        Vector2 frictional_impulse = (fabs(friction_magnitude) < impulse_magnitude * static_coefficient)
+        Vector2 frictional_impulse = (fabsf(friction_magnitude) < impulse_magnitude * static_coefficient)
             ? frVec2ScalarMultiply(tangent, friction_magnitude)
             : frVec2ScalarMultiply(tangent, -impulse_magnitude * dynamic_coefficient);
         

@@ -31,13 +31,13 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 1.25f, 0.25f, 0.25f })
+#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 1.25f, 0.5f, 0.25f })
 
 #define BALL1_MATERIAL  ((frMaterial) { 0.3f, 0.85f, 0.65f, 0.5f })
 #define BALL2_MATERIAL  ((frMaterial) { 0.2f, 0.65f, 0.65f, 0.5f })
 #define BALL3_MATERIAL  ((frMaterial) { 0.1f, 0.5f, 0.65f, 0.5f })
 
-#define CURSOR_MATERIAL ((frMaterial) { 2.5f, 0.5f, 0.75f, 0.75f })
+#define CURSOR_MATERIAL ((frMaterial) { 2.5f, 0.5f, 0.75f, 0.5f })
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);

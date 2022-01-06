@@ -31,13 +31,13 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.75f, 1.0f })
-#define CURSOR_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.75f, 0.75f })
-#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.65f, 0.75f })
+#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
+#define CURSOR_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.85f, 0.5f })
+#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.5f })
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    SetTargetFPS(TARGET_FPS);
+    // SetTargetFPS(TARGET_FPS);
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | bricks.c");
     

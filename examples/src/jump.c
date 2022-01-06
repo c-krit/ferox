@@ -33,10 +33,10 @@
 
 #define EXAMPLE_STRING "PRESS SPACE TO JUMP!"
 
-#define BOX_MATERIAL    ((frMaterial) { 1.75f, 0.0f, 1.0f, 1.0f })
-#define BRICK_MATERIAL  ((frMaterial) { 1.85f, 0.0f, 1.05f, 1.05f })
-#define FLOOR_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.0f, 1.0f })
-#define GROUND_MATERIAL ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.25f })
+#define BOX_MATERIAL    ((frMaterial) { 1.75f, 0.0f, 1.0f, 0.75f })
+#define BRICK_MATERIAL  ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.75f })
+#define FLOOR_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.0f, 0.75f })
+#define GROUND_MATERIAL ((frMaterial) { 2.5f, 0.0f, 1.0f, 0.75f })
 
 #define BRICK_HORIZONTAL_SPEED 0.016f
 #define BRICK_VERTICAL_SPEED 0.02f

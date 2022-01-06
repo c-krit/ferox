@@ -34,7 +34,7 @@ SOURCE_PATH := $(PROJECT_PATH)/src
 
 INCLUDE_PATH += $(SOURCE_PATH)/external
 
-SOURCES :=                      \
+SOURCES := \
 	$(SOURCE_PATH)/broadphase.c \
 	$(SOURCE_PATH)/collision.c  \
 	$(SOURCE_PATH)/dynamics.c   \
@@ -75,8 +75,11 @@ ifeq ($(BUILD),STANDALONE)
 endif
 
 ifeq ($(TARGET_OS),WINDOWS)
-	CC := x86_64-w64-mingw32-gcc
-	AR := x86_64-w64-mingw32-ar
+	ifneq ($(HOST_OS),WINDOWS)
+		CC := x86_64-w64-mingw32-gcc
+		AR := x86_64-w64-mingw32-ar
+	endif
+
 	CFLAGS += -I$(RAYLIB_PATH)/src
 endif
 

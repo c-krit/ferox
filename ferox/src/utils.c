@@ -25,6 +25,10 @@
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
 
+/* | `utils` 모듈 상수... | */
+
+const float TWO_PI = (2 * PI), INVERSE_TWO_PI = (1.0f / TWO_PI);
+
 /* | `utils` 모듈 함수... | */
 
 /* 두 점 `p1`과 `p2`로 만든 직사각형 구조체를 반환한다. */
@@ -39,14 +43,12 @@ Rectangle frCreateRectangle(Vector2 p1, Vector2 p2) {
 
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π, center + π]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center) {
-    return angle - ((2 * PI) * floor((angle + PI - center) / (2 * PI)));
+    return angle - (TWO_PI * floorf((angle + PI - center) * INVERSE_TWO_PI));
 }
 
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frNumberApproxEquals(float f1, float f2) {
-    float f_max = (f1 > f2) ? f1 : f2;
-    
-    return fabs(f1 - f2) <= f_max * FLT_EPSILON;
+    return fabsf(f1 - f2) <= FR_NUMBER_MAX(f1, f2) * FLT_EPSILON;
 }
 
 /* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */

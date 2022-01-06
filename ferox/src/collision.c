@@ -22,7 +22,7 @@
 
 #include "ferox.h"
 
-/* | `collision` 모듈 구조체... | */
+/* | `collision` 모듈 자료형 정의... | */
 
 /* 선분을 나타내는 구조체. */
 typedef struct frEdge {

@@ -23,7 +23,7 @@
 #include "ferox.h"
 #include "stb_ds.h"
 
-/* | `broadphase` 모듈 구조체... | */
+/* | `broadphase` 모듈 자료형 정의... | */
 
 /* 공간 해시맵의 키와 값을 나타내는 구조체. */
 typedef struct frSpatialHashEntry {
