@@ -277,12 +277,12 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
     Vector2 diff = frVec2Subtract(tx2.position, tx1.position);
 
     float radius_sum = frGetCircleRadius(s1) + frGetCircleRadius(s2);
+    float magnitude_sqr = frVec2MagnitudeSqr(diff);
     
-    if (radius_sum * radius_sum < frVec2MagnitudeSqr(diff))
-        return result;
+    if (radius_sum * radius_sum < magnitude_sqr) return result;
 
-    float diff_magnitude = frVec2Magnitude(diff);
-    
+    float diff_magnitude = sqrtf(magnitude_sqr);
+
     result.check = true;
 
     if (diff_magnitude != 0.0f) {
@@ -391,7 +391,9 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         float v2_dot = frVec2DotProduct(diff2, frVec2Subtract(v1, v2));
 
         if (v1_dot <= 0.0f) {
-            if (frVec2MagnitudeSqr(diff1) > radius * radius) return result;
+            float magnitude_sqr = frVec2MagnitudeSqr(diff1);
+
+            if (magnitude_sqr > radius * radius) return result;
 
             result.direction = frVec2Normalize(
                 frVec2Rotate(
@@ -404,8 +406,11 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
                 result.direction = frVec2Negate(result.direction);
             
             result.points[0] = result.points[1] = frVec2Transform(v1, polygon_tx);
+            result.depths[0] = result.depths[1] = radius - sqrtf(magnitude_sqr);
         } else if (v2_dot <= 0.0f) {
-            if (frVec2MagnitudeSqr(diff2) > radius * radius) return result;
+            float magnitude_sqr = frVec2MagnitudeSqr(diff2);
+
+            if (magnitude_sqr > radius * radius) return result;
             
             result.direction = frVec2Normalize(
                 frVec2Rotate(
@@ -418,6 +423,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
                 result.direction = frVec2Negate(result.direction);
 
             result.points[0] = result.points[1] = frVec2Transform(v2, polygon_tx);
+            result.depths[0] = result.depths[1] = radius - sqrtf(magnitude_sqr);
         } else {
             Vector2 normal = normals.data[normal_index];
 
@@ -437,11 +443,12 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
                 circle_tx.position,
                 frVec2ScalarMultiply(result.direction, -radius)
             );
+
+            result.depths[0] = result.depths[1] = radius - max_distance;
         }
 
         result.check = true;
 
-        result.depths[0] = result.depths[1] = radius - max_distance;
         result.count = 1;
     }
 

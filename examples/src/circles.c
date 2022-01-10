@@ -34,7 +34,7 @@
 #define WALL_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
 #define CIRCLE_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 0.85f, 0.75f })
 
-#define MAX_CIRCLE_COUNT 96
+#define MAX_CIRCLE_COUNT 100
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
