@@ -66,6 +66,13 @@ int main(void) {
         circle
     );
 
+    frBody *cursor_clone = frCreateBodyFromShape(
+        FR_BODY_KINEMATIC,
+        FR_FLAG_NONE,
+        FR_STRUCT_ZERO(Vector2),
+        circle
+    );
+
     bool use_polygon_cursor = false;
 
     while (!WindowShouldClose()) {
@@ -78,15 +85,17 @@ int main(void) {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             use_polygon_cursor = !use_polygon_cursor;
             
-            if (use_polygon_cursor) frAttachShapeToBody(cursor, polygon);
-            else frAttachShapeToBody(cursor, circle);
+            if (use_polygon_cursor) {
+                frAttachShapeToBody(cursor, polygon);
+                frAttachShapeToBody(cursor_clone, polygon);
+            } else {
+                frAttachShapeToBody(cursor, circle);
+                frAttachShapeToBody(cursor_clone, circle);
+            }
         }
         
         frDrawBody(large_circle, GRAY);
         frDrawBodyAABB(large_circle, GREEN);
-        
-        frDrawBody(cursor, Fade(BLACK, 0.85f));
-        frDrawBodyAABB(cursor, GREEN);
         
         frCollision collision = frComputeCollision(
             frGetBodyShape(cursor), 
@@ -96,13 +105,21 @@ int main(void) {
         );
         
         if (collision.check) {
-            for (int i = 0; i < collision.count; i++) {         
-                DrawCircleLines(
-                    frNumberMetersToPixels(collision.points[i].x), 
-                    frNumberMetersToPixels(collision.points[i].y), 
-                    4, 
-                    RED
-                );
+            frSetBodyPosition(
+                cursor_clone,
+                frVec2Add(
+                    frGetBodyPosition(cursor),
+                    frVec2ScalarMultiply(
+                        collision.direction, 
+                        -FR_NUMBER_MAX(collision.depths[0], collision.depths[1])
+                    )
+                )
+            );
+
+            frDrawBodyLines(cursor_clone, 2, RED);
+
+            for (int i = 0; i < collision.count; i++) {
+                DrawRing(frVec2MetersToPixels(collision.points[i]), 6, 8, 0, 360, 64, RED);
                 
                 DrawLineEx(
                     frVec2MetersToPixels(collision.points[i]),
@@ -120,6 +137,9 @@ int main(void) {
                 );
             }
         }
+
+        frDrawBody(cursor, Fade(BLACK, 0.85f));
+        frDrawBodyAABB(cursor, GREEN);
         
         DrawFPS(8, 8);
         
@@ -144,6 +164,7 @@ int main(void) {
     frReleaseShape(circle);
     frReleaseShape(polygon);
     
+    frReleaseBody(cursor_clone);
     frReleaseBody(cursor);
     
     CloseWindow();

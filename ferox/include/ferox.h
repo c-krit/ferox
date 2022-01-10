@@ -74,7 +74,7 @@
 #define FR_WORLD_ACCUMULATOR_LIMIT                200.0
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_BODY_COUNT                   128
-#define FR_WORLD_MAX_ITERATIONS                   32
+#define FR_WORLD_MAX_ITERATIONS                   16
 
 #define FR_STRUCT_ZERO(T)                         ((T) { 0 })
 
@@ -273,6 +273,9 @@ frBodyType frGetBodyType(frBody *b);
 /* 강체 `b`의 비트 플래그 조합을 반환한다. */
 frBodyFlags frGetBodyFlags(frBody *b);
 
+/* 강체 `b`의 재질을 반환한다. */
+frMaterial frGetBodyMaterial(frBody *b);
+
 /* 강체 `b`의 질량을 반환한다. */
 float frGetBodyMass(frBody *b);
 
@@ -371,13 +374,13 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision);
 
 /* | `geometry` 모듈 함수... | */
 
-/* 반지름이 `radius`인 원을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
+/* 반지름이 `radius`인 원을 나타내는 도형을 생성한다. */
 frShape *frCreateCircle(frMaterial material, float radius);
 
-/* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
+/* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형을 생성한다. */
 frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count);
 
-/* 형태가 정해지지 않은 도형 구조체의 메모리 주소를 반환한다. */
+/* 형태가 정해지지 않은 도형을 생성한다. */
 frShape *frCreateShape(void);
 
 /* 도형 `s`와 형태가 같은 새로운 도형을 반환한다. */
@@ -452,9 +455,6 @@ double frGetTimeDifference(double new_time, double old_time);
 double frGetTimeSince(double old_time);
 
 /* | `utils` 모듈 함수... | */
-
-/* 두 점 `p1`과 `p2`로 만든 직사각형 구조체를 반환한다. */
-Rectangle frCreateRectangle(Vector2 p1, Vector2 p2);
 
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frNumberApproxEquals(float f1, float f2);

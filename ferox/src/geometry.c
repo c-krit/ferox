@@ -51,7 +51,7 @@ static void frComputeConvex(frShape *s);
 /* 꼭짓점 배열 `vertices`로 만들 수 있는 가장 큰 볼록 다각형의 꼭짓점 배열을 반환한다. */
 static frVertices frJarvisMarch(Vector2 *vertices, int count);
 
-/* 반지름이 `radius`인 원을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
+/* 반지름이 `radius`인 원을 나타내는 도형을 생성한다. */
 frShape *frCreateCircle(frMaterial material, float radius) {
     frShape *result = frCreateShape();
     
@@ -63,7 +63,7 @@ frShape *frCreateCircle(frMaterial material, float radius) {
     return result;
 }
 
-/* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형 구조체의 메모리 주소를 반환한다. */
+/* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형을 생성한다. */
 frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count) {
     frShape *result = frCreateShape();
 
@@ -78,7 +78,7 @@ frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count) {
     return result;
 }
 
-/* 형태가 정해지지 않은 도형 구조체의 메모리 주소를 반환한다. */
+/* 형태가 정해지지 않은 도형을 생성한다. */
 frShape *frCreateShape(void) {
     frShape *result = calloc(1, sizeof(frShape));
     

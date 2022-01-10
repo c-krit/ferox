@@ -37,7 +37,7 @@
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    // SetTargetFPS(TARGET_FPS);
+    SetTargetFPS(TARGET_FPS);
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | bricks.c");
     

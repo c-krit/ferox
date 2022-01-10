@@ -124,6 +124,11 @@ frBodyFlags frGetBodyFlags(frBody *b) {
     return (b != NULL) ? b->flags : 0;
 }
 
+/* 강체 `b`의 재질을 반환한다. */
+frMaterial frGetBodyMaterial(frBody *b) {
+    return (b != NULL) ? b->material : FR_STRUCT_ZERO(frMaterial);
+}
+
 /* 강체 `b`의 질량을 반환한다. */
 float frGetBodyMass(frBody *b) {
     return (b != NULL) ? b->motion.mass : 0.0f;
@@ -419,10 +424,8 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
             + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
             + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
 
-        float inverse_denominator = 1.0f / (collision.count * inverse_mass_sum);
-
         float impulse_magnitude = (-(1.0f + epsilon) * relative_velocity_dot) 
-            * inverse_denominator;
+             / (collision.count * inverse_mass_sum);
 
         Vector2 impulse = frVec2ScalarMultiply(collision.direction, impulse_magnitude);
 
@@ -453,8 +456,15 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
             )
         );
 
+        r1_normal_dot = frVec2DotProduct(r1_normal, tangent);
+        r2_normal_dot = frVec2DotProduct(r2_normal, tangent);
+
+        inverse_mass_sum = (b1->motion.inverse_mass + b2->motion.inverse_mass)
+            + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
+            + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
+
         float friction_magnitude = -frVec2DotProduct(relative_velocity, tangent) 
-            * inverse_denominator;
+             / (collision.count * inverse_mass_sum);
         
         Vector2 frictional_impulse = (fabsf(friction_magnitude) < impulse_magnitude * static_coefficient)
             ? frVec2ScalarMultiply(tangent, friction_magnitude)

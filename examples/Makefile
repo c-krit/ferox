@@ -40,6 +40,7 @@ EXAMPLES := \
 	bouncy  \
 	bricks  \
 	bullet  \
+	circles \
 	jump    \
 	laser
     

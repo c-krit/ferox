@@ -177,14 +177,14 @@ static void DrawCustomCursor(Vector2 position) {
         frVec2Add(position, (Vector2) { .x = -8 }),
         frVec2Add(position, (Vector2) { .x = 8 }),
         2,
-        GREEN
+        RED
     );
     
     DrawLineEx(
         frVec2Add(position, (Vector2) { .y = -8 }),
         frVec2Add(position, (Vector2) { .y = 8 }),
         2,
-        GREEN
+        RED
     );
 }
 
@@ -192,11 +192,11 @@ static void onCollisionPreSolve(frCollision *collision) {
     frBody *b1 = collision->_bodies[0];
     frBody *b2 = collision->_bodies[1];
             
-    int *user_data1 = (int *) frGetBodyUserData(b1);
-    int *user_data2 = (int *) frGetBodyUserData(b2);
+    int *data1 = (int *) frGetBodyUserData(b1);
+    int *data2 = (int *) frGetBodyUserData(b2);
     
-    if ((*user_data1 == BULLET_DATA && *user_data2 == ENEMY_DATA)
-       || (*user_data1 == ENEMY_DATA && *user_data2 == BULLET_DATA)) {
+    if ((*data1 == BULLET_DATA && *data2 == ENEMY_DATA)
+       || (*data1 == ENEMY_DATA && *data2 == BULLET_DATA)) {
         collision->check = false;
         
         frSetBodyPosition(

@@ -57,7 +57,7 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
     result->timestamp = frGetCurrentTime();
     
     arrsetcap(result->bodies, FR_WORLD_MAX_BODY_COUNT);
-    arrsetcap(result->collisions, FR_WORLD_MAX_BODY_COUNT);
+    arrsetcap(result->collisions, FR_WORLD_MAX_BODY_COUNT * FR_WORLD_MAX_BODY_COUNT);
     arrsetcap(result->queries, FR_WORLD_MAX_BODY_COUNT);
     
     return result;
@@ -196,17 +196,22 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *result) {
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
 
-    frQuerySpatialHash(
-        world->hash, 
-        frCreateRectangle(
-            ray.origin, 
-            frVec2Add(
-                ray.origin, 
-                frVec2ScalarMultiply(frVec2Normalize(ray.direction), ray.max_distance)
-            )
-        ),
-        &world->queries
+    Vector2 p1 = ray.origin, p2 = frVec2Add(
+        ray.origin, 
+        frVec2ScalarMultiply(
+            frVec2Normalize(ray.direction), 
+            ray.max_distance
+        )
     );
+
+    Rectangle rec = (Rectangle) {
+        .x = FR_NUMBER_MIN(p1.x, p2.x),
+        .y = FR_NUMBER_MIN(p1.y, p2.y),
+        .width = FR_NUMBER_MAX(p2.x - p1.x, p1.x - p2.x),
+        .height = FR_NUMBER_MAX(p2.y - p1.y, p1.y - p2.y)
+    };
+
+    frQuerySpatialHash(world->hash, rec, &world->queries);
 
     int count = 0;
 

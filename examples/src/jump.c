@@ -33,13 +33,13 @@
 
 #define EXAMPLE_STRING "PRESS SPACE TO JUMP!"
 
-#define BOX_MATERIAL    ((frMaterial) { 1.75f, 0.0f, 1.0f, 0.75f })
-#define BRICK_MATERIAL  ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.75f })
-#define FLOOR_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.0f, 0.75f })
-#define GROUND_MATERIAL ((frMaterial) { 2.5f, 0.0f, 1.0f, 0.75f })
+#define BOX_MATERIAL       ((frMaterial) { 2.25f, 0.0f, 1.25f, 1.0f })
+#define BRICK_MATERIAL     ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.85f })
+#define PLATFORM_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.0f })
+#define WALL_MATERIAL      ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.0f })
 
-#define BRICK_HORIZONTAL_SPEED 0.016f
-#define BRICK_VERTICAL_SPEED 0.02f
+#define BRICK_HORIZONTAL_SPEED  0.016f
+#define BRICK_VERTICAL_SPEED    0.02f
 
 typedef struct Brick {
     int width;
@@ -75,32 +75,44 @@ int main(void) {
         }
     );
 
-    Vector2 box_vertices[4] = {
-        frVec2PixelsToMeters((Vector2) { -25, -20 }),
-        frVec2PixelsToMeters((Vector2) { -25, 20 }),
-        frVec2PixelsToMeters((Vector2) { 25, 20 }),
-        frVec2PixelsToMeters((Vector2) { 25, -20 })
+    Vector2 brick_vertices[4] = {
+        frVec2PixelsToMeters((Vector2) { -(brick.width / 2), -(brick.height / 2) }),
+        frVec2PixelsToMeters((Vector2) { -(brick.width / 2), (brick.height / 2) }),
+        frVec2PixelsToMeters((Vector2) { (brick.width / 2), (brick.height / 2) }),
+        frVec2PixelsToMeters((Vector2) { (brick.width / 2), -(brick.height / 2) })
     };
 
-    Vector2 floor_vertices[4] = {
-        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, -20 }),
-        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, 20 }),
-        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, 20 }),
-        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, -20 })
+    Vector2 wall1_vertices[3] = {
+        frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, -0.35f * SCREEN_HEIGHT }),
+        frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, 0.35f * SCREEN_HEIGHT }),
+        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.35f * SCREEN_HEIGHT }),
     };
 
-    Vector2 ground_vertices[4] = {
+    Vector2 wall2_vertices[4] = {
         frVec2PixelsToMeters((Vector2) { -0.5f * SCREEN_WIDTH, -60 }),
         frVec2PixelsToMeters((Vector2) { -0.5f * SCREEN_WIDTH, 60 }),
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 60 }),
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, -60 })
     };
 
-    Vector2 brick_vertices[4] = {
-        frVec2PixelsToMeters((Vector2) { -(brick.width / 2), -(brick.height / 2) }),
-        frVec2PixelsToMeters((Vector2) { -(brick.width / 2), (brick.height / 2) }),
-        frVec2PixelsToMeters((Vector2) { (brick.width / 2), (brick.height / 2) }),
-        frVec2PixelsToMeters((Vector2) { (brick.width / 2), -(brick.height / 2) })
+    Vector2 wall3_vertices[3] = {
+        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, -0.35f * SCREEN_HEIGHT }),
+        frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, 0.35f * SCREEN_HEIGHT }),
+        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.35f * SCREEN_HEIGHT }),
+    };
+
+    Vector2 platform_vertices[4] = {
+        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, -20 }),
+        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, 20 }),
+        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, 20 }),
+        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, -20 })
+    };
+
+    Vector2 box_vertices[4] = {
+        frVec2PixelsToMeters((Vector2) { -25, -20 }),
+        frVec2PixelsToMeters((Vector2) { -25, 20 }),
+        frVec2PixelsToMeters((Vector2) { 25, 20 }),
+        frVec2PixelsToMeters((Vector2) { 25, -20 })
     };
 
     brick.body = frCreateBodyFromShape(
@@ -112,6 +124,34 @@ int main(void) {
 
     frSetBodyUserData(brick.body, (void *) &brick);
 
+    frBody *wall1 = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.65f * SCREEN_HEIGHT }),
+        frCreatePolygon(WALL_MATERIAL, wall1_vertices, 4)
+    );
+
+    frBody *wall2 = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 60 }),
+        frCreatePolygon(WALL_MATERIAL, wall2_vertices, 4)
+    );
+
+    frBody *wall3 = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { 0.9f * SCREEN_WIDTH, 0.65f * SCREEN_HEIGHT }),
+        frCreatePolygon(WALL_MATERIAL, wall3_vertices, 4)
+    );
+
+    frBody *platform = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, 0.75f * SCREEN_HEIGHT }),
+        frCreatePolygon(PLATFORM_MATERIAL, platform_vertices, 4)
+    );
+
     frBody *box = frCreateBodyFromShape(
         FR_BODY_DYNAMIC,
         FR_FLAG_NONE,
@@ -119,25 +159,15 @@ int main(void) {
         frCreatePolygon(BOX_MATERIAL, box_vertices, 4)
     );
 
-    frBody *floor = frCreateBodyFromShape(
-        FR_BODY_STATIC,
-        FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, 0.7f * SCREEN_HEIGHT }),
-        frCreatePolygon(FLOOR_MATERIAL, floor_vertices, 4)
-    );
-
-    frBody *ground = frCreateBodyFromShape(
-        FR_BODY_STATIC,
-        FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 60 }),
-        frCreatePolygon(GROUND_MATERIAL, ground_vertices, 4)
-    );
-
     frAddToWorld(world, brick.body);
 
+    frAddToWorld(world, wall1);
+    frAddToWorld(world, wall2);
+    frAddToWorld(world, wall3);
+
+    frAddToWorld(world, platform);
+
     frAddToWorld(world, box);
-    frAddToWorld(world, floor);
-    frAddToWorld(world, ground);
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -146,10 +176,12 @@ int main(void) {
 
         HandleBrickMovement(world, &brick);
 
-        frDrawBody(ground, BLACK);
-        frDrawBody(floor, BLACK);
-        frDrawBody(box, DARKGRAY);
+        frDrawBody(wall1, BLACK);
+        frDrawBody(wall2, BLACK);
+        frDrawBody(wall3, BLACK);
+        frDrawBody(platform, BLACK);
 
+        frDrawBody(box, DARKGRAY);
         frDrawBody(brick.body, RED);
 
         frDrawSpatialHash(frGetWorldSpatialHash(world));
@@ -216,27 +248,21 @@ static void HandleBrickMovement(frWorld *world, Brick *brick) {
 }
 
 static void onCollisionPreSolve(frCollision *collision) {
-    frBody *brick_body = NULL;
+    frBody *b1 = collision->_bodies[0];
+    frBody *b2 = collision->_bodies[1];
 
-    frBody *body1 = collision->_bodies[0];
-    frBody *body2 = collision->_bodies[1];
-    
-    frBodyType type1 = frGetBodyType(body1);
-    frBodyType type2 = frGetBodyType(body2);
+    Brick *data1 = frGetBodyUserData(b1);
+    Brick *data2 = frGetBodyUserData(b2);
 
-    Brick *data1 = frGetBodyUserData(body1);
-    Brick *data2 = frGetBodyUserData(body2);
+    frBody *brick_b = NULL;
 
-    if (data1 != NULL && data2 == NULL) {
-        if (type2 == FR_BODY_STATIC) brick_body = body1;
-    } else if (data1 == NULL && data2 != NULL) {
-        if (type1 == FR_BODY_STATIC) brick_body = body2;
-    }
+    if (data1 != NULL && data2 == NULL) brick_b = b1;
+    else if (data1 == NULL && data2 != NULL) brick_b = b2;
 
-    if (brick_body == NULL) return;
+    if (brick_b == NULL) return;
 
-    Brick *brick = frGetBodyUserData(brick_body);
+    Brick *brick = frGetBodyUserData(brick_b);
 
-    if (collision->check) brick->on_ground = true;
+    if (collision->check && collision->direction.y > 0.0f) brick->on_ground = true;
     else brick->on_ground = false;
 }

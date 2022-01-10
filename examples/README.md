@@ -46,6 +46,10 @@ $ make
 
 <img src="res/images/bullet.gif" width="640" alt="bullet.c">
 
+### `circles.c`
+
+<img src="res/images/circles.gif" width="640" alt="circles.c">
+
 ### `jump.c`
 
 <img src="res/images/jump.gif" width="640" alt="jump.c">

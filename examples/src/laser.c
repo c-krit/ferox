@@ -38,6 +38,8 @@
 
 #define MAX_ENEMY_COUNT 100
 
+static void DrawCustomCursor(Vector2 position);
+
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetTargetFPS(TARGET_FPS);
@@ -82,12 +84,16 @@ int main(void) {
         frAddToWorld(world, ball);
     }
 
+    HideCursor();
+
     frRaycastHit hits[MAX_ENEMY_COUNT];
 
     while (!WindowShouldClose()) {
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
+
+        DrawCustomCursor(GetMousePosition());
         
         Vector2 mouse_position = GetMousePosition();
         Vector2 difference = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
@@ -110,15 +116,13 @@ int main(void) {
         for (int i = 1; i < frGetWorldBodyCount(world); i++)
             frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
 
-        for (int i = 0; i < count; i++)
-            DrawCircleLines(
-                frNumberMetersToPixels(hits[i].point.x),
-                frNumberMetersToPixels(hits[i].point.y),
-                6,
-                RED
-            );
+        for (int i = 0; i < count; i++) {
+            frDrawBodyAABB(hits[i].body, GREEN);
+            
+            DrawRing(frVec2MetersToPixels(hits[i].point), 6, 8, 0, 360, 64, RED);
+        }
         
-        DrawLineEx(SCREEN_CENTER, mouse_position, 1, RED);
+        DrawLineEx(SCREEN_CENTER, mouse_position, 2, RED);
         
         frDrawBody(semo, DARKGRAY);
         frDrawBodyAABB(semo, GREEN);
@@ -137,4 +141,20 @@ int main(void) {
     CloseWindow();
 
     return 0;
+}
+
+static void DrawCustomCursor(Vector2 position) {
+    DrawLineEx(
+        frVec2Add(position, (Vector2) { .x = -8 }),
+        frVec2Add(position, (Vector2) { .x = 8 }),
+        2,
+        RED
+    );
+    
+    DrawLineEx(
+        frVec2Add(position, (Vector2) { .y = -8 }),
+        frVec2Add(position, (Vector2) { .y = 8 }),
+        2,
+        RED
+    );
 }
