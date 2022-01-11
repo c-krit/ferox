@@ -54,7 +54,6 @@ ifneq ($(BUILD),STANDALONE)
 endif
 
 HOST_OS := LINUX
-TARGET_OS := $(HOST_OS)
 
 ifeq ($(OS),Windows_NT)
 	PROJECT_PREFIX := $(PROJECT_NAME):
@@ -73,6 +72,8 @@ CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu99
 ifeq ($(BUILD),STANDALONE)
 	CFLAGS += -DFEROX_STANDALONE
 endif
+
+TARGET_OS := $(HOST_OS)
 
 ifeq ($(TARGET_OS),WINDOWS)
 	ifneq ($(HOST_OS),WINDOWS)

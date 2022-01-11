@@ -48,7 +48,6 @@ SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)
 
 HOST_OS := LINUX
-TARGET_OS := $(HOST_OS)
 
 ifeq ($(OS),Windows_NT)
 	PROJECT_PREFIX := $(PROJECT_NAME):
@@ -65,11 +64,17 @@ CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -std=gnu99 -O2
 LDFLAGS := -L$(LIBRARY_PATH)
 LDLIBS := -lferox -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
+TARGET_OS := $(HOST_OS)
+
 ifeq ($(TARGET_OS),WINDOWS)
+	ifneq ($(HOST_OS),WINDOWS)
+		CC := x86_64-w64-mingw32-gcc
+	endif
+
 	TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%.exe)
-	CC := x86_64-w64-mingw32-gcc
+
 	CFLAGS += -I$(RAYLIB_PATH)/src
-	LDFLAGS += -L$(RAYLIB_PATH)/src 
+	LDFLAGS += -L$(RAYLIB_PATH)/src
 	LDLIBS := -lferox -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
 endif
 
