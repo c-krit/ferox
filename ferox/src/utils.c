@@ -52,3 +52,23 @@ float frNumberPixelsToMeters(float value) {
 float frNumberMetersToPixels(float value) {
     return (value * FR_GLOBAL_PIXELS_PER_METER);
 }
+
+/* 주어진 픽셀 단위 `Rectangle` 구조체를 미터 단위 `Rectangle` 구조체로 변환한다. */
+Rectangle frRecPixelsToMeters(Rectangle rec) {
+    return (Rectangle) {
+        .x = frNumberPixelsToMeters(rec.x),
+        .y = frNumberPixelsToMeters(rec.y),
+        .width = frNumberPixelsToMeters(rec.width),
+        .height = frNumberPixelsToMeters(rec.height)
+    };
+}
+
+/* 주어진 미터 단위 `Rectangle` 구조체를 픽셀 단위 `Rectangle` 구조체로 변환한다. */
+Rectangle frRecMetersToPixels(Rectangle rec) {
+    return (Rectangle) {
+        .x = frNumberMetersToPixels(rec.x),
+        .y = frNumberMetersToPixels(rec.y),
+        .width = frNumberMetersToPixels(rec.width),
+        .height = frNumberMetersToPixels(rec.height)
+    };
+}

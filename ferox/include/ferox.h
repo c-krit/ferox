@@ -203,7 +203,7 @@ float frGetSpatialHashCellSize(frSpatialHash *hash);
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key);
 
 /* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result);
+void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries);
 
 /* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
 void frSetSpatialHashBounds(frSpatialHash *hash, Rectangle bounds);
@@ -377,8 +377,11 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision);
 /* 반지름이 `radius`인 원을 나타내는 도형을 생성한다. */
 frShape *frCreateCircle(frMaterial material, float radius);
 
-/* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형을 생성한다. */
-frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count);
+/* 가로 길이가 `width`이고 세로 길이가 `height`인 직사각형을 나타내는 도형을 생성한다. */
+frShape *frCreateRectangle(frMaterial material, float width, float height);
+
+/* 꼭짓점 배열이 `vertices`인 다각형을 나타내는 도형을 생성한다. */
+frShape *frCreatePolygon(frMaterial material, frVertices vertices);
 
 /* 형태가 정해지지 않은 도형을 생성한다. */
 frShape *frCreateShape(void);
@@ -428,8 +431,8 @@ frVertices frGetPolygonNormals(frShape *s);
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius);
 
-/* 다각형 `s`의 꼭짓점 배열을 꼭짓점 개수 `count`개의 배열 `vertices`로 변경한다. */
-void frSetPolygonVertices(frShape *s, Vector2 *vertices, int count);
+/* 다각형 `s`의 꼭짓점 배열을 `vertices`로 변경한다. */
+void frSetPolygonVertices(frShape *s, frVertices vertices);
 
 /* 도형 `s`의 재질을 `material`로 설정한다. */
 void frSetShapeMaterial(frShape *s, frMaterial material);
@@ -467,6 +470,12 @@ float frNumberPixelsToMeters(float value);
 
 /* 주어진 미터 단위 거리를 픽셀 단위 거리로 변환한다. */
 float frNumberMetersToPixels(float value);
+
+/* 주어진 픽셀 단위 `Rectangle` 구조체를 미터 단위 `Rectangle` 구조체로 변환한다. */
+Rectangle frRecPixelsToMeters(Rectangle rec);
+
+/* 주어진 미터 단위 `Rectangle` 구조체를 픽셀 단위 `Rectangle` 구조체로 변환한다. */
+Rectangle frRecMetersToPixels(Rectangle rec);
 
 /* | `vectors` 모듈 함수... | */
 
@@ -541,14 +550,14 @@ frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds);
 /* 세계 `world`에 할당된 메모리를 해제한다. */
 void frReleaseWorld(frWorld *world);
 
-/* 세계 `world`에 강체 `body`를 추가한다. */
-bool frAddToWorld(frWorld *world, frBody *body);
+/* 세계 `world`에 강체 `b`를 추가한다. */
+bool frAddToWorld(frWorld *world, frBody *b);
 
 /* 세계 `world`의 모든 강체를 제거한다. */
 void frClearWorld(frWorld *world);
 
-/* 세계 `world`에서 강체 `body`를 제거한다. */
-bool frRemoveFromWorld(frWorld *world, frBody *body);
+/* 세계 `world`에서 강체 `b`를 제거한다. */
+bool frRemoveFromWorld(frWorld *world, frBody *b);
 
 /* 구조체 `frWorld`의 크기를 반환한다. */
 size_t frGetWorldStructSize(void);
@@ -571,6 +580,9 @@ frSpatialHash *frGetWorldSpatialHash(frWorld *world);
 /* 세계 `world`의 중력 가속도를 반환한다. */
 Vector2 frGetWorldGravity(frWorld *world);
 
+/* 강체 `b`가 세계 `world`의 경계 범위 안에 있는지 확인한다. */
+bool frIsInWorldBounds(frWorld *world, frBody *b);
+
 /* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
 void frSetWorldBounds(frWorld *world, Rectangle bounds);
 
@@ -584,6 +596,6 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity);
 void frSimulateWorld(frWorld *world, double dt);
 
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
-int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *result);
+int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits);
 
 #endif

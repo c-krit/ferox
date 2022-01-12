@@ -123,8 +123,8 @@ void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
 }
 
 /* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
-void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result) {
-    if (hash == NULL || result == NULL) return;
+void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
+    if (hash == NULL || queries == NULL) return;
     
     int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x });
     int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x + rec.width });
@@ -138,15 +138,15 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result) {
 
             if (entry != NULL) 
                 for (int j = 0; j < arrlen(entry->values); j++)
-                    arrput(*result, entry->values[j]);
+                    arrput(*queries, entry->values[j]);
         }
     }
     
-    qsort(*result, arrlen(*result), sizeof(int), frQuickSortCallback);
+    qsort(*queries, arrlen(*queries), sizeof(int), frQuickSortCallback);
     
-    for (int i = 0; i < arrlen(*result); i++)
-        while ((i + 1) < arrlen(*result) && (*result)[i + 1] == (*result)[i])
-            arrdel(*result, i + 1);
+    for (int i = 0; i < arrlen(*queries); i++)
+        while ((i + 1) < arrlen(*queries) && (*queries)[i + 1] == (*queries)[i])
+            arrdel(*queries, i + 1);
 }
 
 /* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */

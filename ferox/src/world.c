@@ -83,12 +83,12 @@ void frReleaseWorld(frWorld *world) {
     free(world);
 }
 
-/* 세계 `world`에 강체 `body`를 추가한다. */
-bool frAddToWorld(frWorld *world, frBody *body) {
+/* 세계 `world`에 강체 `b`를 추가한다. */
+bool frAddToWorld(frWorld *world, frBody *b) {
     if (world == NULL || arrlen(world->bodies) >= FR_WORLD_MAX_BODY_COUNT) 
         return false;
     
-    arrput(world->bodies, body);
+    arrput(world->bodies, b);
     
     return true;
 }
@@ -103,13 +103,12 @@ void frClearWorld(frWorld *world) {
     arrdeln(world->collisions, 0, arrlen(world->collisions));
 }
 
-/* 세계 `world`에서 강체 `body`를 제거한다. */
-bool frRemoveFromWorld(frWorld *world, frBody *body) {
-    if (world == NULL || body == NULL) 
-        return false;
+/* 세계 `world`에서 강체 `b`를 제거한다. */
+bool frRemoveFromWorld(frWorld *world, frBody *b) {
+    if (world == NULL || b == NULL) return false;
     
     for (int i = 0; i < arrlen(world->bodies); i++) {
-        if (world->bodies[i] == body) {
+        if (world->bodies[i] == b) {
             arrdeln(world->bodies, i, 1);
             return true;
         }
@@ -157,6 +156,11 @@ Vector2 frGetWorldGravity(frWorld *world) {
     return (world != NULL) ? world->gravity : FR_STRUCT_ZERO(Vector2);
 }
 
+/* 강체 `b`가 세계 `world`의 경계 범위 안에 있는지 확인한다. */
+bool frIsInWorldBounds(frWorld *world, frBody *b) {
+    return CheckCollisionRecs(frGetBodyAABB(b), frGetWorldBounds(world));
+}
+
 /* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
 void frSetWorldBounds(frWorld *world, Rectangle bounds) {
     if (world != NULL) frSetSpatialHashBounds(world->hash, bounds);
@@ -190,8 +194,10 @@ void frSimulateWorld(frWorld *world, double dt) {
 }
 
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
-int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *result) {
-    if (world == NULL || result == NULL) return -1;
+int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
+    int result = 0;
+
+    if (world == NULL || hits == NULL) return result;
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
@@ -213,17 +219,16 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *result) {
 
     frQuerySpatialHash(world->hash, rec, &world->queries);
 
-    int count = 0;
-
     for (int i = 0; i < arrlen(world->queries); i++) {
         frRaycastHit raycast = frComputeBodyRaycast(world->bodies[world->queries[i]], ray);
         
-        if (raycast.check) result[count++] = raycast;
+        if (raycast.check) 
+            hits[result++] = raycast;
     }
 
     frClearSpatialHash(world->hash);
 
-    return count;
+    return result;
 }
 
 /* 세계 `world`의 업데이트 이전 작업을 실행한다. */

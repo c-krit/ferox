@@ -46,32 +46,26 @@ int main(void) {
         WORLD_RECTANGLE
     );
     
-    Vector2 floor_vertices[4] = {
-        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, -40 }),
-        frVec2PixelsToMeters((Vector2) { -0.25f * SCREEN_WIDTH, 40 }),
-        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, 40 }),
-        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, -40 })
-    };
-    
-    Vector2 brick_vertices[4] = {
-        frVec2PixelsToMeters((Vector2) { -0.02f * SCREEN_WIDTH, -10 }),
-        frVec2PixelsToMeters((Vector2) { -0.02f * SCREEN_WIDTH, 10 }),
-        frVec2PixelsToMeters((Vector2) { 0.02f * SCREEN_WIDTH, 10 }),
-        frVec2PixelsToMeters((Vector2) { 0.02f * SCREEN_WIDTH, -10 })
-    };
-    
     frBody *floor = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 60 }),
-        frCreatePolygon(FLOOR_MATERIAL, floor_vertices, 4)
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60 }),
+        frCreateRectangle(
+            FLOOR_MATERIAL, 
+            frNumberPixelsToMeters(0.5f * SCREEN_WIDTH), 
+            frNumberPixelsToMeters(80.0f)
+        )
     );
     
     frBody *cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         FR_STRUCT_ZERO(Vector2),
-        frCreatePolygon(CURSOR_MATERIAL, brick_vertices, 4)
+        frCreateRectangle(
+            CURSOR_MATERIAL, 
+            frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
+            frNumberPixelsToMeters(20.0f)
+        )
     );
     
     frAddToWorld(world, floor);
@@ -89,7 +83,11 @@ int main(void) {
                 FR_BODY_DYNAMIC,
                 FR_FLAG_NONE,
                 frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10 }),
-                frCreatePolygon(BRICK_MATERIAL, brick_vertices, 4)
+                frCreateRectangle(
+                    CURSOR_MATERIAL, 
+                    frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
+                    frNumberPixelsToMeters(20.0f)
+                )
             );
             
             frAddToWorld(world, brick);
@@ -98,7 +96,7 @@ int main(void) {
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
-            if (!CheckCollisionRecs(frGetBodyAABB(body), WORLD_RECTANGLE))
+            if (!frIsInWorldBounds(world, body)) 
                 frRemoveFromWorld(world, body);
         }
         

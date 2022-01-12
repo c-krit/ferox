@@ -39,15 +39,12 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | arrow.c");
     
-    Vector2 polygon_vertices[4] = {
-        (Vector2) { -6.0, -3.0 },
-        (Vector2) { -6.0, 3.0 },
-        (Vector2) { 6.0, 3.0 },
-        (Vector2) { 6.0, -3.0 }
-    };
-    
     frShape *circle = frCreateCircle(FR_STRUCT_ZERO(frMaterial), 4);
-    frShape *polygon = frCreatePolygon(FR_STRUCT_ZERO(frMaterial), polygon_vertices, 4);
+    frShape *polygon = frCreateRectangle(
+        FR_STRUCT_ZERO(frMaterial), 
+        12.0f,
+        6.0f
+    );
     
     frBody *large_circle = frCreateBodyFromShape(
         FR_BODY_STATIC,

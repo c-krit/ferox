@@ -28,6 +28,7 @@
 typedef struct frShape {
     frShapeType type;
     frMaterial material;
+    bool is_rect;
     float area;
     union {
         struct {
@@ -63,17 +64,41 @@ frShape *frCreateCircle(frMaterial material, float radius) {
     return result;
 }
 
-/* 꼭짓점 배열이 `vertices`이고 꼭짓점 개수가 `count`인 다각형을 나타내는 도형을 생성한다. */
-frShape *frCreatePolygon(frMaterial material, Vector2 *vertices, int count) {
+/* 가로 길이가 `width`이고 세로 길이가 `height`인 직사각형을 나타내는 도형을 생성한다. */
+frShape *frCreateRectangle(frMaterial material, float width, float height) {
     frShape *result = frCreateShape();
 
-    if (count > FR_GEOMETRY_MAX_VERTEX_COUNT)
-        count = FR_GEOMETRY_MAX_VERTEX_COUNT;
+    const float half_width = 0.5f * width, half_height = 0.5f * height;
+
+    frVertices vertices = {
+        .data = {
+            (Vector2) { -half_width, -half_height },
+            (Vector2) { -half_width, half_height },
+            (Vector2) { half_width, half_height },
+            (Vector2) { half_width, -half_height }
+        },
+        .count = 4
+    };
+
+    result->type = FR_SHAPE_POLYGON;
+    result->material = material;
+    
+    frSetPolygonVertices(result, vertices);
+    
+    return result;
+}
+
+/* 꼭짓점 배열이 `vertices`인 다각형을 나타내는 도형을 생성한다. */
+frShape *frCreatePolygon(frMaterial material, frVertices vertices) {
+    frShape *result = frCreateShape();
+
+    if (vertices.count > FR_GEOMETRY_MAX_VERTEX_COUNT)
+        vertices.count = FR_GEOMETRY_MAX_VERTEX_COUNT;
     
     result->type = FR_SHAPE_POLYGON;
     result->material = material;
     
-    frSetPolygonVertices(result, vertices, count);
+    frSetPolygonVertices(result, vertices);
     
     return result;
 }
@@ -265,20 +290,20 @@ void frSetCircleRadius(frShape *s, float radius) {
     frComputeArea(s);
 }
 
-/* 다각형 `s`의 꼭짓점 배열을 꼭짓점 개수 `count`개의 배열 `vertices`로 변경한다. */
-void frSetPolygonVertices(frShape *s, Vector2 *vertices, int count) {
+/* 다각형 `s`의 꼭짓점 배열을 `vertices`로 변경한다. */
+void frSetPolygonVertices(frShape *s, frVertices vertices) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
     
-    s->polygon.vertices.count = count;
-    s->polygon.normals.count = count;
+    s->polygon.vertices.count = vertices.count;
+    s->polygon.normals.count = vertices.count;
 
-    for (int i = 0; i < count; i++)
-        s->polygon.vertices.data[i] = vertices[i];
+    for (int i = 0; i < vertices.count; i++)
+        s->polygon.vertices.data[i] = vertices.data[i];
     
     frComputeConvex(s);
     frComputeArea(s);
 
-    for (int j = count - 1, i = 0; i < count; j = i, i++)
+    for (int j = vertices.count - 1, i = 0; i < vertices.count; j = i, i++)
         s->polygon.normals.data[i] = frVec2LeftNormal(
             frVec2Subtract(
                 s->polygon.vertices.data[i], 

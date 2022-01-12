@@ -59,24 +59,30 @@ int main(void) {
             .pre_solve = onCollisionPreSolve
         }
     );
-    
-    Vector2 bullet_vertices[3] = {
-        frVec2PixelsToMeters((Vector2) { 0, -6 }),
-        frVec2PixelsToMeters((Vector2) { -3, 6 }),
-        frVec2PixelsToMeters((Vector2) { 3, 6 })
+
+    frVertices semo_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) {  0.0f, -16.0f }),
+            frVec2PixelsToMeters((Vector2) { -14.0f, 16.0f }),
+            frVec2PixelsToMeters((Vector2) {  14.0f, 16.0f })
+        },
+        .count = 3
     };
-    
-    Vector2 semo_vertices[3] = {
-        frVec2PixelsToMeters((Vector2) { 0, -16 }),
-        frVec2PixelsToMeters((Vector2) { -14, 16 }),
-        frVec2PixelsToMeters((Vector2) { 14, 16 })
+
+    frVertices bullet_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) {  0.0f, -6.0f }),
+            frVec2PixelsToMeters((Vector2) { -3.0f,  6.0f }),
+            frVec2PixelsToMeters((Vector2) {  3.0f,  6.0f })
+        },
+        .count = 3
     };
     
     frBody *semo = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters(SCREEN_CENTER),
-        frCreatePolygon(SEMO_MATERIAL, semo_vertices, 3)
+        frCreatePolygon(SEMO_MATERIAL, semo_vertices)
     );
     
     frSetBodyUserData(semo, (void *) &SEMO_DATA);
@@ -127,8 +133,8 @@ int main(void) {
             frBody *body = frCreateBodyFromShape(
                 FR_BODY_DYNAMIC,
                 FR_FLAG_NONE,
-                frGetWorldPoint(semo, semo_vertices[0]),
-                frCreatePolygon(BULLET_MATERIAL, bullet_vertices, 3)
+                frGetWorldPoint(semo, semo_vertices.data[0]),
+                frCreatePolygon(BULLET_MATERIAL, bullet_vertices)
             );
             
             frSetBodyRotation(body, frVec2Angle((Vector2) { .y = -1 }, direction));
@@ -142,7 +148,7 @@ int main(void) {
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
-            if (!CheckCollisionRecs(frGetBodyAABB(body), WORLD_RECTANGLE))
+            if (!frIsInWorldBounds(world, body)) 
                 frRemoveFromWorld(world, body);
         }
         

@@ -47,44 +47,47 @@ int main(void) {
         WORLD_RECTANGLE
     );
 
-    Vector2 wall1_vertices[3] = {
-        frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
-        frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, 0.45f * SCREEN_HEIGHT }),
-        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.45f * SCREEN_HEIGHT }),
-    };
-    
-    Vector2 wall2_vertices[4] = {
-        frVec2PixelsToMeters((Vector2) { -0.5f * SCREEN_WIDTH, -40 }),
-        frVec2PixelsToMeters((Vector2) { -0.5f * SCREEN_WIDTH, 40 }),
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 40 }),
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, -40 })
+    frVertices wall1_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT })
+        },
+        .count = 3
     };
 
-    Vector2 wall3_vertices[3] = {
-        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
-        frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, 0.45f * SCREEN_HEIGHT }),
-        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.45f * SCREEN_HEIGHT }),
+    frVertices wall3_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT })
+        },
+        .count = 3
     };
 
     frBody *wall1 = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.55f * SCREEN_HEIGHT }),
-        frCreatePolygon(WALL_MATERIAL, wall1_vertices, 3)
+        frCreatePolygon(WALL_MATERIAL, wall1_vertices)
     );
     
     frBody *wall2 = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 40 }),
-        frCreatePolygon(WALL_MATERIAL, wall2_vertices, 4)
+        frCreateRectangle(
+            WALL_MATERIAL, 
+            frNumberPixelsToMeters(SCREEN_WIDTH), 
+            frNumberPixelsToMeters(80.0f)
+        )
     );
 
     frBody *wall3 = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.9f * SCREEN_WIDTH, 0.55f * SCREEN_HEIGHT }),
-        frCreatePolygon(WALL_MATERIAL, wall3_vertices, 3)
+        frCreatePolygon(WALL_MATERIAL, wall3_vertices)
     );
     
     frAddToWorld(world, wall1);

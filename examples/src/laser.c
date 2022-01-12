@@ -48,17 +48,20 @@ int main(void) {
     
     frWorld *world = frCreateWorld(FR_STRUCT_ZERO(Vector2), WORLD_RECTANGLE);
     
-    Vector2 semo_vertices[3] = {
-        frVec2PixelsToMeters((Vector2) { 0, -16 }),
-        frVec2PixelsToMeters((Vector2) { -14, 16 }),
-        frVec2PixelsToMeters((Vector2) { 14, 16 })
+    frVertices semo_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) {  0.0f, -16.0f }),
+            frVec2PixelsToMeters((Vector2) { -14.0f, 16.0f }),
+            frVec2PixelsToMeters((Vector2) {  14.0f, 16.0f })
+        },
+        .count = 3
     };
     
     frBody *semo = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters(SCREEN_CENTER),
-        frCreatePolygon(SEMO_MATERIAL, semo_vertices, 3)
+        frCreatePolygon(SEMO_MATERIAL, semo_vertices)
     );
     
     frAddToWorld(world, semo);
@@ -96,7 +99,7 @@ int main(void) {
         DrawCustomCursor(GetMousePosition());
         
         Vector2 mouse_position = GetMousePosition();
-        Vector2 difference = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
+        Vector2 diff_in_meters = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
         
         frSetBodyRotation(
             semo, 
@@ -109,7 +112,11 @@ int main(void) {
             )
         );
 
-        frRay ray = { frVec2PixelsToMeters(SCREEN_CENTER), difference, frVec2Magnitude(difference) };
+        frRay ray = { 
+            frVec2PixelsToMeters(SCREEN_CENTER), 
+            diff_in_meters, 
+            frVec2Magnitude(diff_in_meters) 
+        };
 
         int count = frComputeWorldRaycast(world, ray, hits);
 
