@@ -50,7 +50,7 @@ static void frComputeArea(frShape *s);
 static void frComputeConvex(frShape *s);
 
 /* 꼭짓점 배열 `vertices`로 만들 수 있는 가장 큰 볼록 다각형의 꼭짓점 배열을 반환한다. */
-static frVertices frJarvisMarch(Vector2 *vertices, int count);
+static frVertices frJarvisMarch(frVertices *vertices);
 
 /* 반지름이 `radius`인 원을 나타내는 도형을 생성한다. */
 frShape *frCreateCircle(frMaterial material, float radius) {
@@ -82,6 +82,7 @@ frShape *frCreateRectangle(frMaterial material, float width, float height) {
 
     result->type = FR_SHAPE_POLYGON;
     result->material = material;
+    result->is_rect = true;
     
     frSetPolygonVertices(result, vertices);
     
@@ -259,26 +260,12 @@ Vector2 frGetPolygonNormal(frShape *s, int index) {
 
 /* 다각형 `s`의 꼭짓점 배열을 반환한다. */
 frVertices frGetPolygonVertices(frShape *s) {
-    if (s == NULL) return FR_STRUCT_ZERO(frVertices);
-
-    frVertices result = { .count = s->polygon.vertices.count };
-    
-    for (int i = 0; i < result.count; i++)
-        result.data[i] = s->polygon.vertices.data[i];
-    
-    return result;
+    return (s != NULL) ? s->polygon.vertices : FR_STRUCT_ZERO(frVertices);
 }
 
 /* 다각형 `s`의 법선 벡터 배열을 반환한다. */
 frVertices frGetPolygonNormals(frShape *s) {
-    if (s == NULL) return FR_STRUCT_ZERO(frVertices);
-
-    frVertices result = { .count = s->polygon.normals.count };
-    
-    for (int i = 0; i < result.count; i++)
-        result.data[i] = s->polygon.normals.data[i];
-    
-    return result;
+    return (s != NULL) ? s->polygon.normals : FR_STRUCT_ZERO(frVertices);
 }
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
@@ -295,12 +282,14 @@ void frSetPolygonVertices(frShape *s, frVertices vertices) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
     
     s->polygon.vertices.count = vertices.count;
-    s->polygon.normals.count = vertices.count;
+    s->polygon.normals.count = (!s->is_rect) ? vertices.count : 2;
 
     for (int i = 0; i < vertices.count; i++)
         s->polygon.vertices.data[i] = vertices.data[i];
     
-    frComputeConvex(s);
+    // 직사각형은 이미 볼록 다각형이므로 변형하지 않는다.
+    if (!s->is_rect) frComputeConvex(s);
+
     frComputeArea(s);
 
     for (int j = vertices.count - 1, i = 0; i < vertices.count; j = i, i++)
@@ -357,34 +346,43 @@ static void frComputeArea(frShape *s) {
     } else if (s->type == FR_SHAPE_CIRCLE) {
         s->area = PI * (s->circle.radius * s->circle.radius);
     } else if (s->type == FR_SHAPE_POLYGON) {
-        float twice_area_sum = 0.0f;
+        if (s->is_rect) {
+            frVertices *vertices = &(s->polygon.vertices);
 
-        for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
-            float twice_area = frVec2CrossProduct(
-                frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
-                frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
-            );
+            float width = vertices->data[2].x - vertices->data[1].x;
+            float height = vertices->data[1].y - vertices->data[0].y;
 
-            Vector2 thrice_centroid = frVec2Add(
-                s->polygon.vertices.data[0],
-                frVec2Add(s->polygon.vertices.data[i], s->polygon.vertices.data[i + 1])
-            );
+            s->area = width * height;
+        } else {
+            float twice_area_sum = 0.0f;
 
-            twice_area_sum += twice_area;
+            for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
+                float twice_area = frVec2CrossProduct(
+                    frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
+                    frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
+                );
+
+                Vector2 thrice_centroid = frVec2Add(
+                    s->polygon.vertices.data[0],
+                    frVec2Add(
+                        s->polygon.vertices.data[i], 
+                        s->polygon.vertices.data[i + 1]
+                    )
+                );
+
+                twice_area_sum += twice_area;
+            }
+
+            s->area = fabsf(0.5f * twice_area_sum);
         }
-
-        s->area = fabsf(twice_area_sum / 2.0f);
     }
 }
 
 /* 다각형 `s`를 볼록 다각형으로 변형한다. */
 static void frComputeConvex(frShape *s) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
-        
-    frVertices result = frJarvisMarch(
-        s->polygon.vertices.data,
-        s->polygon.vertices.count
-    );
+    
+    frVertices result = frJarvisMarch(&(s->polygon.vertices));
     
     for (int i = 0; i < result.count; i++)
         s->polygon.vertices.data[i] = result.data[i];
@@ -393,26 +391,26 @@ static void frComputeConvex(frShape *s) {
 }
 
 /* 꼭짓점 배열 `vertices`로 만들 수 있는 가장 큰 볼록 다각형의 꼭짓점 배열을 반환한다. */
-static frVertices frJarvisMarch(Vector2 *vertices, int count) {
+static frVertices frJarvisMarch(frVertices *vertices) {
     frVertices result = FR_STRUCT_ZERO(frVertices);
 
-    if (vertices == NULL || count == 0) return result;
+    if (vertices == NULL || vertices->count == 0) return result;
 
     int leftmost_index = 0, pivot_index = 0, next_index = 0, vertex_index = 0;
     
     // 주어진 꼭짓점 배열에서 X좌표 값이 가장 작은 꼭짓점 L을 찾는다.
-    for (int i = 1; i < count; i++)
-        if (vertices[leftmost_index].x > vertices[i].x)
+    for (int i = 1; i < vertices->count; i++)
+        if (vertices->data[leftmost_index].x > vertices->data[i].x)
             leftmost_index = i;
     
-    result.data[vertex_index++] = vertices[leftmost_index];
+    result.data[vertex_index++] = vertices->data[leftmost_index];
     
     // 기준점 P를 방금 찾은 꼭짓점 L로 설정한다.
     pivot_index = leftmost_index;
     
     while (1) {
         // 기준점 P의 바로 다음에 오는 꼭짓점 Q를 찾는다.
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < vertices->count; i++) {
             if (i == pivot_index)
                 continue;
             
@@ -422,12 +420,12 @@ static frVertices frJarvisMarch(Vector2 *vertices, int count) {
         }
         
         // 기준점 P와 꼭짓점 Q 사이에 오는 꼭짓점 R을 찾는다.
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < vertices->count; i++) {
             if (i == pivot_index || i == next_index)
                 continue;
             
             // 기준점 P, 꼭짓점 R과 꼭짓점 Q가 반시계 방향으로 정렬되어 있는지 확인한다.
-            if (frVec2CCW(vertices[pivot_index], vertices[i], vertices[next_index]))
+            if (frVec2CCW(vertices->data[pivot_index], vertices->data[i], vertices->data[next_index]))
                 next_index = i;
         }
         
@@ -438,7 +436,7 @@ static frVertices frJarvisMarch(Vector2 *vertices, int count) {
         pivot_index = next_index;
         
         // 새로 찾은 꼭짓점을 배열에 저장한다.
-        result.data[vertex_index++] = vertices[next_index];
+        result.data[vertex_index++] = vertices->data[next_index];
     }
     
     result.count = vertex_index;

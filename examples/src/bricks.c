@@ -52,7 +52,7 @@ int main(void) {
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60 }),
         frCreateRectangle(
             FLOOR_MATERIAL, 
-            frNumberPixelsToMeters(0.5f * SCREEN_WIDTH), 
+            frNumberPixelsToMeters(0.65f * SCREEN_WIDTH), 
             frNumberPixelsToMeters(80.0f)
         )
     );
