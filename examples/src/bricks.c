@@ -49,7 +49,7 @@ int main(void) {
     frBody *floor = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60 }),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60.0f }),
         frCreateRectangle(
             FLOOR_MATERIAL, 
             frNumberPixelsToMeters(0.65f * SCREEN_WIDTH), 

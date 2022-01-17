@@ -282,7 +282,8 @@ void frSetPolygonVertices(frShape *s, frVertices vertices) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
     
     s->polygon.vertices.count = vertices.count;
-    s->polygon.normals.count = (!s->is_rect) ? vertices.count : 2;
+    // s->polygon.normals.count = (!s->is_rect) ? vertices.count : 2;
+    s->polygon.normals.count = vertices.count;
 
     for (int i = 0; i < vertices.count; i++)
         s->polygon.vertices.data[i] = vertices.data[i];
