@@ -68,11 +68,12 @@ void frReleaseWorld(frWorld *world) {
     if (world == NULL) return;
     
     for (int i = 0; i < arrlen(world->bodies); i++) {
-        frReleaseShape(frGetBodyShape(world->bodies[i]));
-        frReleaseBody(world->bodies[i]);
+        frBody *b = world->bodies[i];
+        frShape *s = frGetBodyShape(b);
+
+        frReleaseShape(s);
+        frReleaseBody(b);
     }
-    
-    frClearWorld(world);
     
     frReleaseSpatialHash(world->hash);
     
@@ -158,6 +159,8 @@ Vector2 frGetWorldGravity(frWorld *world) {
 
 /* 강체 `b`가 세계 `world`의 경계 범위 안에 있는지 확인한다. */
 bool frIsInWorldBounds(frWorld *world, frBody *b) {
+    if (world == NULL || b == NULL) return false;
+
     return CheckCollisionRecs(frGetBodyAABB(b), frGetWorldBounds(world));
 }
 

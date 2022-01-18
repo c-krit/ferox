@@ -42,7 +42,8 @@ EXAMPLES := \
 	bullet  \
 	circles \
 	jump    \
-	laser
+	laser   \
+	smash
     
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)

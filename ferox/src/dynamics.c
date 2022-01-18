@@ -82,7 +82,8 @@ frBody *frCreateBodyFromShape(frBodyType type, frBodyFlags flags, Vector2 p, frS
 
 /* 강체 `b`에 할당된 메모리를 해제한다. */
 void frReleaseBody(frBody *b) {
-    if (b->shape != NULL) frDetachShapeFromBody(b);
+    if (b != NULL && b->shape != NULL) 
+        frDetachShapeFromBody(b);
     
     free(b);
 }
@@ -300,12 +301,12 @@ void frApplyImpulse(frBody *b, Vector2 impulse) {
     );
 }
 
-/* 강체 `b` 위의 점 `point`에 각운동량 `impulse`를 적용한다. */
-void frApplyTorqueImpulse(frBody *b, Vector2 point, Vector2 impulse) {
+/* 강체 `b` 위의 점 `p`에 각운동량 `impulse`를 적용한다. */
+void frApplyTorqueImpulse(frBody *b, Vector2 p, Vector2 impulse) {
     if (b == NULL || b->motion.inverse_inertia <= 0.0f) return;
     
     b->motion.angular_velocity += b->motion.inverse_inertia 
-        * frVec2CrossProduct(point, impulse);
+        * frVec2CrossProduct(p, impulse);
 }
 
 /* 강체 `b`에 작용하는 모든 힘을 제거한다. */
@@ -369,7 +370,10 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
     b->motion.velocity = frVec2Add(
         b->motion.velocity,
         frVec2ScalarMultiply(
-            frVec2ScalarMultiply(b->motion.force, b->motion.inverse_mass),
+            frVec2ScalarMultiply(
+                b->motion.force, 
+                b->motion.inverse_mass
+            ),
             (dt / 2.0f)
         )
     );

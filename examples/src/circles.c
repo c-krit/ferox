@@ -31,10 +31,12 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define WALL_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
+#define WALL_MATERIAL    ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
 #define CIRCLE_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 0.85f, 0.75f })
 
 #define MAX_CIRCLE_COUNT 100
+
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -110,7 +112,9 @@ int main(void) {
         frAddToWorld(world, circle);
     }
 
-    while (!WindowShouldClose()) {       
+    while (!WindowShouldClose()) { 
+        frSimulateWorld(world, DELTA_TIME);
+              
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
@@ -123,8 +127,6 @@ int main(void) {
             frDrawBodyLines(frGetWorldBody(world, i), 2, RED);
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));
-        
-        frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
         
         DrawFPS(8, 8);
 

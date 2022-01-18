@@ -228,6 +228,9 @@ frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray);
 /* | `debug` 모듈 함수... | */
 
 #ifndef FEROX_STANDALONE
+    /* 게임 화면에 점 `p1`에서 `p2`로 향하는 화살표를 그린다. */
+    void frDrawArrow(Vector2 p1, Vector2 p2, float thick, Color color);
+
     /* 게임 화면에 강체 `b`의 도형을 그린다. */
     void frDrawBody(frBody *b, Color color);
 
@@ -357,8 +360,8 @@ void frApplyGravity(frBody *b, Vector2 gravity);
 /* 강체 `b`에 충격량 `impulse`를 적용한다. */
 void frApplyImpulse(frBody *b, Vector2 impulse);
 
-/* 강체 `b` 위의 점 `point`에 각운동량 `impulse`를 적용한다. */
-void frApplyTorqueImpulse(frBody *b, Vector2 point, Vector2 impulse);
+/* 강체 `b` 위의 점 `p`에 각운동량 `impulse`를 적용한다. */
+void frApplyTorqueImpulse(frBody *b, Vector2 p, Vector2 impulse);
 
 /* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
 void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision);

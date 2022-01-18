@@ -23,7 +23,7 @@
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
-#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 })
+#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
 #define SCREEN_HEIGHT_IN_METERS (frNumberPixelsToMeters(SCREEN_HEIGHT))
@@ -39,6 +39,8 @@
 #define MAX_ENEMY_COUNT 100
 
 static void DrawCustomCursor(Vector2 position);
+
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -92,14 +94,8 @@ int main(void) {
     frRaycastHit hits[MAX_ENEMY_COUNT];
 
     while (!WindowShouldClose()) {
-        BeginDrawing();
-        
-        ClearBackground(RAYWHITE);
-
-        DrawCustomCursor(GetMousePosition());
-        
         Vector2 mouse_position = GetMousePosition();
-        Vector2 diff_in_meters = frVec2PixelsToMeters(frVec2Subtract(mouse_position, SCREEN_CENTER));
+        Vector2 position_diff = frVec2Subtract(mouse_position, SCREEN_CENTER);
         
         frSetBodyRotation(
             semo, 
@@ -114,18 +110,25 @@ int main(void) {
 
         frRay ray = { 
             frVec2PixelsToMeters(SCREEN_CENTER), 
-            diff_in_meters, 
-            frVec2Magnitude(diff_in_meters) 
+            frVec2PixelsToMeters(position_diff), 
+            frVec2Magnitude(frVec2PixelsToMeters(position_diff))
         };
 
         int count = frComputeWorldRaycast(world, ray, hits);
+
+        frSimulateWorld(world, DELTA_TIME);
+
+        BeginDrawing();
+        
+        ClearBackground(RAYWHITE);
+
+        DrawCustomCursor(GetMousePosition());
 
         for (int i = 1; i < frGetWorldBodyCount(world); i++)
             frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
 
         for (int i = 0; i < count; i++) {
             frDrawBodyAABB(hits[i].body, GREEN);
-            
             DrawRing(frVec2MetersToPixels(hits[i].point), 6, 8, 0, 360, 64, RED);
         }
         
@@ -135,8 +138,6 @@ int main(void) {
         frDrawBodyAABB(semo, GREEN);
 
         frDrawSpatialHash(frGetWorldSpatialHash(world));
-        
-        frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
         
         DrawFPS(8, 8);
 

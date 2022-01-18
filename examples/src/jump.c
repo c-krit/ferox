@@ -49,7 +49,7 @@ typedef struct Brick {
     frBody *body;
 } Brick;
 
-const float DELTA_TIME = (1.0f / TARGET_FPS) * 100;
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
 static Brick brick = { .width = 40, .height = 80 };
 
@@ -164,11 +164,13 @@ int main(void) {
     frAddToWorld(world, box);
 
     while (!WindowShouldClose()) {
+        HandleBrickMovement(world, &brick);
+
+        frSimulateWorld(world, DELTA_TIME);
+
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
-
-        HandleBrickMovement(world, &brick);
 
         frDrawBody(wall1, BLACK);
         frDrawBody(wall2, BLACK);
@@ -179,8 +181,6 @@ int main(void) {
         frDrawBody(brick.body, RED);
 
         frDrawSpatialHash(frGetWorldSpatialHash(world));
-        
-        frSimulateWorld(world, DELTA_TIME);
         
         Vector2 position = frGetBodyPosition(brick.body);
         Vector2 velocity = frGetBodyVelocity(brick.body);

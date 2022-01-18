@@ -20,7 +20,7 @@
 
 #define TARGET_FPS 60
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
@@ -34,6 +34,8 @@
 #define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
 #define CURSOR_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.85f, 0.5f })
 #define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.5f })
+
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -71,13 +73,9 @@ int main(void) {
     frAddToWorld(world, floor);
     frAddToWorld(world, cursor);
 
-    while (!WindowShouldClose()) {       
-        BeginDrawing();
-        
-        ClearBackground(RAYWHITE);
-        
+    while (!WindowShouldClose()) {
         frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
-        
+
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             frBody *brick = frCreateBodyFromShape(
                 FR_BODY_DYNAMIC,
@@ -96,9 +94,17 @@ int main(void) {
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
-            if (!frIsInWorldBounds(world, body)) 
+            if (!frIsInWorldBounds(world, body)) {
                 frRemoveFromWorld(world, body);
+                frReleaseBody(body);
+            }
         }
+
+        frSimulateWorld(world, DELTA_TIME);
+
+        BeginDrawing();
+        
+        ClearBackground(RAYWHITE);
         
         frDrawBody(floor, BLACK);
         
@@ -113,8 +119,6 @@ int main(void) {
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));
         
-        frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
-        
         const char *message = TextFormat(
             "%d brick(s)!",
             frGetWorldBodyCount(world) - 2
@@ -124,8 +128,8 @@ int main(void) {
             GetFontDefault(),
             message,
             (Vector2) { 
-                (SCREEN_WIDTH - MeasureText(message, 40)) / 2, 
-                SCREEN_HEIGHT / 8
+                (SCREEN_WIDTH - MeasureText(message, 40)) / 2.0f, 
+                0.125f * SCREEN_HEIGHT
             },
             40,
             2, 

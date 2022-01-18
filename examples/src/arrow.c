@@ -20,7 +20,7 @@
 
 #define TARGET_FPS 60
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
@@ -73,10 +73,6 @@ int main(void) {
     bool use_polygon_cursor = false;
 
     while (!WindowShouldClose()) {
-        BeginDrawing();
-        
-        ClearBackground(RAYWHITE);
-        
         frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
         
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -95,6 +91,10 @@ int main(void) {
             frSetBodyRotation(cursor, rotation);
             frSetBodyRotation(cursor_clone, rotation);
         }
+        
+        BeginDrawing();
+        
+        ClearBackground(RAYWHITE);
         
         frDrawBody(large_circle, GRAY);
         frDrawBodyAABB(large_circle, GREEN);
@@ -121,26 +121,32 @@ int main(void) {
             frDrawBodyLines(cursor_clone, 2, RED);
 
             for (int i = 0; i < collision.count; i++) {
-                DrawRing(frVec2MetersToPixels(collision.points[i]), 6, 8, 0, 360, 64, RED);
-                
-                DrawLineEx(
-                    frVec2MetersToPixels(collision.points[i]),
-                    frVec2MetersToPixels(
-                        frVec2Add(
-                            collision.points[i],
-                            frVec2ScalarMultiply(
-                                collision.direction,
-                                -collision.depths[i]
-                            )
+                DrawRing(
+                    frVec2MetersToPixels(collision.points[i]), 
+                    4.0f, 
+                    6.0f, 
+                    0.0f, 
+                    360.0f, 
+                    64, 
+                    RED
+                );
+
+                frDrawArrow(
+                    frVec2Add(
+                        collision.points[i],
+                        frVec2ScalarMultiply(
+                            collision.direction,
+                            -collision.depths[i]
                         )
                     ),
+                    collision.points[i],
                     2,
                     RED
                 );
             }
         }
 
-        frDrawBody(cursor, Fade(BLACK, 0.85f));
+        frDrawBody(cursor, Fade(BLACK, 0.75f));
         frDrawBodyAABB(cursor, GREEN);
         
         DrawFPS(8, 8);

@@ -20,10 +20,10 @@
 
 #define TARGET_FPS 60
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
-#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 })
+#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
 #define SCREEN_HEIGHT_IN_METERS (frNumberPixelsToMeters(SCREEN_HEIGHT))
@@ -37,13 +37,14 @@
 #define BULLET_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.5f, 0.5f })
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
 
-#define MAX_ENEMY_COUNT 32
+#define MAX_ENEMY_COUNT 48
 
 static const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
 
 static void DrawCustomCursor(Vector2 position);
-
 static void onCollisionPreSolve(frCollision *collision);
+
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -115,12 +116,6 @@ int main(void) {
     HideCursor();
 
     while (!WindowShouldClose()) {
-        BeginDrawing();
-        
-        ClearBackground(RAYWHITE);
-        
-        DrawCustomCursor(GetMousePosition());
-        
         Vector2 direction = frVec2Subtract(
             frVec2PixelsToMeters(GetMousePosition()), 
             frGetBodyPosition(semo)
@@ -130,27 +125,37 @@ int main(void) {
         frSetBodyVelocity(semo, frVec2ScalarMultiply(frVec2Normalize(direction), 0.006f));
         
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            frBody *body = frCreateBodyFromShape(
+            frBody *bullet = frCreateBodyFromShape(
                 FR_BODY_DYNAMIC,
                 FR_FLAG_NONE,
                 frGetWorldPoint(semo, semo_vertices.data[0]),
                 frCreatePolygon(BULLET_MATERIAL, bullet_vertices)
             );
             
-            frSetBodyRotation(body, frVec2Angle((Vector2) { .y = -1 }, direction));
-            frSetBodyUserData(body, (void *) &BULLET_DATA);
+            frSetBodyRotation(bullet, frVec2Angle((Vector2) { .y = -1.0f }, direction));
+            frSetBodyUserData(bullet, (void *) &BULLET_DATA);
             
-            frApplyImpulse(body, frVec2ScalarMultiply(frVec2Normalize(direction), 0.005f));
+            frApplyImpulse(bullet, frVec2ScalarMultiply(frVec2Normalize(direction), 0.006f));
             
-            frAddToWorld(world, body);
+            frAddToWorld(world, bullet);
         }
-        
+
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
-            if (!frIsInWorldBounds(world, body)) 
+            if (!frIsInWorldBounds(world, body)) {
                 frRemoveFromWorld(world, body);
+                frReleaseBody(body);
+            }
         }
+
+        frSimulateWorld(world, DELTA_TIME);
+
+        BeginDrawing();
+        
+        ClearBackground(RAYWHITE);
+        
+        DrawCustomCursor(GetMousePosition());
         
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
@@ -163,8 +168,6 @@ int main(void) {
         }
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));
-        
-        frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
         
         DrawFPS(8, 8);
 

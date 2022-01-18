@@ -39,6 +39,8 @@
 
 #define CURSOR_MATERIAL ((frMaterial) { 2.5f, 0.5f, 0.75f, 0.5f })
 
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetTargetFPS(TARGET_FPS);
@@ -53,7 +55,7 @@ int main(void) {
     frBody *floor = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 80 }),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 80.0f }),
         frCreateRectangle(
             FLOOR_MATERIAL, 
             frNumberPixelsToMeters(0.7f * SCREEN_WIDTH), 
@@ -97,7 +99,16 @@ int main(void) {
     
     frAddToWorld(world, cursor);
 
-    while (!WindowShouldClose()) {  
+    while (!WindowShouldClose()) {
+        for (int i = 0; i < frGetWorldBodyCount(world); i++) {
+            frBody *body = frGetWorldBody(world, i);
+            
+            if (!frIsInWorldBounds(world, body)) 
+                frRemoveFromWorld(world, body);
+        }
+        
+        frSimulateWorld(world, DELTA_TIME);
+        
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
@@ -113,8 +124,6 @@ int main(void) {
         frDrawBody(cursor, Fade(RED, 0.5f));
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));
-        
-        frSimulateWorld(world, (1.0f / TARGET_FPS) * 100);
         
         DrawFPS(8, 8);
 

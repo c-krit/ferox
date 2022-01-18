@@ -26,7 +26,40 @@
 
 #ifndef FEROX_STANDALONE
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
-    static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result);
+    static frVertices frGetWorldVerticesInPixels(frBody *b);
+
+    /* 게임 화면에 점 `p1`에서 `p2`로 향하는 화살표를 그린다. */
+    void frDrawArrow(Vector2 p1, Vector2 p2, float thick, Color color) {
+        const float ARROW_HEAD_LENGTH = 16.0f;
+
+        p1 = frVec2MetersToPixels(p1);
+        p2 = frVec2MetersToPixels(p2);
+
+        Vector2 diff = frVec2Normalize(frVec2Subtract(p1, p2));
+
+        Vector2 normal1 = frVec2LeftNormal(diff);
+        Vector2 normal2 = frVec2RightNormal(diff);
+
+        Vector2 h1 = frVec2Add(
+            p2, 
+            frVec2ScalarMultiply(
+                frVec2Normalize(frVec2Add(diff, normal1)), 
+                ARROW_HEAD_LENGTH
+            )
+        );
+
+        Vector2 h2 = frVec2Add(
+            p2, 
+            frVec2ScalarMultiply(
+                frVec2Normalize(frVec2Add(diff, normal2)), 
+                ARROW_HEAD_LENGTH
+            )
+        );
+        
+        DrawLineEx(p1, p2, thick, color);
+        DrawLineEx(p2, h1, thick, color);
+        DrawLineEx(p2, h2, thick, color);
+    }
 
     /* 게임 화면에 강체 `b`의 도형을 그린다. */
     void frDrawBody(frBody *b, Color color) {
@@ -41,10 +74,9 @@
                 color
             );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-            Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
-            int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
+            frVertices world_vertices = frGetWorldVerticesInPixels(b);
             
-            DrawTriangleFan(world_vertices, world_vertex_count, color);
+            DrawTriangleFan(world_vertices.data, world_vertices.count, color);
         }
     }
 
@@ -61,17 +93,16 @@
                 frVec2MetersToPixels(p),
                 frNumberMetersToPixels(frGetCircleRadius(s)) - thick,
                 frNumberMetersToPixels(frGetCircleRadius(s)),
-                0,
-                360,
-                64,
+                0.0f,
+                360.0f,
+                32,
                 color
             );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-            Vector2 world_vertices[FR_GEOMETRY_MAX_VERTEX_COUNT] = { 0 };
-            int world_vertex_count = frGetWorldVerticesInPixels(b, world_vertices);
+            frVertices world_vertices = frGetWorldVerticesInPixels(b);
                 
-            for (int j = world_vertex_count - 1, i = 0; i < world_vertex_count; j = i, i++)
-                DrawLineEx(world_vertices[j], world_vertices[i], thick, color);
+            for (int j = world_vertices.count - 1, i = 0; i < world_vertices.count; j = i, i++)
+                DrawLineEx(world_vertices.data[j], world_vertices.data[i], thick, color);
         }
     }
 
@@ -88,7 +119,7 @@
                 frNumberMetersToPixels(aabb.width),
                 frNumberMetersToPixels(aabb.height)
             }, 
-            1, 
+            1.0f, 
             color
         );
         
@@ -111,9 +142,9 @@
                 tx.position.x, tx.position.y, tx.rotation,
                 velocity.x, velocity.y, frGetBodyAngularVelocity(b)
             ), 
-            frVec2MetersToPixels(frVec2Add(tx.position, (Vector2) { 1, 1 })),
-            10, 
-            1, 
+            frVec2MetersToPixels(frVec2Add(tx.position, (Vector2) { 1.0f, 1.0f })),
+            10.0f, 
+            1.0f, 
             color
         );
     }
@@ -129,7 +160,7 @@
         
         for (int i = 0; i <= v_count; i++)
             DrawLineEx(
-                frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0 })),
+                frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0.0f })),
                 frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height })),
                 0.25f,
                 GRAY
@@ -137,7 +168,7 @@
     
         for (int i = 0; i <= h_count; i++)
             DrawLineEx(
-                frVec2MetersToPixels(((Vector2) { 0, FR_BROADPHASE_CELL_SIZE * i })), 
+                frVec2MetersToPixels(((Vector2) { 0.0f, FR_BROADPHASE_CELL_SIZE * i })), 
                 frVec2MetersToPixels(((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i })),
                 0.25f,
                 GRAY
@@ -150,14 +181,14 @@
     }
 
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
-    static int frGetWorldVerticesInPixels(frBody *b, Vector2 *result) {
-        if (b == NULL || result == NULL) return 0;
-        
+    static frVertices frGetWorldVerticesInPixels(frBody *b) {
+        if (b == NULL) return FR_STRUCT_ZERO(frVertices);
+
         frVertices vertices = frGetPolygonVertices(frGetBodyShape(b));
         
         for (int i = 0; i < vertices.count; i++)
-            result[i] = frVec2MetersToPixels(frGetWorldPoint(b, vertices.data[i]));
+            vertices.data[i] = frVec2MetersToPixels(frGetWorldPoint(b, vertices.data[i]));
         
-        return vertices.count;
+        return vertices;
     }
 #endif

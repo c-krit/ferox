@@ -141,7 +141,7 @@ frShape *frCloneShape(frShape *s) {
 
 /* 도형 `s`에 할당된 메모리를 해제한다. */
 void frReleaseShape(frShape *s) {
-    if (s != NULL) free(s);
+    free(s);
 }
 
 /* 구조체 `frShape`의 크기를 반환한다. */
