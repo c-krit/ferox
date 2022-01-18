@@ -32,31 +32,67 @@ $ make
 
 ### `arrow.c`
 
-<img src="res/images/arrow.gif" width="640" alt="arrow.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/arrow.gif" width="640" alt="arrow.c">
+</details>
 
 ### `bouncy.c`
 
-<img src="res/images/bouncy.gif" width="640" alt="bouncy.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/bouncy.gif" width="640" alt="bouncy.c">
+</details>
 
 ### `bricks.c`
 
-<img src="res/images/bricks.gif" width="640" alt="bricks.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/bricks.gif" width="640" alt="bricks.c">
+</details>
 
 ### `bullet.c`
 
-<img src="res/images/bullet.gif" width="640" alt="bullet.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/bullet.gif" width="640" alt="bullet.c">
+</details>
 
 ### `circles.c`
 
-<img src="res/images/circles.gif" width="640" alt="circles.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/circles.gif" width="640" alt="circles.c">
+</details>
 
 ### `jump.c`
 
-<img src="res/images/jump.gif" width="640" alt="jump.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/jump.gif" width="640" alt="jump.c">
+</details>
 
 ### `laser.c`
 
-<img src="res/images/laser.gif" width="640" alt="laser.c">
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/laser.gif" width="640" alt="laser.c">
+</details>
+
+### `smash.c`
+
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/smash.gif" width="640" alt="smash.c">
+</details>
 
 ## License
 

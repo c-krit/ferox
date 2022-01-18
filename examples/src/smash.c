@@ -184,6 +184,8 @@ int main(void) {
             );
         }
 
+        frDrawBodyLines(ball, 2, RED);
+
         frDrawArrow(
             frVec2PixelsToMeters(GetMousePosition()),
             frVec2PixelsToMeters(SCREEN_CENTER),
