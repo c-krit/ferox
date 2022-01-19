@@ -53,11 +53,18 @@
         float height;
     } Rectangle;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
     /* 직사각형 `rec1`과 `rec2`가 서로 충돌하는지 확인한다. */
     bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2) {
         return ((rec1.x + rec1.width) - rec2.x) >= 0 && ((rec2.x + rec2.width) - rec1.x) >= 0
             && ((rec1.y + rec1.height) - rec2.y) >= 0 && ((rec2.y + rec2.height) - rec1.y) >= 0;
     }
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 /* | 매크로 정의... | */
@@ -181,6 +188,9 @@ typedef struct frWorld frWorld;
 
 /* | `broadphase` 모듈 함수... | */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* 경계 범위가 `bounds`이고 각 셀의 크기가 `cell_size`인 공간 해시맵의 메모리 주소를 반환한다. */
 frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cell_size);
 
@@ -600,5 +610,9 @@ void frSimulateWorld(frWorld *world, double dt);
 
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
