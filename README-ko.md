@@ -58,6 +58,23 @@ $ make
 $ make BUILD=STANDALONE
 ```
 
+### WebAssembly로 컴파일하기
+
+프로젝트를 웹에서 실행할 수 있도록 컴파일하려면 [Emscripten SDK](https://emscripten.org/docs/introducing_emscripten/about_emscripten.html)를 설치해야 합니다.
+
+```console
+$ git clone https://github.com/emscripten-core/emsdk && cd emsdk
+$ ./emsdk install latest
+$ ./emsdk activate latest
+$ source ./emsdk_env.sh
+```
+
+Emscripten SDK의 환경 변수 설정이 끝나면, 아래 명령어를 사용하면 됩니다.
+
+```console
+$ make PLATFORM=WEB
+```
+
 ### Windows 플랫폼을 대상으로 크로스 컴파일하기
 
 `RAYLIB_PATH` 변수에 raylib의 저장소 경로를 입력하고 `TARGET_OS=WINDOWS`를 입력하여 컴파일하면 Windows 플랫폼을 대상으로 프로젝트를 빌드할 수 있습니다.

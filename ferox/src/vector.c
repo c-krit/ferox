@@ -128,7 +128,7 @@ Vector2 frVec2Transform(Vector2 v, frTransform tx) {
 /* 벡터 `v1`, `v2`와 `v3`가 반시계 방향으로 정렬되어 있는지 확인한다. */
 bool frVec2CCW(Vector2 v1, Vector2 v2, Vector2 v3) {
     return (v3.y - v1.y) * (v2.x - v1.x) < (v2.y - v1.y) * (v3.x - v1.x);
-};
+}
 
 /* 픽셀 단위 벡터 `v`를 미터 단위 벡터로 변환한다. */
 Vector2 frVec2PixelsToMeters(Vector2 v) {

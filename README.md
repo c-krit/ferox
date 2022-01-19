@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
+<img src="examples/res/images/logo.png" alt="c-krit/ferox"><br>
 
 [![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)](https://github.com/c-krit/ferox/releases)
 [![codefactor badge](https://www.codefactor.io/repository/github/c-krit/ferox/badge)](https://www.codefactor.io/repository/github/c-krit/ferox)
@@ -19,7 +19,7 @@ A 2D collision detection and physics library written in C.
 
 ## Features
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/bricks.gif" width="640" alt="Bricks!">
+<img src="examples/res/images/bricks.gif" width="640" alt="Bricks!">
 
 **Since this project was made to learn how a physics engine works, I am not planning to add a lot of features to it.**
 
@@ -59,6 +59,23 @@ You can also build this library as standalone-mode to avoid `raylib.h` header in
 $ make BUILD=STANDALONE
 ```
 
+### Compiling into WebAssembly
+
+Compiling for the Web requires installation of the [Emscripten SDK](https://emscripten.org/docs/introducing_emscripten/about_emscripten.html).
+
+```console
+$ git clone https://github.com/emscripten-core/emsdk && cd emsdk
+$ ./emsdk install latest
+$ ./emsdk activate latest
+$ source ./emsdk_env.sh
+```
+
+After setting up the environment variables for Emscripten SDK, do:
+
+```console
+$ make PLATFORM=WEB
+```
+
 ### Cross-compiling for Windows
 
 You may need to recompile raylib for Windows before building this library.
@@ -71,7 +88,7 @@ $ make -j`nproc` CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar OS=Windows_N
 Make sure to set the value of `RAYLIB_PATH` variable to cross-compile for Windows:
 
 ```console
-$ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
+$ make PLATFORM=WINDOWS RAYLIB_PATH=../raylib
 ```
 
 ## References

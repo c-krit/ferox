@@ -22,13 +22,21 @@
 
 .PHONY: all clean
 
-PROJECT_NAME := c-krit/ferox
-PROJECT_PATH := ferox
-PROJECT_PREFIX := $(shell tput setaf 2)$(PROJECT_NAME):$(shell tput sgr0)
+_COLOR_BEGIN := $(shell tput setaf 2)
+_COLOR_END := $(shell tput sgr0)
 
 RAYLIB_PATH ?= ../raylib
 
-INCLUDE_PATH := $(PROJECT_PATH)/include
+PROJECT_NAME := ferox
+PROJECT_FULL_NAME := c-krit/ferox
+
+PROJECT_PATH := $(PROJECT_NAME)
+PROJECT_PREFIX := $(_COLOR_BEGIN)$(PROJECT_FULL_NAME):$(_COLOR_END)
+
+INCLUDE_PATH := \
+	$(PROJECT_PATH)/include \
+	$(RAYLIB_PATH)/src
+
 LIBRARY_PATH := $(PROJECT_PATH)/lib
 SOURCE_PATH := $(PROJECT_PATH)/src
 
@@ -45,7 +53,7 @@ SOURCES := \
 	$(SOURCE_PATH)/world.c
 
 OBJECTS := $(SOURCES:.c=.o)
-TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH)-standalone.a
+TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_NAME)-standalone.a
 
 ifneq ($(BUILD),STANDALONE)
 	SOURCES += $(SOURCE_PATH)/debug.c
@@ -53,35 +61,37 @@ ifneq ($(BUILD),STANDALONE)
 	TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
 endif
 
-HOST_OS := LINUX
+HOST_PLATFORM := LINUX
 
 ifeq ($(OS),Windows_NT)
 	PROJECT_PREFIX := $(PROJECT_NAME):
-	HOST_OS := WINDOWS
+	HOST_PLATFORM := WINDOWS
 else
 	UNAME = $(shell uname)
+
 	ifeq ($(UNAME),Linux)
-		HOST_OS = LINUX
+		HOST_PLATFORM = LINUX
 	endif
 endif
 
 CC := gcc
 AR := ar
-CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu99
+CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu11 -Wno-return-type
 
 ifeq ($(BUILD),STANDALONE)
 	CFLAGS += -DFEROX_STANDALONE
 endif
 
-TARGET_OS := $(HOST_OS)
+PLATFORM := $(HOST_PLATFORM)
 
-ifeq ($(TARGET_OS),WINDOWS)
-	ifneq ($(HOST_OS),WINDOWS)
+ifeq ($(PLATFORM),WINDOWS)
+	ifneq ($(HOST_PLATFORM),WINDOWS)
 		CC := x86_64-w64-mingw32-gcc
 		AR := x86_64-w64-mingw32-ar
 	endif
-
-	CFLAGS += -I$(RAYLIB_PATH)/src
+else ifeq ($(PLATFORM),WEB)
+	CC := emcc
+	AR := emar
 endif
 
 all: pre-build build post-build
