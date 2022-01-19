@@ -186,11 +186,12 @@ typedef struct frSpatialHash frSpatialHash;
 /* 물리 법칙이 존재하는 세계를 나타내는 구조체. */
 typedef struct frWorld frWorld;
 
-/* | `broadphase` 모듈 함수... | */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* | `broadphase` 모듈 함수... | */
+
 /* 경계 범위가 `bounds`이고 각 셀의 크기가 `cell_size`인 공간 해시맵의 메모리 주소를 반환한다. */
 frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cell_size);
 
