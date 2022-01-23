@@ -64,7 +64,7 @@ endif
 HOST_PLATFORM := LINUX
 
 ifeq ($(OS),Windows_NT)
-	PROJECT_PREFIX := $(PROJECT_NAME):
+	PROJECT_PREFIX := $(PROJECT_FULL_NAME):
 	HOST_PLATFORM := WINDOWS
 else
 	UNAME = $(shell uname)
