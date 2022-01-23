@@ -23,28 +23,36 @@
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
-#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
-
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
 #define SCREEN_HEIGHT_IN_METERS (frNumberPixelsToMeters(SCREEN_HEIGHT))
 
-#define WORLD_RECTANGLE ((Rectangle) { \
-    .width = SCREEN_WIDTH_IN_METERS,   \
-    .height = SCREEN_HEIGHT_IN_METERS  \
+#define WORLD_RECTANGLE ((Rectangle) {       \
+    .y = -0.5f * SCREEN_HEIGHT_IN_METERS,    \
+    .width = SCREEN_WIDTH_IN_METERS,         \
+    .height = 1.5f * SCREEN_HEIGHT_IN_METERS \
 })
 
-#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 0.75f, 0.75f })
-#define BULLET_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.5f, 0.5f })
-#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.25f, 0.25f })
+#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 0.75f, 0.5f })
+#define BULLET_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.75f, 0.5f })
+#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
-#define MAX_ENEMY_COUNT 48
+#define SEMO_SPEED      0.024f
 
+#define MAX_ENEMY_COUNT 64
+
+static const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 static const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
 
-static void DrawCustomCursor(Vector2 position);
-static void onCollisionPreSolve(frCollision *collision);
+static int enemy_count = 0;
 
-const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+static frVertices semo_vertices, bullet_vertices;
+
+static void DrawCustomCursor(Vector2 position);
+
+static void HandleSemoBullets(frWorld *world, frBody *semo);
+static void HandleSemoMovement(frWorld *world, frBody *semo);
+
+static void onCollisionPreSolve(frCollision *collision);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -53,7 +61,7 @@ int main(void) {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | bullet.c");
     
     frWorld *world = frCreateWorld(FR_STRUCT_ZERO(Vector2), WORLD_RECTANGLE);
-    
+
     frSetWorldCollisionHandler(
         world,
         (frCollisionHandler) { 
@@ -61,16 +69,16 @@ int main(void) {
         }
     );
 
-    frVertices semo_vertices = {
+    semo_vertices = (frVertices) {
         .data = {
-            frVec2PixelsToMeters((Vector2) {  0.0f, -16.0f }),
-            frVec2PixelsToMeters((Vector2) { -14.0f, 16.0f }),
-            frVec2PixelsToMeters((Vector2) {  14.0f, 16.0f })
+            frVec2PixelsToMeters((Vector2) {  0.0f, -18.0f }),
+            frVec2PixelsToMeters((Vector2) { -16.0f, 18.0f }),
+            frVec2PixelsToMeters((Vector2) {  16.0f, 18.0f })
         },
         .count = 3
     };
 
-    frVertices bullet_vertices = {
+    bullet_vertices = (frVertices) {
         .data = {
             frVec2PixelsToMeters((Vector2) {  0.0f, -6.0f }),
             frVec2PixelsToMeters((Vector2) { -3.0f,  6.0f }),
@@ -78,72 +86,57 @@ int main(void) {
         },
         .count = 3
     };
-    
+
     frBody *semo = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters(SCREEN_CENTER),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 0.85f * SCREEN_HEIGHT }),
         frCreatePolygon(SEMO_MATERIAL, semo_vertices)
     );
-    
+
     frSetBodyUserData(semo, (void *) &SEMO_DATA);
     
     frAddToWorld(world, semo);
-    
-    for (int i = 0; i < MAX_ENEMY_COUNT; i++) {
-        Vector2 position = FR_STRUCT_ZERO(Vector2);
-        
-        position.x = GetRandomValue(0, 1) 
-            ? GetRandomValue(0, 0.45f * SCREEN_WIDTH)
-            : GetRandomValue(0.55f * SCREEN_WIDTH, SCREEN_WIDTH);
-        
-        position.y = GetRandomValue(0, 1)
-            ? GetRandomValue(0, 0.45f * SCREEN_HEIGHT)
-            : GetRandomValue(0.55f * SCREEN_HEIGHT, SCREEN_HEIGHT);
-        
-        frBody *enemy = frCreateBodyFromShape(
-            FR_BODY_DYNAMIC,
-            FR_FLAG_NONE,
-            frVec2PixelsToMeters(position),
-            frCreateCircle(ENEMY_MATERIAL, GetRandomValue(1, 3))
-        );
-        
-        frSetBodyUserData(enemy, (void *) &ENEMY_DATA);
-        
-        frAddToWorld(world, enemy);
-    }
-    
+
     HideCursor();
 
+    frRaycastHit hits[MAX_ENEMY_COUNT];
+
     while (!WindowShouldClose()) {
-        Vector2 direction = frVec2Subtract(
-            frVec2PixelsToMeters(GetMousePosition()), 
-            frGetBodyPosition(semo)
-        );
-        
-        frSetBodyRotation(semo, frVec2Angle((Vector2) { .y = -1 }, direction));
-        frSetBodyVelocity(semo, frVec2ScalarMultiply(frVec2Normalize(direction), 0.006f));
-        
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            frBody *bullet = frCreateBodyFromShape(
-                FR_BODY_DYNAMIC,
-                FR_FLAG_NONE,
-                frGetWorldPoint(semo, semo_vertices.data[0]),
-                frCreatePolygon(BULLET_MATERIAL, bullet_vertices)
-            );
-            
-            frSetBodyRotation(bullet, frVec2Angle((Vector2) { .y = -1.0f }, direction));
-            frSetBodyUserData(bullet, (void *) &BULLET_DATA);
-            
-            frApplyImpulse(bullet, frVec2ScalarMultiply(frVec2Normalize(direction), 0.006f));
-            
-            frAddToWorld(world, bullet);
+        HandleSemoBullets(world, semo);
+        HandleSemoMovement(world, semo);
+
+        if (enemy_count < MAX_ENEMY_COUNT) {
+            for (int i = 0; i < MAX_ENEMY_COUNT - enemy_count; i++) {
+                Vector2 position = FR_STRUCT_ZERO(Vector2);
+                
+                position.x = GetRandomValue(0.05f * SCREEN_WIDTH, 0.95f * SCREEN_WIDTH);
+                position.y = GetRandomValue(-0.25f * SCREEN_HEIGHT, -0.05f * SCREEN_HEIGHT);
+                
+                frBody *enemy = frCreateBodyFromShape(
+                    FR_BODY_DYNAMIC,
+                    FR_FLAG_INFINITE_INERTIA,
+                    frVec2PixelsToMeters(position),
+                    frCreateCircle(ENEMY_MATERIAL, 0.5f * GetRandomValue(3, 5))
+                );
+                
+                frSetBodyUserData(enemy, (void *) &ENEMY_DATA);
+                
+                frAddToWorld(world, enemy);
+
+                enemy_count++;
+            }
         }
 
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
             if (!frIsInWorldBounds(world, body)) {
+                int *user_data = (int *) frGetBodyUserData(body);
+
+                if (*user_data == ENEMY_DATA) 
+                    enemy_count--;
+
                 frRemoveFromWorld(world, body);
                 frReleaseBody(body);
             }
@@ -154,18 +147,44 @@ int main(void) {
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
-        
-        DrawCustomCursor(GetMousePosition());
-        
+
         for (int i = 0; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
             
             int *user_data = (int *) frGetBodyUserData(body);
             
-            if (*user_data == SEMO_DATA) frDrawBody(body, DARKGRAY);
-            else if (*user_data == BULLET_DATA) frDrawBody(body, RED);
-            else frDrawBodyLines(body, 2, BLACK);
+            if (*user_data == SEMO_DATA) {
+                frDrawBody(body, DARKGRAY);
+            } else if (*user_data == BULLET_DATA) {
+                frDrawBody(body, RED);
+            } else {
+                Vector2 direction = frVec2Normalize(
+                    frVec2Subtract(
+                        frGetBodyPosition(semo), 
+                        frGetBodyPosition(body)
+                    )
+                );
+
+                frApplyImpulse(body, frVec2ScalarMultiply(direction, 0.0003f));
+
+                frDrawArrow(
+                    frGetBodyPosition(body),
+                    frVec2Add(
+                        frGetBodyPosition(body),
+                        frVec2ScalarMultiply(
+                            direction,
+                            2.0f * frGetCircleRadius(frGetBodyShape(body))
+                        )
+                    ),
+                    2,
+                    DARKGRAY
+                );
+
+                frDrawBodyLines(body, 2, BLACK);
+            }
         }
+
+        DrawCustomCursor(GetMousePosition());
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));
         
@@ -183,18 +202,71 @@ int main(void) {
 
 static void DrawCustomCursor(Vector2 position) {
     DrawLineEx(
-        frVec2Add(position, (Vector2) { .x = -8 }),
-        frVec2Add(position, (Vector2) { .x = 8 }),
+        frVec2Add(position, (Vector2) { .x = -8.0f }),
+        frVec2Add(position, (Vector2) { .x = 8.0f }),
         2,
-        RED
+        LIME
     );
     
     DrawLineEx(
-        frVec2Add(position, (Vector2) { .y = -8 }),
-        frVec2Add(position, (Vector2) { .y = 8 }),
+        frVec2Add(position, (Vector2) { .y = -8.0f }),
+        frVec2Add(position, (Vector2) { .y = 8.0f }),
         2,
-        RED
+        LIME
     );
+}
+
+static void HandleSemoBullets(frWorld *world, frBody *semo) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 direction = frVec2Subtract(
+            frVec2PixelsToMeters(GetMousePosition()), 
+            frGetBodyPosition(semo)
+        );
+
+        frBody *bullet = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
+            FR_FLAG_INFINITE_INERTIA,
+            frGetWorldPoint(semo, semo_vertices.data[0]),
+            frCreatePolygon(BULLET_MATERIAL, bullet_vertices)
+        );
+        
+        frSetBodyRotation(bullet, frVec2Angle((Vector2) { .y = -1.0f }, direction));
+        frSetBodyUserData(bullet, (void *) &BULLET_DATA);
+        
+        frApplyImpulse(bullet, frVec2ScalarMultiply(frVec2Normalize(direction), 0.006f));
+        
+        frAddToWorld(world, bullet);
+    }
+}
+
+static void HandleSemoMovement(frWorld *world, frBody *semo) {
+    Vector2 direction = frVec2Subtract(
+        frVec2PixelsToMeters(GetMousePosition()), 
+        frGetBodyPosition(semo)
+    );
+
+    float rotation = frVec2Angle((Vector2) { .y = -1.0f }, direction);
+
+    Vector2 position = frGetBodyPosition(semo);
+    Vector2 velocity = frGetBodyVelocity(semo);
+
+    Rectangle aabb = frGetBodyAABB(semo);
+
+    if (position.x <= 0.5f * aabb.width) 
+        position.x = 0.5f * aabb.width;
+    else if (position.x >= SCREEN_WIDTH_IN_METERS - 0.5f * aabb.width)
+        position.x = SCREEN_WIDTH_IN_METERS - 0.5f * aabb.width;
+    
+    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_D)) {
+        if (IsKeyDown(KEY_A)) velocity.x = -SEMO_SPEED;
+        else velocity.x = SEMO_SPEED;
+    } else {
+        velocity.x = 0.0f;
+    }
+    
+    frSetBodyPosition(semo, position);
+    frSetBodyRotation(semo, rotation);
+    frSetBodyVelocity(semo, velocity);
 }
 
 static void onCollisionPreSolve(frCollision *collision) {
@@ -206,18 +278,20 @@ static void onCollisionPreSolve(frCollision *collision) {
     
     if ((*data1 == BULLET_DATA && *data2 == ENEMY_DATA)
        || (*data1 == ENEMY_DATA && *data2 == BULLET_DATA)) {
+        frBody *bullet = NULL, *enemy = NULL;
+
+        if (*data1 == BULLET_DATA) {
+            bullet = b1;
+            enemy = b2;
+        } else {
+            bullet = b2;
+            enemy = b1;
+        }
+
         collision->check = false;
         
         frSetBodyPosition(
-            b1,
-            (Vector2) { 
-                -SCREEN_WIDTH_IN_METERS, 
-                -SCREEN_HEIGHT_IN_METERS 
-            }
-        );
-        
-        frSetBodyPosition(
-            b2,
+            enemy,
             (Vector2) { 
                 -SCREEN_WIDTH_IN_METERS, 
                 -SCREEN_HEIGHT_IN_METERS 

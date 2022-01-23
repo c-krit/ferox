@@ -155,7 +155,7 @@ int main(void) {
             GetFontDefault(),
             EXAMPLE_STRING,
             (Vector2) { 
-                (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)) / 2, 
+                0.5f * (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)), 
                 SCREEN_HEIGHT / 16
             },
             20,

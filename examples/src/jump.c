@@ -189,7 +189,7 @@ int main(void) {
             GetFontDefault(),
             EXAMPLE_STRING,
             (Vector2) { 
-                (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)) / 2, 
+                0.5f * (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)), 
                 SCREEN_HEIGHT / 16
             },
             20,
@@ -213,8 +213,8 @@ static void HandleBrickMovement(frWorld *world, Brick *brick) {
     Vector2 position = frGetBodyPosition(brick->body);
     Vector2 velocity = frGetBodyVelocity(brick->body);
 
-    float half_brick_width = frNumberPixelsToMeters(brick->width) / 2;
-    float half_brick_height = frNumberPixelsToMeters(brick->height) / 2;
+    float half_brick_width = 0.5f * frNumberPixelsToMeters(brick->width);
+    float half_brick_height = 0.5f * frNumberPixelsToMeters(brick->height);
 
     if (position.x <= half_brick_width) 
         position.x = half_brick_width;

@@ -80,7 +80,7 @@ int main(void) {
             frBody *brick = frCreateBodyFromShape(
                 FR_BODY_DYNAMIC,
                 FR_FLAG_NONE,
-                frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10 }),
+                frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10.0f }),
                 frCreateRectangle(
                     CURSOR_MATERIAL, 
                     frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
@@ -128,7 +128,7 @@ int main(void) {
             GetFontDefault(),
             message,
             (Vector2) { 
-                (SCREEN_WIDTH - MeasureText(message, 40)) / 2.0f, 
+                0.5f * (SCREEN_WIDTH - MeasureText(message, 40)), 
                 0.125f * SCREEN_HEIGHT
             },
             40,

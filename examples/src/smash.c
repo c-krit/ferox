@@ -23,7 +23,7 @@
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
-#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
+#define SCREEN_CENTER ((Vector2) { 0.5f * SCREEN_WIDTH, 0.5f * SCREEN_HEIGHT })
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
 #define SCREEN_HEIGHT_IN_METERS (frNumberPixelsToMeters(SCREEN_HEIGHT))

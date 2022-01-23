@@ -77,7 +77,7 @@ int main(void) {
     frBody *wall2 = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { SCREEN_WIDTH / 2, SCREEN_HEIGHT - 40 }),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 40 }),
         frCreateRectangle(
             WALL_MATERIAL, 
             frNumberPixelsToMeters(SCREEN_WIDTH), 
@@ -99,7 +99,7 @@ int main(void) {
     for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
         Vector2 position = FR_STRUCT_ZERO(Vector2);
         
-        position.x = GetRandomValue(5, 13) * 0.05f * SCREEN_WIDTH;
+        position.x = (GetRandomValue(5, 13) * 0.05f) * SCREEN_WIDTH;
         position.y = GetRandomValue(0.25f * SCREEN_HEIGHT, 0.35f * SCREEN_HEIGHT);
         
         frBody *circle = frCreateBodyFromShape(
