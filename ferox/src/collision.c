@@ -285,7 +285,7 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
 
     result.check = true;
 
-    if (diff_magnitude != 0.0f) {
+    if (diff_magnitude > 0.0f) {
         result.direction = frVec2ScalarMultiply(diff, 1.0f / diff_magnitude);
         
         frVertices e = frGetShapeSignificantEdge(s1, tx1, result.direction);
