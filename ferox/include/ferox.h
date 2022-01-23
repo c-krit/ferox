@@ -141,10 +141,16 @@ typedef struct frShape frShape;
 /* 강체를 나타내는 구조체. */
 typedef struct frBody frBody;
 
+/* 강체 사이의 충돌 정보를 나타내는 구조체. */
+typedef struct frSolverCache {
+    frBody *bodies[2];
+    /* TODO: ... */
+} frSolverCache;
+
 /* 도형 사이의 충돌을 나타내는 구조체. */
 typedef struct frCollision {
     bool check;
-    frBody *_bodies[2];
+    frSolverCache cache;
     Vector2 direction;
     Vector2 points[2];
     float depths[2];

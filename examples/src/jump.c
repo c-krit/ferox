@@ -242,8 +242,8 @@ static void HandleBrickMovement(frWorld *world, Brick *brick) {
 }
 
 static void onCollisionPreSolve(frCollision *collision) {
-    frBody *b1 = collision->_bodies[0];
-    frBody *b2 = collision->_bodies[1];
+    frBody *b1 = collision->cache.bodies[0];
+    frBody *b2 = collision->cache.bodies[1];
 
     Brick *data1 = frGetBodyUserData(b1);
     Brick *data2 = frGetBodyUserData(b2);

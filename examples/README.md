@@ -21,7 +21,7 @@ A 2D collision detection and physics library written in C.
 
 This directory contains the example source files for `ferox`.
 
-To build all examples, run the following commands (replace `make` with `make TARGET_OS=WINDOWS` to build for Windows):
+To build all examples, run the following commands (replace `make` with `make PLATFORM=WINDOWS` to build for Windows):
 
 ```console
 $ cd examples

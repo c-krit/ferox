@@ -21,7 +21,7 @@
 
 이 디렉토리는 `ferox`의 예제 소스 파일이 저장되어 있는 곳입니다.
 
-아래 명령어를 사용하면 예제 파일을 빌드할 수 있습니다 (Windows 플랫폼을 대상으로 빌드하려면 `make` 대신 `make TARGET_OS=WINDOWS`을 사용하세요):
+아래 명령어를 사용하면 예제 파일을 빌드할 수 있습니다 (Windows 플랫폼을 대상으로 빌드하려면 `make` 대신 `make PLATFORM=WINDOWS`을 사용하세요):
 
 ```console
 $ cd examples

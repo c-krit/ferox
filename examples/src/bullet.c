@@ -270,8 +270,8 @@ static void HandleSemoMovement(frWorld *world, frBody *semo) {
 }
 
 static void onCollisionPreSolve(frCollision *collision) {
-    frBody *b1 = collision->_bodies[0];
-    frBody *b2 = collision->_bodies[1];
+    frBody *b1 = collision->cache.bodies[0];
+    frBody *b2 = collision->cache.bodies[1];
             
     int *data1 = (int *) frGetBodyUserData(b1);
     int *data2 = (int *) frGetBodyUserData(b2);
