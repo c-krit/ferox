@@ -71,7 +71,7 @@ extern "C" {
 
 #define FR_GLOBAL_PIXELS_PER_METER                16.0f
 
-#define FR_BROADPHASE_CELL_SIZE                   4
+#define FR_BROADPHASE_CELL_SIZE                   3.0f
 
 #define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.25f
 #define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.02f

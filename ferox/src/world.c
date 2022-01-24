@@ -86,7 +86,7 @@ void frReleaseWorld(frWorld *world) {
 
 /* 세계 `world`에 강체 `b`를 추가한다. */
 bool frAddToWorld(frWorld *world, frBody *b) {
-    if (world == NULL || arrlen(world->bodies) >= FR_WORLD_MAX_BODY_COUNT) 
+    if (world == NULL || b == NULL || arrlen(world->bodies) >= FR_WORLD_MAX_BODY_COUNT)
         return false;
     
     arrput(world->bodies, b);
@@ -198,9 +198,9 @@ void frSimulateWorld(frWorld *world, double dt) {
 
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
-    int result = 0;
+    if (world == NULL || hits == NULL) return 0;
 
-    if (world == NULL || hits == NULL) return result;
+    int result = 0;
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
@@ -236,6 +236,8 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
 
 /* 세계 `world`의 업데이트 이전 작업을 실행한다. */
 static void frPreUpdateWorld(frWorld *world) {
+    if (world == NULL || world->hash == NULL) return;
+
     for (int i = 0; i < arrlen(world->bodies); i++)
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
     
@@ -275,6 +277,8 @@ static void frPreUpdateWorld(frWorld *world) {
 
 /* 세계 `world`의 업데이트 이후 작업을 실행한다. */
 static void frPostUpdateWorld(frWorld *world) {
+    if (world == NULL || world->hash == NULL) return;
+
     for (int i = 0; i < arrlen(world->bodies); i++)
         frClearBodyForces(world->bodies[i]);
     
@@ -285,7 +289,7 @@ static void frPostUpdateWorld(frWorld *world) {
 
 /* 세계 `world`를 시간 `dt` (단위: ms)만큼 업데이트한다. */
 static void frUpdateWorld(frWorld *world, double dt) {
-    if (world == NULL || world->hash == NULL || world->bodies == NULL) return;
+    if (world == NULL || world->bodies == NULL || world->collisions == NULL) return;
 
     frPreUpdateWorld(world);
     
