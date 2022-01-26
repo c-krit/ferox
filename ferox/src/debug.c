@@ -95,7 +95,7 @@
                 frNumberMetersToPixels(frGetCircleRadius(s)),
                 0.0f,
                 360.0f,
-                32,
+                FR_DEBUG_CIRCLE_SEGMENT_COUNT,
                 color
             );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {

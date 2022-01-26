@@ -19,7 +19,7 @@ A 2D collision detection and physics library written in C.
 
 ## Features
 
-<img src="examples/res/images/bricks.gif" width="640" alt="Bricks!">
+<img src="examples/res/images/bricks.gif" width="600" alt="Bricks!">  
 
 **Since this project was made to learn how a physics engine works, I am not planning to add a lot of features to it.**
 

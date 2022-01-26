@@ -99,12 +99,7 @@ int main(void) {
         frDrawBody(large_circle, GRAY);
         frDrawBodyAABB(large_circle, GREEN);
         
-        frCollision collision = frComputeCollision(
-            frGetBodyShape(cursor), 
-            frGetBodyTransform(cursor), 
-            frGetBodyShape(large_circle), 
-            frGetBodyTransform(large_circle)
-        );
+        frCollision collision = frComputeBodyCollision(cursor, large_circle);
         
         if (collision.check) {
             frSetBodyPosition(
@@ -127,7 +122,7 @@ int main(void) {
                     6.0f, 
                     0.0f, 
                     360.0f, 
-                    64, 
+                    32, 
                     RED
                 );
 

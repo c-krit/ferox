@@ -129,7 +129,16 @@ int main(void) {
 
         for (int i = 0; i < count; i++) {
             frDrawBodyAABB(hits[i].body, GREEN);
-            DrawRing(frVec2MetersToPixels(hits[i].point), 6, 8, 0, 360, 64, RED);
+
+            DrawRing(
+                frVec2MetersToPixels(hits[i].point), 
+                6.0f, 
+                8.0f,
+                0.0f, 
+                360.0f, 
+                32,
+                RED
+            );
         }
         
         DrawLineEx(SCREEN_CENTER, mouse_position, 2, RED);

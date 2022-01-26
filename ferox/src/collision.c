@@ -62,26 +62,22 @@ static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector
 static bool frComputeIntersectionRayCircle(Vector2 o, Vector2 v, Vector2 c, float r, float *distance);
 
 /* 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
-frCollision frComputeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
+frCollision frComputeShapeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
     return frCheckCollisionAABB(s1, tx1, s2, tx2)
         ? frComputeCollisionSAT(s1, tx1, s2, tx2)
         : FR_STRUCT_ZERO(frCollision);
 }
 
-/* 강체 `b`에 광선을 투사한다. */
-frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray) {
-    if (b == NULL || frGetBodyShape(b) == NULL) {
-        return FR_STRUCT_ZERO(frRaycastHit);
-    } else {
-        frRaycastHit result = frComputeShapeRaycast(
-            frGetBodyShape(b), frGetBodyTransform(b), 
-            ray
-        );
-
-        result.body = b;
-
-        return result;
-    }
+/* 강체 `b1`에서 `b2`로의 충돌을 계산한다. */
+frCollision frComputeBodyCollision(frBody *b1, frBody *b2) {
+    if (b1 == NULL || b2 == NULL) return FR_STRUCT_ZERO(frCollision);
+    
+    return frComputeShapeCollision(
+        frGetBodyShape(b1),
+        frGetBodyTransform(b1),
+        frGetBodyShape(b2),
+        frGetBodyTransform(b2)
+    );
 }
 
 /* 도형 `s`에 광선을 투사한다. */
@@ -156,6 +152,22 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
             
             return result;
         }
+    }
+}
+
+/* 강체 `b`에 광선을 투사한다. */
+frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray) {
+    if (b == NULL || frGetBodyShape(b) == NULL) {
+        return FR_STRUCT_ZERO(frRaycastHit);
+    } else {
+        frRaycastHit result = frComputeShapeRaycast(
+            frGetBodyShape(b), frGetBodyTransform(b), 
+            ray
+        );
+
+        result.body = b;
+
+        return result;
     }
 }
 

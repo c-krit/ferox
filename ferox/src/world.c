@@ -256,17 +256,15 @@ static void frPreUpdateWorld(frWorld *world) {
             frBody *b1 = world->bodies[i];
             frBody *b2 = world->bodies[j];
             
-            frCollision collision = frComputeCollision(
-                frGetBodyShape(b1),
-                frGetBodyTransform(b1),
-                frGetBodyShape(b2),
-                frGetBodyTransform(b2)
-            );
+            frCollision collision = frComputeBodyCollision(b1, b2);
             
             if (collision.check) {
+                collision.cache.indexes[0] = i;
+                collision.cache.indexes[1] = j;
+
                 collision.cache.bodies[0] = b1;
                 collision.cache.bodies[1] = b2;
-                
+
                 arrput(world->collisions, collision);
             }
         }

@@ -73,6 +73,8 @@ extern "C" {
 
 #define FR_BROADPHASE_CELL_SIZE                   3.0f
 
+#define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32
+
 #define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.25f
 #define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.02f
 
@@ -143,6 +145,7 @@ typedef struct frBody frBody;
 
 /* 강체 사이의 충돌 정보를 나타내는 구조체. */
 typedef struct frSolverCache {
+    int indexes[2];
     frBody *bodies[2];
     /* TODO: ... */
 } frSolverCache;
@@ -234,7 +237,10 @@ int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
 /* | `collision` 모듈 함수... | */
 
 /* 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
-frCollision frComputeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
+frCollision frComputeShapeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
+
+/* 강체 `b1`에서 `b2`로의 충돌을 계산한다. */
+frCollision frComputeBodyCollision(frBody *b1, frBody *b2);
 
 /* 도형 `s`에 광선을 투사한다. */
 frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray);
