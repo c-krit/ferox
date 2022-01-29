@@ -26,17 +26,17 @@
 /* | `broadphase` 모듈 자료형 정의... | */
 
 /* 공간 해시맵의 키와 값을 나타내는 구조체. */
-typedef struct frSpatialHashEntry {
+typedef struct frSpatialEntry {
     int key;
     int *values;
-} frSpatialHashEntry;
+} frSpatialEntry;
 
 /* 공간 해시맵을 나타내는 구조체. */
 typedef struct frSpatialHash {
     Rectangle bounds;
     float cell_size;
     float inverse_cell_size;
-    frSpatialHashEntry *map;
+    frSpatialEntry *map;
 } frSpatialHash;
 
 /* | `broadphase` 모듈 함수... | */
@@ -80,12 +80,12 @@ void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
-            frSpatialHashEntry *entry = hmgetp_null(hash->map, x + y);
+            frSpatialEntry *entry = hmgetp_null(hash->map, x + y);
             
             if (entry != NULL) {
                 arrput(entry->values, value);
             } else {
-                frSpatialHashEntry entry = (frSpatialHashEntry) { x + y, NULL };
+                frSpatialEntry entry = { x + y, NULL };
 
                 arrput(entry.values, value);
                 hmputs(hash->map, entry);
@@ -116,7 +116,7 @@ float frGetSpatialHashCellSize(frSpatialHash *hash) {
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
     if (hash == NULL) return;
     
-    frSpatialHashEntry entry = hmgets(hash->map, key);
+    frSpatialEntry entry = hmgets(hash->map, key);
     arrfree(entry.values);
     
     hmdel(hash->map, key);
@@ -134,7 +134,7 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
-            frSpatialHashEntry *entry = hmgetp_null(hash->map, x + y);
+            frSpatialEntry *entry = hmgetp_null(hash->map, x + y);
 
             if (entry != NULL) 
                 for (int j = 0; j < arrlen(entry->values); j++)

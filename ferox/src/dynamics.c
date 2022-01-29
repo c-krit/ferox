@@ -366,6 +366,8 @@ void frIntegrateForBodyPosition(frBody *b, double dt) {
 /* 단위 시간 `dt` 이후의 강체 `b`의 속도와 각속도를 계산한다. */
 void frIntegrateForBodyVelocities(frBody *b, double dt) {
     if (b == NULL || b->motion.inverse_mass <= 0.0f) return;
+
+    float half_dt = 0.5f * dt;
     
     b->motion.velocity = frVec2Add(
         b->motion.velocity,
@@ -374,11 +376,11 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
                 b->motion.force, 
                 b->motion.inverse_mass
             ),
-            (dt / 2.0f)
+            half_dt
         )
     );
     
-    b->motion.angular_velocity += (b->motion.torque * b->motion.inverse_inertia) * (dt / 2.0f);
+    b->motion.angular_velocity += (b->motion.torque * b->motion.inverse_inertia) * half_dt;
 }
 
 /* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */

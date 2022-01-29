@@ -157,18 +157,17 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
 
 /* 강체 `b`에 광선을 투사한다. */
 frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray) {
-    if (b == NULL || frGetBodyShape(b) == NULL) {
+    if (b == NULL || frGetBodyShape(b) == NULL)
         return FR_STRUCT_ZERO(frRaycastHit);
-    } else {
-        frRaycastHit result = frComputeShapeRaycast(
-            frGetBodyShape(b), frGetBodyTransform(b), 
-            ray
-        );
+    
+    frRaycastHit result = frComputeShapeRaycast(
+        frGetBodyShape(b), frGetBodyTransform(b), 
+        ray
+    );
 
-        result.body = b;
+    result.body = b;
 
-        return result;
-    }
+    return result;
 }
 
 /* 도형 `s1`의 AABB가 `s2`의 AABB와 충돌하는지 확인한다. */
@@ -201,12 +200,12 @@ static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
 
 /* 도형 `s`에서 벡터 `v`와 가장 수직에 가까운 변을 반환한다. */
 static frVertices frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 v) {
+    if (s == NULL || frGetShapeType(s) == FR_SHAPE_UNKNOWN) return FR_STRUCT_ZERO(frVertices);
+
     frVertices result = FR_STRUCT_ZERO(frVertices);
     
-    if (s == NULL || frGetShapeType(s) == FR_SHAPE_UNKNOWN) return result;
-    
     if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
-        result.data[0] = result.data[1] = frVec2Transform(
+        result.data[0] = frVec2Transform(
             frVec2ScalarMultiply(v, frGetCircleRadius(s)), 
             tx
         );
@@ -250,10 +249,10 @@ static int frGetSeparatingAxisIndex(
     frShape *s2, frTransform tx2, 
     float *depth
 ) {
-    int result = -1;
-
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON) 
-        return result;
+        return -1;
+
+    int result = -1;
     
     frVertices normals = frGetPolygonNormals(s1);
     
@@ -281,10 +280,10 @@ static int frGetSeparatingAxisIndex(
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
-    frCollision result = FR_STRUCT_ZERO(frCollision);
-
     if (frGetShapeType(s1) != FR_SHAPE_CIRCLE || frGetShapeType(s2) != FR_SHAPE_CIRCLE)
-        return result;
+        return FR_STRUCT_ZERO(frCollision);
+
+    frCollision result = FR_STRUCT_ZERO(frCollision);
 
     Vector2 diff = frVec2Subtract(tx2.position, tx1.position);
 
@@ -320,11 +319,11 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 다각형 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
-    frCollision result = FR_STRUCT_ZERO(frCollision);
-    
     if (frGetShapeType(s1) == FR_SHAPE_UNKNOWN || frGetShapeType(s2) == FR_SHAPE_UNKNOWN 
         || frGetShapeType(s1) == frGetShapeType(s2))
-        return result;
+        return FR_STRUCT_ZERO(frCollision);
+
+    frCollision result = FR_STRUCT_ZERO(frCollision);
         
     frShape *circle = s1, *polygon = s2;
     frTransform circle_tx = tx1, polygon_tx = tx2;
@@ -469,10 +468,10 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
 /* 최적화된 분리 축 정리를 이용하여, 다각형 `s1`에서 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
-    frCollision result = FR_STRUCT_ZERO(frCollision);
-
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON)
-        return result;
+        return FR_STRUCT_ZERO(frCollision);
+
+    frCollision result = FR_STRUCT_ZERO(frCollision);
     
     float depth1 = FLT_MAX, depth2 = FLT_MAX;
     
