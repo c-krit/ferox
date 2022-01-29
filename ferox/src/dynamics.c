@@ -328,13 +328,13 @@ void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
         return;
     }
     
-    float max_depth = FR_NUMBER_MAX(collision.depths[0], collision.depths[1]);
+    float max_depth = fmaxf(collision.depths[0], collision.depths[1]);
     
     // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
     Vector2 correction = frVec2ScalarMultiply(
         collision.direction,
         FR_DYNAMICS_CORRECTION_DEPTH_SCALE * (
-            FR_NUMBER_MAX(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
+            fmaxf(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
             / (b1->motion.inverse_mass + b2->motion.inverse_mass)
         )
     );
@@ -394,7 +394,7 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
         return;
     }
     
-    float epsilon = FR_NUMBER_MAX(0.0f, FR_NUMBER_MIN(b1->material.restitution, b2->material.restitution));
+    float epsilon = fmaxf(0.0f, fminf(b1->material.restitution, b2->material.restitution));
     
     float static_coefficient = b1->material.static_friction * b2->material.static_friction;
     float dynamic_coefficient = b1->material.dynamic_friction * b2->material.dynamic_friction;

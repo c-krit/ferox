@@ -38,7 +38,7 @@ float frNormalizeAngle(float angle, float center) {
 
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frNumberApproxEquals(float f1, float f2) {
-    return fabsf(f1 - f2) <= FR_NUMBER_MAX(f1, f2) * FLT_EPSILON;
+    return fabsf(f1 - f2) <= fmaxf(f1, f2) * FLT_EPSILON;
 }
 
 /* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */

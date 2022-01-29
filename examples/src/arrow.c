@@ -108,7 +108,7 @@ int main(void) {
                     frGetBodyPosition(cursor),
                     frVec2ScalarMultiply(
                         collision.direction, 
-                        -FR_NUMBER_MAX(collision.depths[0], collision.depths[1])
+                        -fmaxf(collision.depths[0], collision.depths[1])
                     )
                 )
             );

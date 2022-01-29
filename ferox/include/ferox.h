@@ -69,6 +69,8 @@ extern "C" {
 
 /* | 매크로 정의... | */
 
+#define FR_STRUCT_ZERO(T)                         ((T) { 0 })
+
 #define FR_GLOBAL_PIXELS_PER_METER                16.0f
 
 #define FR_BROADPHASE_CELL_SIZE                   3.0f
@@ -84,11 +86,6 @@ extern "C" {
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_BODY_COUNT                   128
 #define FR_WORLD_MAX_ITERATIONS                   16
-
-#define FR_STRUCT_ZERO(T)                         ((T) { 0 })
-
-#define FR_NUMBER_MIN(x, y)                       (((x) < (y)) ? (x) : (y))
-#define FR_NUMBER_MAX(x, y)                       (((x) > (y)) ? (x) : (y))
 
 /* | 자료형 정의... | */
 

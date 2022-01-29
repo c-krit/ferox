@@ -214,10 +214,10 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
     );
 
     Rectangle rec = (Rectangle) {
-        .x = FR_NUMBER_MIN(p1.x, p2.x),
-        .y = FR_NUMBER_MIN(p1.y, p2.y),
-        .width = FR_NUMBER_MAX(p2.x - p1.x, p1.x - p2.x),
-        .height = FR_NUMBER_MAX(p2.y - p1.y, p1.y - p2.y)
+        .x = fminf(p1.x, p2.x),
+        .y = fminf(p1.y, p2.y),
+        .width = fmaxf(p2.x - p1.x, p1.x - p2.x),
+        .height = fmaxf(p2.y - p1.y, p1.y - p2.y)
     };
 
     frQuerySpatialHash(world->hash, rec, &world->queries);

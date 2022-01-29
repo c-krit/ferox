@@ -173,6 +173,8 @@
                 0.25f,
                 GRAY
             );
+
+        DrawRectangleLinesEx(bounds, 0.25f, GRAY);
     }
     
     /* 무작위 색상을 반환한다. */
