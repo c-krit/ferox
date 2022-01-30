@@ -393,18 +393,18 @@ static void frComputeConvex(frShape *s) {
 
 /* 꼭짓점 배열 `vertices`로 만들 수 있는 가장 큰 볼록 다각형의 꼭짓점 배열을 반환한다. */
 static frVertices frJarvisMarch(frVertices *vertices) {
+    if (vertices == NULL || vertices->count == 0) return FR_STRUCT_ZERO(frVertices);
+
     frVertices result = FR_STRUCT_ZERO(frVertices);
 
-    if (vertices == NULL || vertices->count == 0) return result;
-
-    int leftmost_index = 0, pivot_index = 0, next_index = 0, vertex_index = 0;
+    int leftmost_index = 0, pivot_index = 0, next_index = 0, vertex_count = 0;
     
     // 주어진 꼭짓점 배열에서 X좌표 값이 가장 작은 꼭짓점 L을 찾는다.
     for (int i = 1; i < vertices->count; i++)
         if (vertices->data[leftmost_index].x > vertices->data[i].x)
             leftmost_index = i;
     
-    result.data[vertex_index++] = vertices->data[leftmost_index];
+    result.data[vertex_count++] = vertices->data[leftmost_index];
     
     // 기준점 P를 방금 찾은 꼭짓점 L로 설정한다.
     pivot_index = leftmost_index;
@@ -437,10 +437,10 @@ static frVertices frJarvisMarch(frVertices *vertices) {
         pivot_index = next_index;
         
         // 새로 찾은 꼭짓점을 배열에 저장한다.
-        result.data[vertex_index++] = vertices->data[next_index];
+        result.data[vertex_count++] = vertices->data[next_index];
     }
     
-    result.count = vertex_index;
+    result.count = vertex_count;
     
     return result;
 }

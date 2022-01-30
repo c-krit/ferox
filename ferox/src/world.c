@@ -312,6 +312,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
             frBody *b1 = collision->cache.bodies[0];
             frBody *b2 = collision->cache.bodies[1];
             
+            // TODO: `b1`과 `b2`를 매개 변수에서 제거하기
             frResolveCollision(b1, b2, *collision);
         }
     }
@@ -327,6 +328,7 @@ static void frUpdateWorld(frWorld *world, double dt) {
         frBody *b1 = collision->cache.bodies[0];
         frBody *b2 = collision->cache.bodies[1];
         
+        // TODO: `b1`과 `b2`를 매개 변수에서 제거하기
         frCorrectBodyPositions(b1, b2, *collision);
     }
     

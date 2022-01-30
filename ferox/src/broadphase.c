@@ -141,6 +141,8 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
                     arrput(*queries, entry->values[j]);
         }
     }
+
+    if (arrlen(*queries) <= 0) return;
     
     qsort(*queries, arrlen(*queries), sizeof(int), frQuickSortCallback);
     
