@@ -18,7 +18,7 @@
 
 ## 주요 기능
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/bricks.gif" width="640" alt="Bricks!">
+<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/bricks.gif" width="600" alt="Bricks!">  
 
 **이 프로젝트는 제가 물리 엔진의 구조를 이해하기 위해 만들었으며, 새로운 기능이 자주 추가되지 않을 수도 있습니다.**
 
@@ -60,7 +60,7 @@ $ make BUILD=STANDALONE
 
 ### WebAssembly로 컴파일하기
 
-프로젝트를 웹에서 실행할 수 있도록 컴파일하려면 [Emscripten SDK](https://emscripten.org/docs/introducing_emscripten/about_emscripten.html)를 설치해야 합니다.
+이 프로젝트를 웹을 대상으로 컴파일하려면 [Emscripten SDK](https://emscripten.org/docs/introducing_emscripten/about_emscripten.html)를 설치해야 합니다.
 
 ```console
 $ git clone https://github.com/emscripten-core/emsdk && cd emsdk
@@ -69,7 +69,7 @@ $ ./emsdk activate latest
 $ source ./emsdk_env.sh
 ```
 
-Emscripten SDK의 환경 변수 설정이 끝나면, 아래 명령어를 사용하면 됩니다.
+Emscripten SDK의 환경 변수 설정이 끝나면, 아래 명령어를 사용하여 프로젝트를 빌드할 수 있습니다.
 
 ```console
 $ make PLATFORM=WEB
@@ -77,10 +77,17 @@ $ make PLATFORM=WEB
 
 ### Windows 플랫폼을 대상으로 크로스 컴파일하기
 
-`RAYLIB_PATH` 변수에 raylib의 저장소 경로를 입력하고 `TARGET_OS=WINDOWS`를 입력하여 컴파일하면 Windows 플랫폼을 대상으로 프로젝트를 빌드할 수 있습니다.
+이 프로젝트를 빌드하기 전에, raylib를 Windows 플랫폼을 대상으로 빌드해야 할 수도 있습니다.
 
 ```console
-$ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
+$ git clone https://github.com/raysan5/raylib && cd raylib/src
+$ make -j`nproc` CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar OS=Windows_NT
+```
+
+Windows 플랫폼을 대상으로 크로스 컴파일할 때는 반드시 `RAYLIB_PATH` 변수를 제대로 설정했는지 확인해주세요.
+
+```console
+$ make PLATFORM=WINDOWS RAYLIB_PATH=../raylib
 ```
 
 ## 참고 문헌
@@ -90,6 +97,7 @@ $ make RAYLIB_PATH=../raylib TARGET_OS=WINDOWS
 - [dyn4j. (2011, November 11), Contact Points Using Clipping](http://www.dyn4j.org/2011/11/contact-points-using-clipping)
 - [dyn4j. (2010, January 01), SAT (Separating Axis Theorem)](http://dyn4j.org/2010/01/sat)
 - [Catto, Erin. (2006), Fast and Simple Physics using Sequential Impulses](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
+- [Catto, Erin. (2019), How Do Physics Engines Work?](https://github.com/erincatto/box2d-lite/blob/master/docs/HowDoPhysicsEnginesWork.pdf)
 - [Catto, Erin. (2005), Iterative Dynamics with Temporal Coherence](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
 - [Chou, Ming-Lun. (2014, January 7), Game Physics: Stability – Warm Starting](http://allenchou.net/2014/01/game-physics-stability-warm-starting/)
 - [Coumans, Erwin. (2010, July 26), Collision Detection: Contact Generation and GPU Acceleration](https://sgvr.kaist.ac.kr/~sungeui/Collision_tutorial/Erwin.pdf)
