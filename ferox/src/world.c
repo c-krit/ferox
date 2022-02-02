@@ -259,9 +259,6 @@ static void frPreUpdateWorld(frWorld *world) {
             frCollision collision = frComputeBodyCollision(b1, b2);
             
             if (collision.check) {
-                collision.cache.indexes[0] = i;
-                collision.cache.indexes[1] = j;
-
                 collision.cache.bodies[0] = b1;
                 collision.cache.bodies[1] = b2;
 

@@ -27,12 +27,14 @@
 
 /* | `utils` 모듈 상수... | */
 
-const float TWO_PI = (2 * PI), INVERSE_TWO_PI = (1.0f / TWO_PI);
+const float TWO_PI = (2.0f * PI), INVERSE_TWO_PI = (1.0f / TWO_PI);
 
 /* | `utils` 모듈 함수... | */
 
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π, center + π]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center) {
+    if (angle > center - PI && angle < center + PI) return angle;
+
     return angle - (TWO_PI * floorf((angle + PI - center) * INVERSE_TWO_PI));
 }
 

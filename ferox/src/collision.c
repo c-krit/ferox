@@ -249,7 +249,7 @@ static int frGetSeparatingAxisIndex(
     frShape *s2, frTransform tx2, 
     float *depth
 ) {
-    if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON) 
+    if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON)
         return -1;
 
     int result = -1;
@@ -440,12 +440,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
             if (frVec2DotProduct(diff1, normal) > radius) return result;
 
-            result.direction = frVec2Negate(
-                frVec2Rotate(
-                    normals.data[normal_index], 
-                    polygon_tx.rotation
-                )
-            );
+            result.direction = frVec2Negate(frVec2Rotate(normal, polygon_tx.rotation));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
@@ -484,8 +479,6 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     Vector2 direction = (depth1 > depth2) 
         ? frVec2Rotate(frGetPolygonNormal(s1, index1), tx1.rotation)
         : frVec2Rotate(frGetPolygonNormal(s2, index2), tx2.rotation);
-        
-    float depth = fmaxf(depth1, depth2);
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
         direction = frVec2Negate(direction);
@@ -504,7 +497,7 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     float dot1 = frVec2DotProduct(frVec2Subtract(e1.data[1], e1.data[0]), direction);
     float dot2 = frVec2DotProduct(frVec2Subtract(e2.data[1], e2.data[0]), direction);
 
-    if (fabs(dot1) > fabs(dot2)) {
+    if (fabsf(dot1) > fabsf(dot2)) {
         ref_e = e2;
         inc_e = e1;
 
@@ -642,7 +635,7 @@ static bool frComputeIntersectionRayCircle(Vector2 o, Vector2 v, Vector2 c, floa
     float base_sqr = (r * r) - height_sqr;
     
     // 광선과 원은 서로 만나지 않는다.
-    if (dot < 0.0f || base_sqr < 0) result = false;
+    if (dot < 0.0f || base_sqr < 0.0f) result = false;
     
     *distance = dot - sqrtf(base_sqr);
     

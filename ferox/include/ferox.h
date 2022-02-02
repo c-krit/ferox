@@ -71,16 +71,17 @@ extern "C" {
 
 #define FR_STRUCT_ZERO(T)                         ((T) { 0 })
 
-#define FR_GLOBAL_PIXELS_PER_METER                16.0f
-
 #define FR_BROADPHASE_CELL_SIZE                   3.0f
 
 #define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32
 
 #define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.25f
 #define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.02f
+#define FR_DYNAMICS_DYNAMIC_FRICTION_MULTIPLIER   0.85f
 
 #define FR_GEOMETRY_MAX_VERTEX_COUNT              10
+
+#define FR_GLOBAL_PIXELS_PER_METER                16.0f
 
 #define FR_WORLD_ACCUMULATOR_LIMIT                200.0
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
@@ -142,7 +143,6 @@ typedef struct frBody frBody;
 
 /* 강체 사이의 충돌 정보를 나타내는 구조체. */
 typedef struct frSolverCache {
-    int indexes[2];
     frBody *bodies[2];
     /* TODO: ... */
 } frSolverCache;
@@ -383,9 +383,6 @@ void frApplyImpulse(frBody *b, Vector2 impulse);
 /* 강체 `b` 위의 점 `p`에 각운동량 `impulse`를 적용한다. */
 void frApplyTorqueImpulse(frBody *b, Vector2 p, Vector2 impulse);
 
-/* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
-void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision);
-
 /* 단위 시간 `dt` 이후의 강체 `b`의 위치를 계산한다. */
 void frIntegrateForBodyPosition(frBody *b, double dt);
 
@@ -394,6 +391,9 @@ void frIntegrateForBodyVelocities(frBody *b, double dt);
 
 /* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
 void frResolveCollision(frBody *b1, frBody *b2, frCollision collision);
+
+/* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
+void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision);
 
 /* | `geometry` 모듈 함수... | */
 

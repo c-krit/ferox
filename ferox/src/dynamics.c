@@ -317,44 +317,6 @@ void frClearBodyForces(frBody *b) {
     b->motion.torque = 0.0f;
 }
 
-/* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
-void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
-    if (b1 == NULL || b2 == NULL || !collision.check) return;
-    
-    if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
-        if (frGetBodyType(b1) == FR_BODY_STATIC) b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
-        if (frGetBodyType(b2) == FR_BODY_STATIC) b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
-        
-        return;
-    }
-    
-    float max_depth = fmaxf(collision.depths[0], collision.depths[1]);
-    
-    // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
-    Vector2 correction = frVec2ScalarMultiply(
-        collision.direction,
-        FR_DYNAMICS_CORRECTION_DEPTH_SCALE * (
-            fmaxf(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
-            / (b1->motion.inverse_mass + b2->motion.inverse_mass)
-        )
-    );
-    
-    frSetBodyPosition(
-        b1, 
-        frVec2Subtract(
-            b1->tx.position, 
-            frVec2ScalarMultiply(correction, b1->motion.inverse_mass)
-        )
-    );
-    frSetBodyPosition(
-        b2, 
-        frVec2Add(
-            b2->tx.position, 
-            frVec2ScalarMultiply(correction, b2->motion.inverse_mass)
-        )
-    );
-}
-
 /* 단위 시간 `dt` 이후의 강체 `b`의 위치를 계산한다. */
 void frIntegrateForBodyPosition(frBody *b, double dt) {
     if (b == NULL || b->type == FR_BODY_STATIC) return;
@@ -396,8 +358,11 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
     
     float epsilon = fmaxf(0.0f, fminf(b1->material.restitution, b2->material.restitution));
     
-    float static_coefficient = b1->material.static_friction * b2->material.static_friction;
-    float dynamic_coefficient = b1->material.dynamic_friction * b2->material.dynamic_friction;
+    float static_mu = b1->material.static_friction * b2->material.static_friction;
+    float dynamic_mu = b1->material.dynamic_friction * b2->material.dynamic_friction;
+
+    // 대체로 운동 마찰 계수는 정지 마찰 계수보다 작은 값을 가진다.
+    if (static_mu < dynamic_mu) dynamic_mu = FR_DYNAMICS_DYNAMIC_FRICTION_MULTIPLIER * static_mu;
     
     for (int i = 0; i < collision.count; i++) {
         Vector2 r1 = frVec2Subtract(collision.points[i], frGetBodyPosition(b1));
@@ -430,10 +395,10 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
             + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
             + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
 
-        float impulse_magnitude = (-(1.0f + epsilon) * relative_velocity_dot) 
-             / (collision.count * inverse_mass_sum);
+        float impulse_param = (-(1.0f + epsilon) * relative_velocity_dot)
+            / (collision.count * inverse_mass_sum);
 
-        Vector2 impulse = frVec2ScalarMultiply(collision.direction, impulse_magnitude);
+        Vector2 impulse = frVec2ScalarMultiply(collision.direction, impulse_param);
 
         frApplyImpulse(b1, frVec2Negate(impulse));
         frApplyTorqueImpulse(b1, r1, frVec2Negate(impulse));
@@ -469,19 +434,57 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision collision) {
             + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
             + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
 
-        float friction_magnitude = -frVec2DotProduct(relative_velocity, tangent) 
-             / (collision.count * inverse_mass_sum);
+        float friction_param = -frVec2DotProduct(relative_velocity, tangent)
+            / (collision.count * inverse_mass_sum);
         
-        Vector2 frictional_impulse = (fabsf(friction_magnitude) < impulse_magnitude * static_coefficient)
-            ? frVec2ScalarMultiply(tangent, friction_magnitude)
-            : frVec2ScalarMultiply(tangent, -impulse_magnitude * dynamic_coefficient);
+        Vector2 friction = (fabsf(friction_param) < impulse_param * static_mu)
+            ? frVec2ScalarMultiply(tangent, friction_param)
+            : frVec2ScalarMultiply(tangent, -impulse_param * dynamic_mu);
         
-        frApplyImpulse(b1, frVec2Negate(frictional_impulse));
-        frApplyTorqueImpulse(b1, r1, frVec2Negate(frictional_impulse));
+        frApplyImpulse(b1, frVec2Negate(friction));
+        frApplyTorqueImpulse(b1, r1, frVec2Negate(friction));
         
-        frApplyImpulse(b2, frictional_impulse);
-        frApplyTorqueImpulse(b2, r2, frictional_impulse);
+        frApplyImpulse(b2, friction);
+        frApplyTorqueImpulse(b2, r2, friction);
     }
+}
+
+/* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
+void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision) {
+    if (b1 == NULL || b2 == NULL || !collision.check) return;
+    
+    if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
+        if (frGetBodyType(b1) == FR_BODY_STATIC) b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        if (frGetBodyType(b2) == FR_BODY_STATIC) b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
+        
+        return;
+    }
+    
+    float max_depth = fmaxf(collision.depths[0], collision.depths[1]);
+    
+    // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
+    Vector2 correction = frVec2ScalarMultiply(
+        collision.direction,
+        FR_DYNAMICS_CORRECTION_DEPTH_SCALE * (
+            fmaxf(0.0f, max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) 
+            / (b1->motion.inverse_mass + b2->motion.inverse_mass)
+        )
+    );
+    
+    frSetBodyPosition(
+        b1, 
+        frVec2Subtract(
+            b1->tx.position, 
+            frVec2ScalarMultiply(correction, b1->motion.inverse_mass)
+        )
+    );
+    frSetBodyPosition(
+        b2, 
+        frVec2Add(
+            b2->tx.position, 
+            frVec2ScalarMultiply(correction, b2->motion.inverse_mass)
+        )
+    );
 }
 
 /* 강체 `b`의 질량을 다시 계산한다. */
