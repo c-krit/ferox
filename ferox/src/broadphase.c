@@ -70,7 +70,7 @@ void frReleaseSpatialHash(frSpatialHash *hash) {
 
 /* 공간 해시맵 `hash`에 직사각형 `rec`로 생성한 키와 `value`를 추가한다. */
 void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
-    if (hash == NULL) return;
+    if (hash == NULL || !CheckCollisionRecs(hash->bounds, rec)) return;
     
     int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x });    
     int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x + rec.width });
@@ -102,16 +102,6 @@ void frClearSpatialHash(frSpatialHash *hash) {
         arrdeln(hash->map[i].values, 0, arrlen(hash->map[i].values));
 }
 
-/* 공간 해시맵 `hash`의 경계 범위를 반환한다. */
-Rectangle frGetSpatialHashBounds(frSpatialHash *hash) {
-    return (hash != NULL) ? hash->bounds : FR_STRUCT_ZERO(Rectangle);
-}
-
-/* 공간 해시맵 `hash`의 각 셀의 크기를 반환한다. */
-float frGetSpatialHashCellSize(frSpatialHash *hash) {
-    return (hash != NULL) ? hash->cell_size : 0.0f;
-}
-
 /* 공간 해시맵 `hash`에서 키가 `key`인 값을 제거한다. */
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
     if (hash == NULL) return;
@@ -124,7 +114,7 @@ void frRemoveFromSpatialHash(frSpatialHash *hash, int key) {
 
 /* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 도형의 인덱스를 반환한다. */
 void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
-    if (hash == NULL || queries == NULL) return;
+    if (hash == NULL || queries == NULL || !CheckCollisionRecs(hash->bounds, rec)) return;
     
     int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x });
     int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x + rec.width });
@@ -149,6 +139,16 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
     for (int i = 0; i < arrlen(*queries); i++)
         while ((i + 1) < arrlen(*queries) && (*queries)[i + 1] == (*queries)[i])
             arrdel(*queries, i + 1);
+}
+
+/* 공간 해시맵 `hash`의 경계 범위를 반환한다. */
+Rectangle frGetSpatialHashBounds(frSpatialHash *hash) {
+    return (hash != NULL) ? hash->bounds : FR_STRUCT_ZERO(Rectangle);
+}
+
+/* 공간 해시맵 `hash`의 각 셀의 크기를 반환한다. */
+float frGetSpatialHashCellSize(frSpatialHash *hash) {
+    return (hash != NULL) ? hash->cell_size : 0.0f;
 }
 
 /* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
