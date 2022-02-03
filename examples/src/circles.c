@@ -31,8 +31,8 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define WALL_MATERIAL    ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
-#define CIRCLE_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 0.85f, 0.75f })
+#define WALL_MATERIAL    ((frMaterial) { 2.5f, 0.0f, 0.85f, 0.65f })
+#define CIRCLE_MATERIAL  ((frMaterial) { 8.0f, 0.0f, 0.9f, 0.85f })
 
 #define MAX_CIRCLE_COUNT 100
 
@@ -99,14 +99,14 @@ int main(void) {
     for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
         Vector2 position = FR_STRUCT_ZERO(Vector2);
         
-        position.x = (GetRandomValue(5, 13) * 0.05f) * SCREEN_WIDTH;
-        position.y = GetRandomValue(0.25f * SCREEN_HEIGHT, 0.35f * SCREEN_HEIGHT);
+        position.x = GetRandomValue(0.25f * SCREEN_WIDTH, 0.75f * SCREEN_WIDTH);
+        position.y = GetRandomValue(0.28f * SCREEN_HEIGHT, 0.36f * SCREEN_HEIGHT);
         
         frBody *circle = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
             FR_FLAG_NONE,
             frVec2PixelsToMeters(position),
-            frCreateCircle(CIRCLE_MATERIAL, GetRandomValue(1, 2))
+            frCreateCircle(CIRCLE_MATERIAL, 0.9f * GetRandomValue(1, 2))
         );
         
         frAddToWorld(world, circle);
