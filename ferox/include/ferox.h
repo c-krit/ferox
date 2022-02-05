@@ -482,11 +482,11 @@ double frGetTimeSince(double old_time);
 
 /* | `utils` 모듈 함수... | */
 
-/* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
-bool frNumberApproxEquals(float f1, float f2);
-
 /* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π/2, center + π/2]`에 포함되도록 한다. */
 float frNormalizeAngle(float angle, float center);
+
+/* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
+bool frNumberApproxEquals(float f1, float f2);
 
 /* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */
 float frNumberPixelsToMeters(float value);

@@ -6,7 +6,7 @@
 ![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)
 ![license badge](https://img.shields.io/github/license/c-krit/ferox)
 
-`ferox`는 C언어로 작성된 2차원 충돌 감지 및 물리 시뮬레이션 라이브러리입니다.
+`ferox`는 2차원 공간에서의 충돌 감지 및 강체 시뮬레이션 기능을 제공하는 경량 C 라이브러리입니다.
 
 **이 프로젝트는 아직 개발 초기 단계에 있으므로 주의하여 사용하시기 바랍니다.**
 

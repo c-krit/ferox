@@ -7,7 +7,7 @@
 [![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)](https://github.com/c-krit/ferox)
 [![license badge](https://img.shields.io/github/license/c-krit/ferox)](https://github.com/c-krit/ferox/blob/main/LICENSE)
 
-A 2D collision detection and physics library written in C.
+A lightweight 2D collision detection and physics library written in C.
 
 **WARNING: This library is in an early alpha stage, use it at your own risk.**
 

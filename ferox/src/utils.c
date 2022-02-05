@@ -45,14 +45,16 @@ bool frNumberApproxEquals(float f1, float f2) {
 
 /* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */
 float frNumberPixelsToMeters(float value) {
-    return (FR_GLOBAL_PIXELS_PER_METER != 0.0f)
+    return (FR_GLOBAL_PIXELS_PER_METER >= 0.0f)
         ? (value / FR_GLOBAL_PIXELS_PER_METER)
         : 0.0f;
 }
 
 /* 주어진 미터 단위 거리를 픽셀 단위 거리로 변환한다. */
 float frNumberMetersToPixels(float value) {
-    return (value * FR_GLOBAL_PIXELS_PER_METER);
+    return (FR_GLOBAL_PIXELS_PER_METER >= 0.0f)
+        ? (value * FR_GLOBAL_PIXELS_PER_METER)
+        : 0.0f;
 }
 
 /* 주어진 픽셀 단위 `Rectangle` 구조체를 미터 단위 `Rectangle` 구조체로 변환한다. */
