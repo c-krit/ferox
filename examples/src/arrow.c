@@ -16,6 +16,8 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
@@ -39,7 +41,7 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | arrow.c");
     
-    frShape *circle = frCreateCircle(FR_STRUCT_ZERO(frMaterial), 4);
+    frShape *circle = frCreateCircle(FR_STRUCT_ZERO(frMaterial), 4.0f);
     frShape *polygon = frCreateRectangle(
         FR_STRUCT_ZERO(frMaterial), 
         12.0f,
@@ -53,7 +55,7 @@ int main(void) {
             SCREEN_WIDTH_IN_METERS * 0.5f, 
             SCREEN_HEIGHT_IN_METERS * 0.5f
         },
-        frCreateCircle(FR_STRUCT_ZERO(frMaterial), 10)
+        frCreateCircle(FR_STRUCT_ZERO(frMaterial), 10.0f)
     );
     
     frBody *cursor = frCreateBodyFromShape(
@@ -113,7 +115,7 @@ int main(void) {
                 )
             );
 
-            frDrawBodyLines(cursor_clone, 2, RED);
+            frDrawBodyLines(cursor_clone, 2.0f, RED);
 
             for (int i = 0; i < collision.count; i++) {
                 DrawRing(
@@ -151,10 +153,10 @@ int main(void) {
             EXAMPLE_STRING,
             (Vector2) { 
                 0.5f * (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)), 
-                SCREEN_HEIGHT / 16
+                SCREEN_HEIGHT / 16.0f
             },
-            20,
-            2, 
+            20.0f,
+            2.0f, 
             Fade(GRAY, 0.85f)
         );
 

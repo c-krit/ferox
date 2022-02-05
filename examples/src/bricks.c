@@ -16,6 +16,8 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
@@ -112,7 +114,6 @@ int main(void) {
             frBody *body = frGetWorldBody(world, i);
 
             frDrawBody(body, RED);
-            // frDrawBodyLines(body, 1, GREEN);
         }
         
         frDrawBody(cursor, Fade(RED, 0.5f));

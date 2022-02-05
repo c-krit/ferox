@@ -49,7 +49,6 @@ SOURCES := \
 	$(SOURCE_PATH)/geometry.c   \
 	$(SOURCE_PATH)/timer.c      \
 	$(SOURCE_PATH)/utils.c      \
-	$(SOURCE_PATH)/vector.c     \
 	$(SOURCE_PATH)/world.c
 
 OBJECTS := $(SOURCES:.c=.o)

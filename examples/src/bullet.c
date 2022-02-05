@@ -16,6 +16,8 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
@@ -180,7 +182,7 @@ int main(void) {
                     DARKGRAY
                 );
 
-                frDrawBodyLines(body, 2, BLACK);
+                frDrawBodyLines(body, 2.0f, BLACK);
             }
         }
 

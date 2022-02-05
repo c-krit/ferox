@@ -16,11 +16,13 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
@@ -33,10 +35,10 @@
 
 #define EXAMPLE_STRING "PRESS SPACE TO JUMP!"
 
-#define BOX_MATERIAL       ((frMaterial) { 2.25f, 0.0f, 1.25f, 1.0f })
-#define BRICK_MATERIAL     ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.85f })
-#define PLATFORM_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.0f })
-#define WALL_MATERIAL      ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.0f })
+#define BOX_MATERIAL      ((frMaterial) { 2.25f, 0.0f, 1.25f, 1.0f })
+#define BRICK_MATERIAL    ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.85f })
+#define PLATFORM_MATERIAL ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.0f })
+#define WALL_MATERIAL     ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.0f })
 
 #define BRICK_HORIZONTAL_SPEED  0.016f
 #define BRICK_VERTICAL_SPEED    0.02f
@@ -116,7 +118,7 @@ int main(void) {
     frBody *wall2 = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60 }),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60.0f }),
         frCreateRectangle(
             WALL_MATERIAL, 
             frNumberPixelsToMeters(SCREEN_WIDTH),
@@ -190,10 +192,10 @@ int main(void) {
             EXAMPLE_STRING,
             (Vector2) { 
                 0.5f * (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)), 
-                SCREEN_HEIGHT / 16
+                SCREEN_HEIGHT / 16.0f
             },
-            20,
-            2, 
+            20.0f,
+            2.0f, 
             Fade(GRAY, 0.85f)
         );
 

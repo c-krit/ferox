@@ -21,6 +21,7 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
 
 /* | `geometry` 모듈 자료형 정의... | */
 

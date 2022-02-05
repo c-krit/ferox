@@ -16,6 +16,8 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
@@ -33,13 +35,13 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define BALL_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.75f })
-#define BOX_MATERIAL   ((frMaterial) { 1.75f, 0.0f, 0.75f, 0.5f })
+#define BALL_MATERIAL ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.75f })
+#define BOX_MATERIAL  ((frMaterial) { 1.75f, 0.0f, 0.75f, 0.5f })
 
 #define BALL_RADIUS 4.0f
 
-#define TOTAL_WIDTH_IN_BOXES  4
-#define TOTAL_HEIGHT_IN_BOXES 4
+#define TOTAL_WIDTH_IN_BOXES   8
+#define TOTAL_HEIGHT_IN_BOXES  8
 
 #define MAX_BOX_COUNT (TOTAL_WIDTH_IN_BOXES * TOTAL_HEIGHT_IN_BOXES)
 
@@ -184,7 +186,7 @@ int main(void) {
             );
         }
 
-        frDrawBodyLines(ball, 2, RED);
+        frDrawBodyLines(ball, 2.0f, RED);
 
         frDrawArrow(
             frVec2PixelsToMeters(GetMousePosition()),

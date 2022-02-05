@@ -16,14 +16,16 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
-#define SCREEN_CENTER ((Vector2) { SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f })
+#define SCREEN_CENTER ((Vector2) { 0.5f * SCREEN_WIDTH, 0.5f * SCREEN_HEIGHT })
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
 #define SCREEN_HEIGHT_IN_METERS (frNumberPixelsToMeters(SCREEN_HEIGHT))
@@ -33,8 +35,8 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 1.0f, 0.75f })
-#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
+#define SEMO_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.0f, 0.75f })
+#define ENEMY_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
 #define MAX_ENEMY_COUNT 100
 
@@ -125,7 +127,7 @@ int main(void) {
         DrawCustomCursor(GetMousePosition());
 
         for (int i = 1; i < frGetWorldBodyCount(world); i++)
-            frDrawBodyLines(frGetWorldBody(world, i), 2, BLACK);
+            frDrawBodyLines(frGetWorldBody(world, i), 2.0f, BLACK);
 
         for (int i = 0; i < count; i++) {
             frDrawBodyAABB(hits[i].body, GREEN);
@@ -141,7 +143,7 @@ int main(void) {
             );
         }
         
-        DrawLineEx(SCREEN_CENTER, mouse_position, 2, RED);
+        DrawLineEx(SCREEN_CENTER, mouse_position, 2.0f, RED);
         
         frDrawBody(semo, DARKGRAY);
         frDrawBodyAABB(semo, GREEN);
@@ -162,16 +164,16 @@ int main(void) {
 
 static void DrawCustomCursor(Vector2 position) {
     DrawLineEx(
-        frVec2Add(position, (Vector2) { .x = -8 }),
-        frVec2Add(position, (Vector2) { .x = 8 }),
-        2,
+        frVec2Add(position, (Vector2) { .x = -8.0f }),
+        frVec2Add(position, (Vector2) { .x = 8.0f }),
+        2.0f,
         RED
     );
     
     DrawLineEx(
-        frVec2Add(position, (Vector2) { .y = -8 }),
-        frVec2Add(position, (Vector2) { .y = 8 }),
-        2,
+        frVec2Add(position, (Vector2) { .y = -8.0f }),
+        frVec2Add(position, (Vector2) { .y = 8.0f }),
+        2.0f,
         RED
     );
 }

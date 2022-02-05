@@ -16,11 +16,13 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
+
 #include "raylib.h"
 
 #define TARGET_FPS 60
 
-#define SCREEN_WIDTH 800
+#define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
 
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
@@ -34,7 +36,7 @@
 #define WALL_MATERIAL    ((frMaterial) { 2.5f, 0.0f, 0.85f, 0.65f })
 #define CIRCLE_MATERIAL  ((frMaterial) { 8.0f, 0.0f, 0.9f, 0.85f })
 
-#define MAX_CIRCLE_COUNT 100
+#define MAX_CIRCLE_COUNT 128
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
@@ -77,7 +79,7 @@ int main(void) {
     frBody *wall2 = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 40 }),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 40.0f }),
         frCreateRectangle(
             WALL_MATERIAL, 
             frNumberPixelsToMeters(SCREEN_WIDTH), 
@@ -124,7 +126,7 @@ int main(void) {
         frDrawBody(wall3, BLACK);
         
         for (int i = 3; i < frGetWorldBodyCount(world); i++)
-            frDrawBodyLines(frGetWorldBody(world, i), 2, RED);
+            frDrawBodyLines(frGetWorldBody(world, i), 2.0f, RED);
         
         frDrawSpatialHash(frGetWorldSpatialHash(world));
         

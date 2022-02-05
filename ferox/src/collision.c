@@ -21,6 +21,7 @@
 */
 
 #include "ferox.h"
+#include "fr_vec2.h"
 
 /* | `collision` 모듈 함수... | */
 

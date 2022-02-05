@@ -85,7 +85,7 @@ extern "C" {
 
 #define FR_WORLD_ACCUMULATOR_LIMIT                200.0
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
-#define FR_WORLD_MAX_BODY_COUNT                   128
+#define FR_WORLD_MAX_BODY_COUNT                   192
 #define FR_WORLD_MAX_ITERATIONS                   16
 
 /* | 자료형 정의... | */
@@ -499,71 +499,6 @@ Rectangle frRecPixelsToMeters(Rectangle rec);
 
 /* 주어진 미터 단위 `Rectangle` 구조체를 픽셀 단위 `Rectangle` 구조체로 변환한다. */
 Rectangle frRecMetersToPixels(Rectangle rec);
-
-/* | `vectors` 모듈 함수... | */
-
-/* 벡터 `v1`과 `v2`의 합을 반환한다. */
-Vector2 frVec2Add(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v1`과 `v2`의 차를 반환한다. */
-Vector2 frVec2Subtract(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v`의 각 성분에 `value`를 곱한 2차원 벡터를 반환한다. */
-Vector2 frVec2ScalarMultiply(Vector2 v, float value);
-
-/* 벡터 `v`의 크기를 반환한다. */
-float frVec2Magnitude(Vector2 v);
-
-/* 벡터 `v`의 크기의 제곱을 반환한다. */
-float frVec2MagnitudeSqr(Vector2 v);
-
-/* 벡터 `v`와 크기가 같고 방향이 반대인 2차원 벡터를 반환한다. */
-Vector2 frVec2Negate(Vector2 v);
-
-/* 벡터 `v`를 정규화한 2차원 벡터를 반환한다. */
-Vector2 frVec2Normalize(Vector2 v);
-
-/* 벡터 `v1`과 `v2`가 이루는 각도 (단위: rad.)를 반환한다. */
-float frVec2Angle(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v1`의 모든 성분이 `v2`의 모든 성분과 근접한 값인지 확인한다. */
-bool frVec2ApproxEquals(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v1`과 `v2`의 외적을 반환한다. */
-float frVec2CrossProduct(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v1`과 `v2`의 내적을 반환한다. */
-float frVec2DotProduct(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v`의 왼쪽 방향에서 수직을 이루는 법선 벡터를 반환한다. */
-Vector2 frVec2LeftNormal(Vector2 v);
-
-/* 벡터 `v`의 오른쪽 방향에서 수직을 이루는 법선 벡터를 반환한다. */
-Vector2 frVec2RightNormal(Vector2 v);
-
-/* 벡터 `v1`과 `v2` 사이의 거리를 반환한다. */
-float frVec2Distance(Vector2 v1, Vector2 v2);
-
-/* 벡터 `v1`과 `v2` 사이의 거리의 제곱을 반환한다. */
-float frVec2DistanceSqr(Vector2 v1, Vector2 v2);
-
-/* 점 `p`와 점 `q`를 지나고 방향 벡터가 `v`인 직선 사이의 거리를 반환한다. */
-float frVec2DistancePointLine(Vector2 p, Vector2 q, Vector2 v);
-
-/* 영점을 기준으로 벡터 `v`를 `angle` (단위: rad.)만큼 회전시킨 벡터를 반환한다. */
-Vector2 frVec2Rotate(Vector2 v, float angle);
-
-/* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */
-Vector2 frVec2Transform(Vector2 v, frTransform tx);
-
-/* 벡터 `v1`, `v2`와 `v3`가 반시계 방향으로 정렬되어 있는지 확인한다. */
-bool frVec2CCW(Vector2 v1, Vector2 v2, Vector2 v3);
-
-/* 픽셀 단위 벡터 `v`를 미터 단위 벡터로 변환한다. */
-Vector2 frVec2PixelsToMeters(Vector2 v);
-
-/* 미터 단위 벡터 `v`를 픽셀 단위 벡터로 변환한다. */
-Vector2 frVec2MetersToPixels(Vector2 v);
 
 /* | `world` 모듈 함수... | */
 
