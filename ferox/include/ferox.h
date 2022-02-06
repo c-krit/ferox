@@ -72,6 +72,7 @@ extern "C" {
 #define FR_STRUCT_ZERO(T)                         ((T) { 0 })
 
 #define FR_BROADPHASE_CELL_SIZE                   3.0f
+#define FR_BROADPHASE_INVERSE_CELL_SIZE           (1.0f / (FR_BROADPHASE_CELL_SIZE))
 
 #define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32
 

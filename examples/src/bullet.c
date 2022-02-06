@@ -38,9 +38,10 @@
 #define BULLET_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.75f, 0.5f })
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
-#define SEMO_SPEED      0.024f
+#define SEMO_HORIZONTAL_SPEED      0.026f
+#define ENEMY_IMPULSE_MULTIPLIER   0.0005f
 
-#define MAX_ENEMY_COUNT 64
+#define MAX_ENEMY_COUNT 72
 
 static const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 static const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
@@ -105,9 +106,6 @@ int main(void) {
     frRaycastHit hits[MAX_ENEMY_COUNT];
 
     while (!WindowShouldClose()) {
-        HandleSemoBullets(world, semo);
-        HandleSemoMovement(world, semo);
-
         if (enemy_count < MAX_ENEMY_COUNT) {
             for (int i = 0; i < MAX_ENEMY_COUNT - enemy_count; i++) {
                 Vector2 position = FR_STRUCT_ZERO(Vector2);
@@ -146,6 +144,9 @@ int main(void) {
 
         frSimulateWorld(world, DELTA_TIME);
 
+        HandleSemoBullets(world, semo);
+        HandleSemoMovement(world, semo);
+
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
@@ -167,7 +168,7 @@ int main(void) {
                     )
                 );
 
-                frApplyImpulse(body, frVec2ScalarMultiply(direction, 0.0003f));
+                frApplyImpulse(body, frVec2ScalarMultiply(direction, ENEMY_IMPULSE_MULTIPLIER));
 
                 frDrawArrow(
                     frGetBodyPosition(body),
@@ -178,7 +179,7 @@ int main(void) {
                             2.0f * frGetCircleRadius(frGetBodyShape(body))
                         )
                     ),
-                    2,
+                    2.0f,
                     DARKGRAY
                 );
 
@@ -260,8 +261,8 @@ static void HandleSemoMovement(frWorld *world, frBody *semo) {
         position.x = SCREEN_WIDTH_IN_METERS - 0.5f * aabb.width;
     
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_D)) {
-        if (IsKeyDown(KEY_A)) velocity.x = -SEMO_SPEED;
-        else velocity.x = SEMO_SPEED;
+        if (IsKeyDown(KEY_A)) velocity.x = -SEMO_HORIZONTAL_SPEED;
+        else velocity.x = SEMO_HORIZONTAL_SPEED;
     } else {
         velocity.x = 0.0f;
     }

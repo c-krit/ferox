@@ -280,11 +280,8 @@ void frApplyGravity(frBody *b, Vector2 gravity) {
     b->motion.force = frVec2Add(
         b->motion.force,
         frVec2ScalarMultiply(
-            frVec2ScalarMultiply(
-                gravity,
-                b->motion.gravity_scale
-            ),
-            b->motion.mass
+            gravity,
+            b->motion.gravity_scale * b->motion.mass
         )
     );
 }
@@ -330,16 +327,13 @@ void frIntegrateForBodyPosition(frBody *b, double dt) {
 void frIntegrateForBodyVelocities(frBody *b, double dt) {
     if (b == NULL || b->motion.inverse_mass <= 0.0f) return;
 
-    float half_dt = 0.5f * dt;
+    const float half_dt = 0.5f * dt;
     
     b->motion.velocity = frVec2Add(
         b->motion.velocity,
         frVec2ScalarMultiply(
-            frVec2ScalarMultiply(
-                b->motion.force, 
-                b->motion.inverse_mass
-            ),
-            half_dt
+            b->motion.force, 
+            b->motion.inverse_mass * half_dt
         )
     );
     

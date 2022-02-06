@@ -166,9 +166,9 @@ int main(void) {
     frAddToWorld(world, box);
 
     while (!WindowShouldClose()) {
-        HandleBrickMovement(world, &brick);
-
         frSimulateWorld(world, DELTA_TIME);
+
+        HandleBrickMovement(world, &brick);
 
         BeginDrawing();
         

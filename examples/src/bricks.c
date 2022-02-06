@@ -56,7 +56,7 @@ int main(void) {
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60.0f }),
         frCreateRectangle(
             FLOOR_MATERIAL, 
-            frNumberPixelsToMeters(0.65f * SCREEN_WIDTH), 
+            frNumberPixelsToMeters(0.75f * SCREEN_WIDTH), 
             frNumberPixelsToMeters(80.0f)
         )
     );
@@ -132,8 +132,8 @@ int main(void) {
                 0.5f * (SCREEN_WIDTH - MeasureText(message, 40)), 
                 0.125f * SCREEN_HEIGHT
             },
-            40,
-            2, 
+            40.0f,
+            2.0f, 
             Fade(GRAY, 0.85f)
         );
         

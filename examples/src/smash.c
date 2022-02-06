@@ -133,13 +133,11 @@ int main(void) {
             Vector2 position = frVec2PixelsToMeters(GetMousePosition());
 
             Vector2 impulse = frVec2ScalarMultiply(
-                frVec2Normalize(
-                    frVec2Subtract(
-                        frVec2PixelsToMeters(SCREEN_CENTER), 
-                        position
-                    )
+                frVec2Subtract(
+                    frVec2PixelsToMeters(SCREEN_CENTER), 
+                    position
                 ),
-                2.0f
+                0.15f
             );
 
             frSetBodyVelocity(ball, FR_STRUCT_ZERO(Vector2));
@@ -191,7 +189,7 @@ int main(void) {
         frDrawArrow(
             frVec2PixelsToMeters(GetMousePosition()),
             frVec2PixelsToMeters(SCREEN_CENTER),
-            2,
+            2.0f,
             Fade(RED, 0.75f)
         );
 

@@ -23,6 +23,10 @@
 #include "ferox.h"
 #include "fr_vec2.h"
 
+/* | `debug` 모듈 변수... | */
+
+const float ARROW_HEAD_LENGTH = 16.0f;
+
 /* | `debug` 모듈 함수... | */
 
 #ifndef FEROX_STANDALONE
@@ -31,8 +35,6 @@
 
     /* 게임 화면에 점 `p1`에서 `p2`로 향하는 화살표를 그린다. */
     void frDrawArrow(Vector2 p1, Vector2 p2, float thick, Color color) {
-        const float ARROW_HEAD_LENGTH = 16.0f;
-
         p1 = frVec2MetersToPixels(p1);
         p2 = frVec2MetersToPixels(p2);
 
@@ -124,7 +126,7 @@
             color
         );
         
-        DrawCircleV(frVec2MetersToPixels(frGetBodyPosition(b)), 2, BLACK);
+        DrawCircleV(frVec2MetersToPixels(frGetBodyPosition(b)), 2, color);
     }
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
@@ -154,10 +156,8 @@
     void frDrawSpatialHash(frSpatialHash *hm) {
         Rectangle bounds = frGetSpatialHashBounds(hm);
 
-        const float inverse_cell_size = 1.0f / FR_BROADPHASE_CELL_SIZE;
-
-        const int v_count = bounds.width * inverse_cell_size;
-        const int h_count = bounds.height * inverse_cell_size;
+        const int v_count = bounds.width * FR_BROADPHASE_INVERSE_CELL_SIZE;
+        const int h_count = bounds.height * FR_BROADPHASE_INVERSE_CELL_SIZE;
         
         for (int i = 0; i <= v_count; i++)
             DrawLineEx(
@@ -180,7 +180,7 @@
     
     /* 무작위 색상을 반환한다. */
     Color frGetRandomColor(void) {
-        return ColorFromHSV(GetRandomValue(0, 360), 1, 1);
+        return ColorFromHSV(GetRandomValue(0, 360), 1.0f, 1.0f);
     }
 
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */
