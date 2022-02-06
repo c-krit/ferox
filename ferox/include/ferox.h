@@ -555,6 +555,9 @@ void frSetWorldGravity(frWorld *world, Vector2 gravity);
 /* 세계 `world`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
 void frSimulateWorld(frWorld *world, double dt);
 
+/* 세계 `world`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 강체를 반환한다. */
+int frQueryWorldSpatialHash(frWorld *world, Rectangle rec, frBody **bodies);
+
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits);
 

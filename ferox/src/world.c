@@ -198,6 +198,27 @@ void frSimulateWorld(frWorld *world, double dt) {
         frUpdateWorld(world, dt);
 }
 
+/* 세계 `world`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 강체를 반환한다. */
+int frQueryWorldSpatialHash(frWorld *world, Rectangle rec, frBody **bodies) {
+    if (world == NULL || bodies == NULL) return 0;
+
+    int count = 0;
+
+    for (int i = 0; i < arrlen(world->bodies); i++) 
+        frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
+
+    frQuerySpatialHash(world->hash, rec, &world->queries);
+
+    if (arrlen(world->queries) <= 0) return count;
+
+    for (int i = 0; i < arrlen(world->queries); i++)
+        bodies[count++] = world->bodies[world->queries[i]];
+
+    frClearSpatialHash(world->hash);
+
+    return count;
+}
+
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
     if (world == NULL || hits == NULL) return 0;
