@@ -2,9 +2,10 @@
 
 <img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
 
-![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)
-![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)
-![license badge](https://img.shields.io/github/license/c-krit/ferox)
+[![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)](https://github.com/c-krit/ferox/releases)
+[![codefactor badge](https://www.codefactor.io/repository/github/c-krit/ferox/badge)](https://www.codefactor.io/repository/github/c-krit/ferox)
+[![code-size badge](https://img.shields.io/github/languages/code-size/c-krit/ferox?color=brightgreen)](https://github.com/c-krit/ferox)
+[![license badge](https://img.shields.io/github/license/c-krit/ferox)](https://github.com/c-krit/ferox/blob/main/LICENSE)
 
 `ferox`는 2차원 공간에서의 충돌 감지 및 강체 시뮬레이션 기능을 제공하는 경량 C 라이브러리입니다.
 
