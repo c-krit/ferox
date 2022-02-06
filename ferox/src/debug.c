@@ -175,7 +175,11 @@ const float ARROW_HEAD_LENGTH = 16.0f;
                 GRAY
             );
 
-        DrawRectangleLinesEx(bounds, 0.25f, GRAY);
+        DrawRectangleLinesEx(
+            frRecMetersToPixels(bounds), 
+            0.5f, 
+            GRAY
+        );
     }
     
     /* 무작위 색상을 반환한다. */

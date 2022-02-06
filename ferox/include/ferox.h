@@ -172,6 +172,7 @@ typedef struct frRay {
     Vector2 origin;
     Vector2 direction;
     float max_distance;
+    bool closest;
 } frRay;
 
 /* 광선 투사의 결과를 나타내는 구조체. */

@@ -202,8 +202,6 @@ void frSimulateWorld(frWorld *world, double dt) {
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
     if (world == NULL || hits == NULL) return 0;
 
-    int result = 0;
-
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
 
@@ -224,16 +222,42 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
 
     frQuerySpatialHash(world->hash, rec, &world->queries);
 
-    for (int i = 0; i < arrlen(world->queries); i++) {
-        frRaycastHit raycast = frComputeBodyRaycast(world->bodies[world->queries[i]], ray);
-        
-        if (raycast.check) 
-            hits[result++] = raycast;
+    if (arrlen(world->queries) <= 0) return 0;
+
+    if (ray.closest) {
+        float min_distance = FLT_MAX;
+
+        for (int i = 0; i < arrlen(world->queries); i++) {
+            frRaycastHit raycast = frComputeBodyRaycast(
+                world->bodies[world->queries[i]], 
+                ray
+            );
+            
+            if (!raycast.check) continue;
+
+            if (min_distance > raycast.distance) {
+                min_distance = raycast.distance;
+                hits[0] = raycast;
+            }
+        }
+
+        return 1;
+    } else {
+        int count = 0;
+
+        for (int i = 0; i < arrlen(world->queries); i++) {
+            frRaycastHit raycast = frComputeBodyRaycast(
+                world->bodies[world->queries[i]], 
+                ray
+            );
+
+            if (raycast.check) hits[count++] = raycast;
+        }
+
+        frClearSpatialHash(world->hash);
+
+        return count;
     }
-
-    frClearSpatialHash(world->hash);
-
-    return result;
 }
 
 /* 세계 `world`의 업데이트 이전 작업을 실행한다. */
