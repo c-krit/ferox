@@ -241,6 +241,8 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
             }
         }
 
+        frClearSpatialHash(world->hash);
+
         return 1;
     } else {
         int count = 0;
