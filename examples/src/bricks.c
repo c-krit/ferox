@@ -84,7 +84,7 @@ int main(void) {
                 FR_FLAG_NONE,
                 frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10.0f }),
                 frCreateRectangle(
-                    CURSOR_MATERIAL, 
+                    CURSOR_MATERIAL,
                     frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
                     frNumberPixelsToMeters(20.0f)
                 )
