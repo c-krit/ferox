@@ -39,6 +39,7 @@
 #define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.25f })
 
 #define SEMO_HORIZONTAL_SPEED      0.026f
+#define SEMO_WEAPON_FIRE_RATE      (0.15f * TARGET_FPS)
 #define ENEMY_IMPULSE_MULTIPLIER   0.0005f
 
 #define MAX_ENEMY_COUNT 72
@@ -83,9 +84,9 @@ int main(void) {
 
     bullet_vertices = (frVertices) {
         .data = {
-            frVec2PixelsToMeters((Vector2) {  0.0f, -6.0f }),
-            frVec2PixelsToMeters((Vector2) { -3.0f,  6.0f }),
-            frVec2PixelsToMeters((Vector2) {  3.0f,  6.0f })
+            frVec2PixelsToMeters((Vector2) {  0.0f, -7.2f }),
+            frVec2PixelsToMeters((Vector2) { -2.8f,  7.2f }),
+            frVec2PixelsToMeters((Vector2) {  2.8f,  7.2f })
         },
         .count = 3
     };
@@ -220,7 +221,9 @@ static void DrawCustomCursor(Vector2 position) {
 }
 
 static void HandleSemoBullets(frWorld *world, frBody *semo) {
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+    static int frame_counter = SEMO_WEAPON_FIRE_RATE;
+
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && frame_counter >= SEMO_WEAPON_FIRE_RATE) {
         Vector2 direction = frVec2Subtract(
             frVec2PixelsToMeters(GetMousePosition()), 
             frGetBodyPosition(semo)
@@ -239,7 +242,11 @@ static void HandleSemoBullets(frWorld *world, frBody *semo) {
         frApplyImpulse(bullet, frVec2ScalarMultiply(frVec2Normalize(direction), 0.006f));
         
         frAddToWorld(world, bullet);
+
+        frame_counter = 0;
     }
+    
+    frame_counter++;
 }
 
 static void HandleSemoMovement(frWorld *world, frBody *semo) {
