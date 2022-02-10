@@ -392,10 +392,10 @@ void frIntegrateForBodyPosition(frBody *b, double dt);
 void frIntegrateForBodyVelocities(frBody *b, double dt);
 
 /* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
-void frResolveCollision(frBody *b1, frBody *b2, frCollision collision);
+void frResolveCollision(frCollision *collision);
 
 /* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
-void frCorrectBodyPositions(frBody *b1, frBody *b2, frCollision collision);
+void frCorrectBodyPositions(frCollision *collision, float inverse_dt);
 
 /* | `geometry` 모듈 함수... | */
 

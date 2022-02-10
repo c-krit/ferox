@@ -351,32 +351,19 @@ static void frUpdateWorld(frWorld *world, double dt) {
     }
     
     // 순차적으로 충격량을 반복 적용하여, 두 강체 사이의 충돌을 해결한다.
-    for (int i = 0; i < FR_WORLD_MAX_ITERATIONS; i++) {
-        for (int j = 0; j < arrlen(world->collisions); j++) {
-            frCollision *collision = &world->collisions[j];
-
-            frBody *b1 = collision->cache.bodies[0];
-            frBody *b2 = collision->cache.bodies[1];
-            
-            // TODO: `b1`과 `b2`를 매개 변수에서 제거하기
-            frResolveCollision(b1, b2, *collision);
-        }
-    }
+    for (int i = 0; i < FR_WORLD_MAX_ITERATIONS; i++)
+        for (int j = 0; j < arrlen(world->collisions); j++)
+            frResolveCollision(&world->collisions[j]);
     
     // 강체의 현재 위치를 계산한다.
     for (int i = 0; i < arrlen(world->bodies); i++)
         frIntegrateForBodyPosition(world->bodies[i], dt);
     
+    float inverse_dt = (dt != 0.0f) ? (1.0f / dt) : 0.0f;
+    
     // 강체의 위치를 적절하게 보정한다.
-    for (int i = 0; i < arrlen(world->collisions); i++) {
-        frCollision *collision = &world->collisions[i];
-
-        frBody *b1 = collision->cache.bodies[0];
-        frBody *b2 = collision->cache.bodies[1];
-        
-        // TODO: `b1`과 `b2`를 매개 변수에서 제거하기
-        frCorrectBodyPositions(b1, b2, *collision);
-    }
+    for (int i = 0; i < arrlen(world->collisions); i++)
+        frCorrectBodyPositions(&world->collisions[i], inverse_dt);
     
     // 강체 사이의 충돌 해결 직후에 사전 정의된 함수를 호출한다. 
     for (int i = 0; i < arrlen(world->collisions); i++) {
