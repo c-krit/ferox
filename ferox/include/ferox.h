@@ -76,8 +76,8 @@ extern "C" {
 
 #define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32
 
-#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.25f
-#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.02f
+#define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.24f
+#define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.01f
 #define FR_DYNAMICS_DYNAMIC_FRICTION_MULTIPLIER   0.85f
 
 #define FR_GEOMETRY_MAX_VERTEX_COUNT              10
@@ -128,6 +128,11 @@ typedef struct frMaterial {
 typedef struct frTransform {
     Vector2 position;
     float rotation;
+    struct {
+        bool valid;
+        float sin_a;
+        float cos_a;
+    } cache;
 } frTransform;
 
 /* 다각형의 꼭짓점 배열을 나타내는 구조체. */

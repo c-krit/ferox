@@ -261,7 +261,7 @@ static int frGetSeparatingAxisIndex(
     
     for (int i = 0; i < normals.count; i++) {
         Vector2 vertex = frVec2Transform(frGetPolygonVertex(s1, i), tx1);
-        Vector2 normal = frVec2Rotate(normals.data[i], tx1.rotation);
+        Vector2 normal = frVec2RotateTx(normals.data[i], tx1);
         
         int furthest_index = frGetPolygonFurthestIndex(s2, tx2, frVec2Negate(normal));
         Vector2 furthest_vertex = frVec2Transform(frGetPolygonVertex(s2, furthest_index), tx2);
@@ -366,12 +366,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
     if (max_distance < 0.0f) {
         result.check = true;
 
-        result.direction = frVec2Negate(
-            frVec2Rotate(
-                normals.data[normal_index], 
-                polygon_tx.rotation
-            )
-        );
+        result.direction = frVec2Negate(frVec2RotateTx(normals.data[normal_index], polygon_tx));
 
         if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
             result.direction = frVec2Negate(result.direction);
@@ -407,12 +402,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
             if (magnitude_sqr > radius * radius) return result;
 
-            result.direction = frVec2Normalize(
-                frVec2Rotate(
-                    frVec2Negate(diff1), 
-                    polygon_tx.rotation
-                )
-            );
+            result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff1), polygon_tx));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
@@ -424,12 +414,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
             if (magnitude_sqr > radius * radius) return result;
             
-            result.direction = frVec2Normalize(
-                frVec2Rotate(
-                    frVec2Negate(diff2), 
-                    polygon_tx.rotation
-                )
-            );
+            result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff2), polygon_tx));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
@@ -441,7 +426,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
             if (frVec2DotProduct(diff1, normal) > radius) return result;
 
-            result.direction = frVec2Negate(frVec2Rotate(normal, polygon_tx.rotation));
+            result.direction = frVec2Negate(frVec2RotateTx(normal, polygon_tx));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
@@ -478,8 +463,8 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     if (depth2 >= 0.0f) return result;
     
     Vector2 direction = (depth1 > depth2) 
-        ? frVec2Rotate(frGetPolygonNormal(s1, index1), tx1.rotation)
-        : frVec2Rotate(frGetPolygonNormal(s2, index2), tx2.rotation);
+        ? frVec2RotateTx(frGetPolygonNormal(s1, index1), tx1)
+        : frVec2RotateTx(frGetPolygonNormal(s2, index2), tx2);
     
     if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), direction) < 0.0f) 
         direction = frVec2Negate(direction);

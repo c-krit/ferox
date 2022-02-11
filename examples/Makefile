@@ -75,7 +75,7 @@ else
 endif
 
 CC := gcc
-CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -std=gnu99 -O2
+CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu99
 LDFLAGS := $(LIBRARY_PATH:%=-L%)
 LDLIBS := -lferox -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 

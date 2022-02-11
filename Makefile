@@ -75,7 +75,7 @@ endif
 
 CC := gcc
 AR := ar
-CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu11 -Wno-return-type
+CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu11
 
 ifeq ($(BUILD),STANDALONE)
 	CFLAGS += -DFEROX_STANDALONE
@@ -91,6 +91,8 @@ ifeq ($(PLATFORM),WINDOWS)
 else ifeq ($(PLATFORM),WEB)
 	CC := emcc
 	AR := emar
+
+	CFLAGS += -Wno-return-type
 endif
 
 all: pre-build build post-build

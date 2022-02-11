@@ -248,6 +248,10 @@ void frSetBodyTransform(frBody *b, frTransform tx) {
     
     b->tx.position = tx.position;
     b->tx.rotation = frNormalizeAngle(tx.rotation, PI);
+
+    b->tx.cache.valid = true;
+    b->tx.cache.sin_a = sinf(b->tx.rotation);
+    b->tx.cache.cos_a = cosf(b->tx.rotation);
     
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
@@ -257,6 +261,7 @@ void frSetBodyPosition(frBody *b, Vector2 p) {
     if (b == NULL) return;
     
     b->tx.position = p;
+
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
 
@@ -265,6 +270,11 @@ void frSetBodyRotation(frBody *b, float rotation) {
     if (b == NULL) return;
     
     b->tx.rotation = frNormalizeAngle(rotation, PI);
+
+    b->tx.cache.valid = true;
+    b->tx.cache.sin_a = sinf(b->tx.rotation);
+    b->tx.cache.cos_a = cosf(b->tx.rotation);
+
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
 

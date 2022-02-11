@@ -156,9 +156,21 @@ FR_MATH_INLINE Vector2 frVec2Rotate(Vector2 v, float angle) {
     };
 }
 
+/* 벡터 `v`를 `tx`의 값에 따라 회전시킨다. */
+FR_MATH_INLINE Vector2 frVec2RotateTx(Vector2 v, frTransform tx) {
+    Vector2 w = {
+        (v.x * tx.cache.cos_a - v.y * tx.cache.sin_a),
+        (v.x * tx.cache.sin_a + v.y * tx.cache.cos_a)
+    };
+
+    if (!tx.cache.valid) w = frVec2Rotate(v, tx.rotation);
+
+    return w;
+}
+
 /* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */
 FR_MATH_INLINE Vector2 frVec2Transform(Vector2 v, frTransform tx) {
-    return frVec2Add(tx.position, frVec2Rotate(v, tx.rotation));
+    return frVec2Add(tx.position, frVec2RotateTx(v, tx));
 }
 
 /* 벡터 `v1`, `v2`와 `v3`가 반시계 방향으로 정렬되어 있는지 확인한다. */

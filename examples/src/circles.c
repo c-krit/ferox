@@ -34,7 +34,7 @@
 })
 
 #define WALL_MATERIAL    ((frMaterial) { 2.5f, 0.0f, 0.85f, 0.65f })
-#define CIRCLE_MATERIAL  ((frMaterial) { 8.0f, 0.0f, 0.9f, 0.85f })
+#define CIRCLE_MATERIAL  ((frMaterial) { 8.5f, 0.0f, 0.95f, 0.85f })
 
 #define MAX_CIRCLE_COUNT 128
 
@@ -81,8 +81,8 @@ int main(void) {
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 40.0f }),
         frCreateRectangle(
-            WALL_MATERIAL, 
-            frNumberPixelsToMeters(SCREEN_WIDTH), 
+            WALL_MATERIAL,
+            frNumberPixelsToMeters(SCREEN_WIDTH),
             frNumberPixelsToMeters(80.0f)
         )
     );
