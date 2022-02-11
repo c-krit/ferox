@@ -21,7 +21,7 @@
 */
 
 #include "ferox.h"
-#include "fr_vec2.h"
+#include "fr_math.h"
 
 /* | `debug` 모듈 변수... | */
 

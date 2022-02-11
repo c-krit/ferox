@@ -490,18 +490,6 @@ float frNormalizeAngle(float angle, float center);
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frNumberApproxEquals(float f1, float f2);
 
-/* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */
-float frNumberPixelsToMeters(float value);
-
-/* 주어진 미터 단위 거리를 픽셀 단위 거리로 변환한다. */
-float frNumberMetersToPixels(float value);
-
-/* 주어진 픽셀 단위 `Rectangle` 구조체를 미터 단위 `Rectangle` 구조체로 변환한다. */
-Rectangle frRecPixelsToMeters(Rectangle rec);
-
-/* 주어진 미터 단위 `Rectangle` 구조체를 픽셀 단위 `Rectangle` 구조체로 변환한다. */
-Rectangle frRecMetersToPixels(Rectangle rec);
-
 /* | `world` 모듈 함수... | */
 
 /* 중력 가속도가 `gravity`이고 경계 범위가 `bounds`인 세계를 생성한다. */ 
