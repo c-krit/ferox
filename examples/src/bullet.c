@@ -190,7 +190,7 @@ int main(void) {
 
         DrawCustomCursor(GetMousePosition());
         
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         DrawFPS(8, 8);
 

@@ -110,7 +110,7 @@ const float ARROW_HEAD_LENGTH = 16.0f;
     }
 
     /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
-    void frDrawBodyAABB(frBody *b, Color color) {
+    void frDrawBodyAABB(frBody *b, float thick, Color color) {
         if (b == NULL) return;
         
         Rectangle aabb = frGetBodyAABB(b);
@@ -122,11 +122,11 @@ const float ARROW_HEAD_LENGTH = 16.0f;
                 frNumberMetersToPixels(aabb.width),
                 frNumberMetersToPixels(aabb.height)
             }, 
-            1.0f, 
+            thick, 
             color
         );
         
-        DrawCircleV(frVec2MetersToPixels(frGetBodyPosition(b)), 2, color);
+        DrawCircleV(frVec2MetersToPixels(frGetBodyPosition(b)), 2.0f, color);
     }
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
@@ -153,7 +153,7 @@ const float ARROW_HEAD_LENGTH = 16.0f;
     }
 
     /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
-    void frDrawSpatialHash(frSpatialHash *hm) {
+    void frDrawSpatialHash(frSpatialHash *hm, float thick, Color color) {
         Rectangle bounds = frGetSpatialHashBounds(hm);
 
         const int v_count = bounds.width * FR_BROADPHASE_INVERSE_CELL_SIZE;
@@ -161,25 +161,21 @@ const float ARROW_HEAD_LENGTH = 16.0f;
         
         for (int i = 0; i <= v_count; i++)
             DrawLineEx(
-                frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0.0f })),
-                frVec2MetersToPixels(((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height })),
-                0.25f,
-                GRAY
+                frVec2MetersToPixels((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0.0f }),
+                frVec2MetersToPixels((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height }),
+                thick,
+                color
             );
     
         for (int i = 0; i <= h_count; i++)
             DrawLineEx(
-                frVec2MetersToPixels(((Vector2) { 0.0f, FR_BROADPHASE_CELL_SIZE * i })), 
-                frVec2MetersToPixels(((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i })),
-                0.25f,
-                GRAY
+                frVec2MetersToPixels((Vector2) { 0.0f, FR_BROADPHASE_CELL_SIZE * i }), 
+                frVec2MetersToPixels((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i }),
+                thick,
+                color
             );
 
-        DrawRectangleLinesEx(
-            frRecMetersToPixels(bounds), 
-            0.5f, 
-            GRAY
-        );
+        DrawRectangleLinesEx(frRecMetersToPixels(bounds), thick, color);
     }
     
     /* 무작위 색상을 반환한다. */

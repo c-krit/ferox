@@ -118,7 +118,7 @@ int main(void) {
         
         frDrawBody(cursor, Fade(RED, 0.5f));
         
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         const char *message = TextFormat(
             "%d brick(s)!",

@@ -203,7 +203,7 @@ int main(void) {
             Fade(RED, 0.75f)
         );
 
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         DrawFPS(8, 8);
 

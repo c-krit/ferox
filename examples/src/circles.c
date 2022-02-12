@@ -128,7 +128,7 @@ int main(void) {
         for (int i = 3; i < frGetWorldBodyCount(world); i++)
             frDrawBodyLines(frGetWorldBody(world, i), 2.0f, RED);
         
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         DrawFPS(8, 8);
 

@@ -99,7 +99,7 @@ int main(void) {
         ClearBackground(RAYWHITE);
         
         frDrawBody(large_circle, GRAY);
-        frDrawBodyAABB(large_circle, GREEN);
+        frDrawBodyAABB(large_circle, 1.0f, GREEN);
         
         frCollision collision = frComputeBodyCollision(cursor, large_circle);
         
@@ -144,7 +144,7 @@ int main(void) {
         }
 
         frDrawBody(cursor, Fade(BLACK, 0.75f));
-        frDrawBodyAABB(cursor, GREEN);
+        frDrawBodyAABB(cursor, 1.0f, GREEN);
         
         DrawFPS(8, 8);
         

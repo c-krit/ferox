@@ -125,7 +125,7 @@ int main(void) {
         
         frDrawBody(cursor, Fade(RED, 0.5f));
         
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         DrawFPS(8, 8);
 

@@ -182,7 +182,7 @@ int main(void) {
         frDrawBody(box, DARKGRAY);
         frDrawBody(brick.body, RED);
 
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         Vector2 position = frGetBodyPosition(brick.body);
         Vector2 velocity = frGetBodyVelocity(brick.body);

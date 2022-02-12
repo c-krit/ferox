@@ -265,13 +265,13 @@ frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray);
     void frDrawBodyLines(frBody *b, float thick, Color color);
 
     /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
-    void frDrawBodyAABB(frBody *b, Color color);
+    void frDrawBodyAABB(frBody *b, float thick, Color color);
 
     /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
     void frDrawBodyProperties(frBody *b, Color color);
 
     /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
-    void frDrawSpatialHash(frSpatialHash *hm);
+    void frDrawSpatialHash(frSpatialHash *hm, float thick, Color color);
 
     /* 무작위 색상을 반환한다. */
     Color frGetRandomColor(void);

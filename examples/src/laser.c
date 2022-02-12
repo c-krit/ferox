@@ -130,7 +130,7 @@ int main(void) {
             frDrawBodyLines(frGetWorldBody(world, i), 2.0f, BLACK);
 
         for (int i = 0; i < count; i++) {
-            frDrawBodyAABB(hits[i].body, GREEN);
+            frDrawBodyAABB(hits[i].body, 1.0f, GREEN);
 
             DrawRing(
                 frVec2MetersToPixels(hits[i].point), 
@@ -146,9 +146,9 @@ int main(void) {
         DrawLineEx(SCREEN_CENTER, mouse_position, 2.0f, RED);
         
         frDrawBody(semo, DARKGRAY);
-        frDrawBodyAABB(semo, GREEN);
+        frDrawBodyAABB(semo, 1.0f, GREEN);
 
-        frDrawSpatialHash(frGetWorldSpatialHash(world));
+        frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         DrawFPS(8, 8);
 
