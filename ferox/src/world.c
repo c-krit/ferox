@@ -202,14 +202,16 @@ void frSimulateWorld(frWorld *world, double dt) {
 int frQueryWorldSpatialHash(frWorld *world, Rectangle rec, frBody **bodies) {
     if (world == NULL || bodies == NULL) return 0;
 
-    int count = 0;
+    arrdeln(world->queries, 0, arrlen(world->queries));
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
 
     frQuerySpatialHash(world->hash, rec, &world->queries);
 
-    if (arrlen(world->queries) <= 0) return count;
+    if (arrlen(world->queries) <= 0) return 0;
+
+    int count = 0;
 
     for (int i = 0; i < arrlen(world->queries); i++)
         bodies[count++] = world->bodies[world->queries[i]];
@@ -222,6 +224,8 @@ int frQueryWorldSpatialHash(frWorld *world, Rectangle rec, frBody **bodies) {
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
     if (world == NULL || hits == NULL) return 0;
+
+    arrdeln(world->queries, 0, arrlen(world->queries));
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
