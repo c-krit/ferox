@@ -21,7 +21,6 @@
 */
 
 #include "ferox.h"
-#include "fr_math.h"
 
 /* | `geometry` 모듈 자료형 정의... | */
 

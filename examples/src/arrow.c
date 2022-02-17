@@ -16,8 +16,6 @@
 */
 
 #include "ferox.h"
-#include "fr_math.h"
-
 #include "raylib.h"
 
 #define TARGET_FPS 60

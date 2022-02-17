@@ -21,7 +21,6 @@
 */
 
 #include "ferox.h"
-#include "fr_math.h"
 
 /* | `collision` 모듈 함수... | */
 

@@ -21,8 +21,6 @@
 */
 
 #include "ferox.h"
-#include "fr_math.h"
-
 #include "stb_ds.h"
 
 /* | `world` 모듈 자료형 정의... | */
