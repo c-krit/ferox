@@ -460,6 +460,9 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx);
 /* 원 `s`의 반지름을 반환한다. */
 float frGetCircleRadius(frShape *s);
 
+/* 직사각형 `s`의 가로 및 세로 길이를 반환한다. */
+Vector2 frGetRectangleDimensions(frShape *s);
+
 /* 다각형 `s`의 `index + 1`번째 꼭짓점을 반환한다. */
 Vector2 frGetPolygonVertex(frShape *s, int index);
 
@@ -472,8 +475,14 @@ frVertices frGetPolygonVertices(frShape *s);
 /* 다각형 `s`의 법선 벡터 배열을 반환한다. */
 frVertices frGetPolygonNormals(frShape *s);
 
+/* 다각형 `s`가 직사각형인지 확인한다. */
+bool frIsShapeRectangle(frShape *s);
+
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius);
+
+/* 직사각형 `s`의 가로 및 세로 길이를 `wh`의 X값과 Y값으로 설정한다. */
+void frSetRectangleDimensions(frShape *s, Vector2 wh);
 
 /* 다각형 `s`의 꼭짓점 배열을 `vertices`로 변경한다. */
 void frSetPolygonVertices(frShape *s, frVertices vertices);

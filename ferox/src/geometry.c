@@ -244,6 +244,16 @@ float frGetCircleRadius(frShape *s) {
     return (s != NULL && s->type == FR_SHAPE_CIRCLE) ? s->circle.radius : 0.0f;
 }
 
+/* 직사각형 `s`의 가로 및 세로 길이를 반환한다. */
+Vector2 frGetRectangleDimensions(frShape *s) {
+    if (!frIsShapeRectangle(s)) return FR_STRUCT_ZERO(Vector2);
+
+    return (Vector2) { 
+        s->polygon.vertices.data[2].x - s->polygon.vertices.data[1].x,
+        s->polygon.vertices.data[1].y - s->polygon.vertices.data[0].y
+    };
+}
+
 /* 다각형 `s`의 `index + 1`번째 꼭짓점을 반환한다. */
 Vector2 frGetPolygonVertex(frShape *s, int index) {
     return (s != NULL && index >= 0 && index < s->polygon.vertices.count)
@@ -268,13 +278,37 @@ frVertices frGetPolygonNormals(frShape *s) {
     return (s != NULL) ? s->polygon.normals : FR_STRUCT_ZERO(frVertices);
 }
 
+/* 다각형 `s`가 직사각형인지 확인한다. */
+bool frIsShapeRectangle(frShape *s) {
+    return (s != NULL) && (s->type == FR_SHAPE_POLYGON) && s->is_rect;
+}
+
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
 void frSetCircleRadius(frShape *s, float radius) {
     if (s == NULL || s->type != FR_SHAPE_CIRCLE) return; 
-        
+    
     s->circle.radius = radius;
     
     frComputeArea(s);
+}
+
+/* 직사각형 `s`의 가로 및 세로 길이를 `wh`의 X값과 Y값으로 설정한다. */
+void frSetRectangleDimensions(frShape *s, Vector2 wh) {
+    if (!frIsShapeRectangle(s) || wh.x <= 0.0f || wh.y <= 0.0f) return;
+
+    wh = frVec2ScalarMultiply(wh, 0.5f);
+
+    frVertices vertices = {
+        .data = {
+            (Vector2) { -wh.x, -wh.y },
+            (Vector2) { -wh.x, wh.y },
+            (Vector2) { wh.x, wh.y },
+            (Vector2) { wh.x, -wh.y }
+        },
+        .count = 4
+    };
+
+    frSetPolygonVertices(s, vertices);
 }
 
 /* 다각형 `s`의 꼭짓점 배열을 `vertices`로 변경한다. */
