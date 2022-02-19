@@ -123,7 +123,7 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
                 Vector2 v1 = frVec2Transform(vertices.data[i], tx);
                 Vector2 v2 = frVec2Transform(vertices.data[j], tx);
 
-                Vector2 diff = frVec2Normalize(frVec2Subtract(v1, v2));
+                Vector2 diff = frVec2Subtract(v1, v2);
                 
                 bool intersects = frComputeIntersectionRays(
                     ray.origin, ray.direction, 

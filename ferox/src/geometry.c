@@ -121,6 +121,7 @@ frShape *frCloneShape(frShape *s) {
     
     result->type = s->type;
     result->material = s->material;
+    result->is_rect = s->is_rect;
     result->area = s->area;
     
     if (result->type == FR_SHAPE_CIRCLE) {
