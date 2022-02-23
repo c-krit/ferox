@@ -579,21 +579,21 @@ int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits);
 
 /* | 인라인 함수... | */
 
-/* 주어진 픽셀 단위 거리를 미터 단위 거리로 변환한다. */
+/* 픽셀 단위의 값 `value`를 미터 단위의 값으로 변환한다. */
 FR_API_INLINE float frNumberPixelsToMeters(float value) {
     return (FR_GLOBAL_PIXELS_PER_METER > 0.0f)
         ? (value / FR_GLOBAL_PIXELS_PER_METER)
         : 0.0f;
 }
 
-/* 주어진 미터 단위 거리를 픽셀 단위 거리로 변환한다. */
+/* 미터 단위의 값 `value`를 픽셀 단위의 값으로 변환한다. */
 FR_API_INLINE float frNumberMetersToPixels(float value) {
     return (FR_GLOBAL_PIXELS_PER_METER > 0.0f)
         ? (value * FR_GLOBAL_PIXELS_PER_METER)
         : 0.0f;
 }
 
-/* 주어진 픽셀 단위 `Rectangle` 구조체를 미터 단위 `Rectangle` 구조체로 변환한다. */
+/* 픽셀 단위의 `Rectangle` 구조체 `rec`을 미터 단위로 변환한다. */
 FR_API_INLINE Rectangle frRecPixelsToMeters(Rectangle rec) {
     return (Rectangle) {
         .x = frNumberPixelsToMeters(rec.x),
@@ -603,7 +603,7 @@ FR_API_INLINE Rectangle frRecPixelsToMeters(Rectangle rec) {
     };
 }
 
-/* 주어진 미터 단위 `Rectangle` 구조체를 픽셀 단위 `Rectangle` 구조체로 변환한다. */
+/* 미터 단위의 `Rectangle` 구조체 `rec`을 픽셀 단위로 변환한다. */
 FR_API_INLINE Rectangle frRecMetersToPixels(Rectangle rec) {
     return (Rectangle) {
         .x = frNumberMetersToPixels(rec.x),
@@ -654,7 +654,7 @@ FR_API_INLINE Vector2 frVec2Negate(Vector2 v) {
     return (Vector2) { -v.x, -v.y };
 }
 
-/* 벡터 `v`를 정규화한 새로운 벡터를 반환한다. */
+/* 벡터 `v`와 방향이 같은 새로운 단위 벡터를 반환한다. */
 FR_API_INLINE Vector2 frVec2Normalize(Vector2 v) {
     const float magnitude = frVec2Magnitude(v);
     
@@ -683,7 +683,7 @@ FR_API_INLINE Vector2 frVec2RightNormal(Vector2 v) {
     return frVec2Normalize((Vector2) { v.y, -v.x });
 }
 
-/* 영점을 기준으로 벡터 `v`를 `angle` (rad.)만큼 회전시킨 벡터를 반환한다. */
+/* 벡터 `v`를 영점을 기준으로 `angle` (rad.)만큼 회전시킨다. */
 FR_API_INLINE Vector2 frVec2Rotate(Vector2 v, float angle) {
     const float sin_angle = sinf(angle);
     const float cos_angle = cosf(angle);
@@ -696,14 +696,14 @@ FR_API_INLINE Vector2 frVec2Rotate(Vector2 v, float angle) {
 
 /* 벡터 `v`를 `tx`의 값에 따라 회전시킨다. */
 FR_API_INLINE Vector2 frVec2RotateTx(Vector2 v, frTransform tx) {
-    Vector2 w = {
+    Vector2 result = {
         (v.x * tx.cache.cos_a - v.y * tx.cache.sin_a),
         (v.x * tx.cache.sin_a + v.y * tx.cache.cos_a)
     };
 
-    if (!tx.cache.valid) w = frVec2Rotate(v, tx.rotation);
+    if (!tx.cache.valid) result = frVec2Rotate(v, tx.rotation);
 
-    return w;
+    return result;
 }
 
 /* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */

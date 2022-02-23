@@ -209,7 +209,7 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx) {
         result.x = tx.position.x - (s->circle.radius);
         result.y = tx.position.y - (s->circle.radius);
         
-        result.width = result.height = 2 * (s->circle.radius);
+        result.width = result.height = 2.0f * (s->circle.radius);
         
         return result;
     } else if (s->type == FR_SHAPE_POLYGON) {
@@ -317,7 +317,6 @@ void frSetPolygonVertices(frShape *s, frVertices vertices) {
     if (s == NULL || s->type != FR_SHAPE_POLYGON) return;
     
     s->polygon.vertices.count = vertices.count;
-    // s->polygon.normals.count = (!s->is_rect) ? vertices.count : 2;
     s->polygon.normals.count = vertices.count;
 
     for (int i = 0; i < vertices.count; i++)
