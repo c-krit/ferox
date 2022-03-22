@@ -85,22 +85,22 @@ extern "C" {
 
 /* | 사용자 설정 매크로 정의... | */
 
-#define FR_BROADPHASE_CELL_SIZE                   3.0f
+#define FR_BROADPHASE_CELL_SIZE                   3.2f
 #define FR_BROADPHASE_INVERSE_CELL_SIZE           (1.0f / (FR_BROADPHASE_CELL_SIZE))
 
-#define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32
+#define FR_DEBUG_CIRCLE_SEGMENT_COUNT             16
 
 #define FR_DYNAMICS_CORRECTION_DEPTH_SCALE        0.24f
 #define FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD    0.01f
 #define FR_DYNAMICS_DYNAMIC_FRICTION_MULTIPLIER   0.85f
 
-#define FR_GEOMETRY_MAX_VERTEX_COUNT              10
+#define FR_GEOMETRY_MAX_VERTEX_COUNT              8
 
 #define FR_GLOBAL_PIXELS_PER_METER                16.0f
 
 #define FR_WORLD_ACCUMULATOR_LIMIT                200.0
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
-#define FR_WORLD_MAX_BODY_COUNT                   192
+#define FR_WORLD_MAX_BODY_COUNT                   256
 #define FR_WORLD_MAX_ITERATIONS                   16
 
 /* | 자료형 정의... | */

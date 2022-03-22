@@ -34,6 +34,8 @@ const float ARROW_HEAD_LENGTH = 16.0f;
 
     /* 게임 화면에 점 `p1`에서 `p2`로 향하는 화살표를 그린다. */
     void frDrawArrow(Vector2 p1, Vector2 p2, float thick, Color color) {
+        if (thick <= 0.0f) return;
+        
         p1 = frVec2MetersToPixels(p1);
         p2 = frVec2MetersToPixels(p2);
 
@@ -65,7 +67,7 @@ const float ARROW_HEAD_LENGTH = 16.0f;
 
     /* 게임 화면에 강체 `b`의 도형을 그린다. */
     void frDrawBody(frBody *b, Color color) {
-        if (b == NULL || frGetBodyShape(b) == NULL) return;
+        if (b == NULL) return;
         
         frShape *s = frGetBodyShape(b);
         
@@ -84,7 +86,7 @@ const float ARROW_HEAD_LENGTH = 16.0f;
 
     /* 게임 화면에 강체 `b`의 도형 테두리를 그린다. */
     void frDrawBodyLines(frBody *b, float thick, Color color) {
-        if (b == NULL || frGetBodyShape(b) == NULL) return;
+        if (b == NULL || thick <= 0.0f) return;
         
         frShape *s = frGetBodyShape(b);
         
@@ -110,7 +112,7 @@ const float ARROW_HEAD_LENGTH = 16.0f;
 
     /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
     void frDrawBodyAABB(frBody *b, float thick, Color color) {
-        if (b == NULL) return;
+        if (b == NULL || thick <= 0.0f) return;
         
         Rectangle aabb = frGetBodyAABB(b);
         
@@ -153,6 +155,8 @@ const float ARROW_HEAD_LENGTH = 16.0f;
 
     /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
     void frDrawSpatialHash(frSpatialHash *hm, float thick, Color color) {
+        if (hm == NULL || thick <= 0.0f) return;
+
         Rectangle bounds = frGetSpatialHashBounds(hm);
 
         const int v_count = bounds.width * FR_BROADPHASE_INVERSE_CELL_SIZE;
@@ -175,11 +179,6 @@ const float ARROW_HEAD_LENGTH = 16.0f;
             );
 
         DrawRectangleLinesEx(frRecMetersToPixels(bounds), thick, color);
-    }
-    
-    /* 무작위 색상을 반환한다. */
-    Color frGetRandomColor(void) {
-        return ColorFromHSV(GetRandomValue(0, 360), 1.0f, 1.0f);
     }
 
     /* 강체 `b`의 다각형 꼭짓점 배열을 세계 기준의 픽셀 좌표 배열로 변환한다. */

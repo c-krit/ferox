@@ -32,9 +32,9 @@
 })
 
 #define WALL_MATERIAL    ((frMaterial) { 2.5f, 0.0f, 0.85f, 0.65f })
-#define CIRCLE_MATERIAL  ((frMaterial) { 8.5f, 0.0f, 0.95f, 0.85f })
+#define CIRCLE_MATERIAL  ((frMaterial) { 7.5f, 0.0f, 0.85f, 0.65f })
 
-#define MAX_CIRCLE_COUNT 128
+#define MAX_CIRCLE_COUNT 192
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
@@ -106,7 +106,7 @@ int main(void) {
             FR_BODY_DYNAMIC,
             FR_FLAG_NONE,
             frVec2PixelsToMeters(position),
-            frCreateCircle(CIRCLE_MATERIAL, 0.9f * GetRandomValue(1, 2))
+            frCreateCircle(CIRCLE_MATERIAL, 0.45f * GetRandomValue(2, 3))
         );
         
         frAddToWorld(world, circle);
