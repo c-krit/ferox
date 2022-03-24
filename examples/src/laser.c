@@ -38,9 +38,19 @@
 
 #define MAX_ENEMY_COUNT 100
 
-static void DrawCustomCursor(Vector2 position);
-
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+
+static frRaycastHit hits[MAX_ENEMY_COUNT];
+
+static frWorld *world;
+
+static frBody *semo;
+
+void InitExample(void);
+void DeinitExample(void);
+void UpdateExample(void);
+
+void DrawCustomCursor(Vector2 position);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -48,9 +58,22 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | laser.c");
     
-    frWorld *world = frCreateWorld(FR_STRUCT_ZERO(Vector2), WORLD_RECTANGLE);
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+
+    DeinitExample();
     
-    frVertices semo_vertices = {
+    CloseWindow();
+
+    return 0;
+}
+
+void InitExample(void) {
+    world = frCreateWorld(FR_STRUCT_ZERO(Vector2), WORLD_RECTANGLE);
+    
+    const frVertices semo_vertices = {
         .data = {
             frVec2PixelsToMeters((Vector2) {  0.0f, -16.0f }),
             frVec2PixelsToMeters((Vector2) { -14.0f, 16.0f }),
@@ -59,7 +82,7 @@ int main(void) {
         .count = 3
     };
     
-    frBody *semo = frCreateBodyFromShape(
+    semo = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters(SCREEN_CENTER),
@@ -90,34 +113,38 @@ int main(void) {
     }
 
     HideCursor();
+}
 
-    frRaycastHit hits[MAX_ENEMY_COUNT];
+void DeinitExample(void) {
+    frReleaseWorld(world);
+}
 
-    while (!WindowShouldClose()) {
-        Vector2 mouse_position = GetMousePosition();
-        Vector2 position_diff = frVec2Subtract(mouse_position, SCREEN_CENTER);
-        
-        frSetBodyRotation(
-            semo, 
-            frVec2Angle(
-                (Vector2) { .y = -1 },
-                frVec2Subtract(
-                    frVec2PixelsToMeters(mouse_position),
-                    frGetBodyPosition(semo)
-                )
+void UpdateExample(void) {
+    Vector2 mouse_position = GetMousePosition();
+    Vector2 position_diff = frVec2Subtract(mouse_position, SCREEN_CENTER);
+    
+    frSetBodyRotation(
+        semo, 
+        frVec2Angle(
+            (Vector2) { .y = -1.0f },
+            frVec2Subtract(
+                frVec2PixelsToMeters(mouse_position),
+                frGetBodyPosition(semo)
             )
-        );
+        )
+    );
 
-        frRay ray = { 
-            frVec2PixelsToMeters(SCREEN_CENTER), 
-            frVec2PixelsToMeters(position_diff), 
-            frVec2Magnitude(frVec2PixelsToMeters(position_diff))
-        };
+    frRay ray = { 
+        frVec2PixelsToMeters(SCREEN_CENTER), 
+        frVec2PixelsToMeters(position_diff), 
+        frVec2Magnitude(frVec2PixelsToMeters(position_diff))
+    };
 
-        int count = frComputeWorldRaycast(world, ray, hits);
+    int count = frComputeWorldRaycast(world, ray, hits);
 
-        frSimulateWorld(world, DELTA_TIME);
-
+    frSimulateWorld(world, DELTA_TIME);
+    
+    {
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
@@ -152,15 +179,9 @@ int main(void) {
 
         EndDrawing();
     }
-
-    frReleaseWorld(world);
-    
-    CloseWindow();
-
-    return 0;
 }
 
-static void DrawCustomCursor(Vector2 position) {
+void DrawCustomCursor(Vector2 position) {
     DrawLineEx(
         frVec2Add(position, (Vector2) { .x = -8.0f }),
         frVec2Add(position, (Vector2) { .x = 8.0f }),

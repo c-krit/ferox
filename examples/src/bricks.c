@@ -31,11 +31,18 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 0.0f, 0.85f, 0.5f })
-#define CURSOR_MATERIAL ((frMaterial) { 2.0f, 0.0f, 0.85f, 0.5f })
-#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.5f })
+#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.75f })
+#define CURSOR_MATERIAL ((frMaterial) {  2.0f, 0.0f, 0.5f, 0.75f })
+#define WALL_MATERIAL   ((frMaterial) { 1.25f, 0.0f, 0.5f, 0.75f })
+
+void InitExample(void);
+void DeinitExample(void);
+void UpdateExample(void);
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+
+static frWorld *world;
+static frBody *wall, *cursor;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -43,23 +50,36 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | bricks.c");
     
-    frWorld *world = frCreateWorld(
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+
+    DeinitExample();
+    
+    CloseWindow();
+
+    return 0;
+}
+
+void InitExample(void) {
+    world = frCreateWorld(
         frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
     );
-    
-    frBody *floor = frCreateBodyFromShape(
+
+    wall = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60.0f }),
         frCreateRectangle(
-            FLOOR_MATERIAL, 
+            WALL_MATERIAL,
             frNumberPixelsToMeters(0.75f * SCREEN_WIDTH), 
             frNumberPixelsToMeters(80.0f)
         )
     );
     
-    frBody *cursor = frCreateBodyFromShape(
+    cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         FR_STRUCT_ZERO(Vector2),
@@ -70,43 +90,49 @@ int main(void) {
         )
     );
     
-    frAddToWorld(world, floor);
+    frAddToWorld(world, wall);
     frAddToWorld(world, cursor);
+}
 
-    while (!WindowShouldClose()) {
-        frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
+void DeinitExample(void) {
+    frReleaseWorld(world);
+}
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            frBody *brick = frCreateBodyFromShape(
-                FR_BODY_DYNAMIC,
-                FR_FLAG_NONE,
-                frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10.0f }),
-                frCreateRectangle(
-                    CURSOR_MATERIAL,
-                    frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
-                    frNumberPixelsToMeters(20.0f)
-                )
-            );
-            
-            frAddToWorld(world, brick);
-        }
+void UpdateExample(void) {
+    frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        frBody *brick = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
+            FR_FLAG_NONE,
+            frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10.0f }),
+            frCreateRectangle(
+                CURSOR_MATERIAL,
+                frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
+                frNumberPixelsToMeters(20.0f)
+            )
+        );
         
-        for (int i = 0; i < frGetWorldBodyCount(world); i++) {
-            frBody *body = frGetWorldBody(world, i);
-            
-            if (!frIsInWorldBounds(world, body)) {
-                frRemoveFromWorld(world, body);
-                frReleaseBody(body);
-            }
+        frAddToWorld(world, brick);
+    }
+    
+    for (int i = 0; i < frGetWorldBodyCount(world); i++) {
+        frBody *body = frGetWorldBody(world, i);
+        
+        if (!frIsInWorldBounds(world, body)) {
+            frRemoveFromWorld(world, body);
+            frReleaseBody(body);
         }
+    }
 
-        frSimulateWorld(world, DELTA_TIME);
+    frSimulateWorld(world, DELTA_TIME);
 
+    {
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
         
-        frDrawBody(floor, BLACK);
+        frDrawBody(wall, BLACK);
         
         for (int i = 2; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
@@ -139,10 +165,4 @@ int main(void) {
 
         EndDrawing();
     }
-    
-    frReleaseWorld(world);
-    
-    CloseWindow();
-
-    return 0;
 }

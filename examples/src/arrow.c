@@ -31,22 +31,46 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define EXAMPLE_STRING "LEFT-CLICK TO CHANGE THE SHAPE TYPE OF THE CURSOR!"
+#define TEXT_FONT_SIZE   20
+#define TEXT_STRING_DATA "LEFT-CLICK TO CHANGE THE"   \
+                         " SHAPE TYPE OF THE CURSOR!"
+
+void InitExample(void);
+void DeinitExample(void);
+void UpdateExample(void);
+
+static frShape *circle, *polygon;
+static frBody *large_circle, *cursor, *cursor_clone;
+
+static bool use_polygon_cursor = false;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     SetTargetFPS(TARGET_FPS);
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | arrow.c");
+
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+
+    DeinitExample();
     
-    frShape *circle = frCreateCircle(FR_STRUCT_ZERO(frMaterial), 4.0f);
-    frShape *polygon = frCreateRectangle(
+    CloseWindow();
+
+    return 0;
+}
+
+void InitExample(void) {
+    circle = frCreateCircle(FR_STRUCT_ZERO(frMaterial), 4.0f);
+    polygon = frCreateRectangle(
         FR_STRUCT_ZERO(frMaterial), 
         12.0f,
         6.0f
     );
     
-    frBody *large_circle = frCreateBodyFromShape(
+    large_circle = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         (Vector2) { 
@@ -56,42 +80,53 @@ int main(void) {
         frCreateCircle(FR_STRUCT_ZERO(frMaterial), 10.0f)
     );
     
-    frBody *cursor = frCreateBodyFromShape(
+    cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         FR_STRUCT_ZERO(Vector2),
         circle
     );
 
-    frBody *cursor_clone = frCreateBodyFromShape(
+    cursor_clone = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
         FR_FLAG_NONE,
         FR_STRUCT_ZERO(Vector2),
         circle
     );
+}
 
-    bool use_polygon_cursor = false;
+void DeinitExample(void) {
+    frReleaseShape(frGetBodyShape(large_circle));
+    frReleaseBody(large_circle);
+    
+    frReleaseShape(circle);
+    frReleaseShape(polygon);
+    
+    frReleaseBody(cursor_clone);
+    frReleaseBody(cursor);
+}
 
-    while (!WindowShouldClose()) {
-        frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
+void UpdateExample(void) {
+    frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
         
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            use_polygon_cursor = !use_polygon_cursor;
-            
-            if (use_polygon_cursor) {
-                frAttachShapeToBody(cursor, polygon);
-                frAttachShapeToBody(cursor_clone, polygon);
-            } else {
-                frAttachShapeToBody(cursor, circle);
-                frAttachShapeToBody(cursor_clone, circle);
-            }
-        } else if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-            float rotation = DEG2RAD * GetRandomValue(0, 360);
-            
-            frSetBodyRotation(cursor, rotation);
-            frSetBodyRotation(cursor_clone, rotation);
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        use_polygon_cursor = !use_polygon_cursor;
+        
+        if (use_polygon_cursor) {
+            frAttachShapeToBody(cursor, polygon);
+            frAttachShapeToBody(cursor_clone, polygon);
+        } else {
+            frAttachShapeToBody(cursor, circle);
+            frAttachShapeToBody(cursor_clone, circle);
         }
+    } else if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
+        float rotation = DEG2RAD * GetRandomValue(0, 360);
         
+        frSetBodyRotation(cursor, rotation);
+        frSetBodyRotation(cursor_clone, rotation);
+    }
+
+    {
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
@@ -148,29 +183,16 @@ int main(void) {
         
         DrawTextEx(
             GetFontDefault(),
-            EXAMPLE_STRING,
+            TEXT_STRING_DATA,
             (Vector2) { 
-                0.5f * (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)), 
+                0.5f * (SCREEN_WIDTH - MeasureText(TEXT_STRING_DATA, TEXT_FONT_SIZE)), 
                 SCREEN_HEIGHT / 16.0f
             },
-            20.0f,
-            2.0f, 
+            (float) TEXT_FONT_SIZE,
+            2.0f,
             Fade(GRAY, 0.85f)
         );
 
         EndDrawing();
     }
-    
-    frReleaseShape(frGetBodyShape(large_circle));
-    frReleaseBody(large_circle);
-    
-    frReleaseShape(circle);
-    frReleaseShape(polygon);
-    
-    frReleaseBody(cursor_clone);
-    frReleaseBody(cursor);
-    
-    CloseWindow();
-
-    return 0;
 }

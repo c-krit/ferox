@@ -31,12 +31,15 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define EXAMPLE_STRING "PRESS SPACE TO JUMP!"
+#define TEXT_FONT_SIZE    20
+#define TEXT_STRING_DATA  "PRESS SPACE TO JUMP!"
 
-#define BOX_MATERIAL      ((frMaterial) { 2.25f, 0.0f, 1.25f, 1.0f })
-#define BRICK_MATERIAL    ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.85f })
-#define PLATFORM_MATERIAL ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.0f })
-#define WALL_MATERIAL     ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.0f })
+#define BOX_MATERIAL       ((frMaterial) { 2.25f, 0.0f, 1.25f, 1.0f })
+#define BRICK_MATERIAL     ((frMaterial) { 1.85f, 0.0f, 1.0f, 0.85f })
+#define PLATFORM_MATERIAL  ((frMaterial) { 2.0f, 0.0f, 1.25f, 1.0f })
+#define WALL_MATERIAL      ((frMaterial) { 2.5f, 0.0f, 1.25f, 1.0f })
+
+#define MAX_WALL_COUNT          3
 
 #define BRICK_HORIZONTAL_SPEED  0.016f
 #define BRICK_VERTICAL_SPEED    0.02f
@@ -51,11 +54,19 @@ typedef struct Brick {
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
+static frWorld *world;
+
+static frBody *walls[MAX_WALL_COUNT];
+static frBody *platform, *box;
+
 static Brick brick = { .width = 40, .height = 80 };
 
-static void HandleBrickMovement(frWorld *world, Brick *brick);
+void InitExample(void);
+void DeinitExample(void);
+void UpdateExample(void);
 
-static void onCollisionPreSolve(frCollision *collision);
+void HandleBrickMovement(frWorld *world, Brick *brick);
+void onCollisionPreSolve(frCollision *collision);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -63,7 +74,20 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | jump.c");
     
-    frWorld *world = frCreateWorld(
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+
+    DeinitExample();
+    
+    CloseWindow();
+
+    return 0;
+}
+
+void InitExample(void) {
+    world = frCreateWorld(
         frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
     );
@@ -106,14 +130,14 @@ int main(void) {
 
     frSetBodyUserData(brick.body, (void *) &brick);
 
-    frBody *wall1 = frCreateBodyFromShape(
+    walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.65f * SCREEN_HEIGHT }),
         frCreatePolygon(WALL_MATERIAL, wall1_vertices)
     );
 
-    frBody *wall2 = frCreateBodyFromShape(
+    walls[1] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60.0f }),
@@ -124,14 +148,14 @@ int main(void) {
         )
     );
 
-    frBody *wall3 = frCreateBodyFromShape(
+    walls[2] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.9f * SCREEN_WIDTH, 0.65f * SCREEN_HEIGHT }),
         frCreatePolygon(WALL_MATERIAL, wall3_vertices)
     );
 
-    frBody *platform = frCreateBodyFromShape(
+    platform = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 0.75f * SCREEN_HEIGHT }),
@@ -142,7 +166,7 @@ int main(void) {
         )
     );
 
-    frBody *box = frCreateBodyFromShape(
+    box = frCreateBodyFromShape(
         FR_BODY_DYNAMIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 0.25f * SCREEN_HEIGHT}),
@@ -155,44 +179,49 @@ int main(void) {
 
     frAddToWorld(world, brick.body);
 
-    frAddToWorld(world, wall1);
-    frAddToWorld(world, wall2);
-    frAddToWorld(world, wall3);
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frAddToWorld(world, walls[i]);
 
     frAddToWorld(world, platform);
 
     frAddToWorld(world, box);
+}
 
-    while (!WindowShouldClose()) {
-        frSimulateWorld(world, DELTA_TIME);
+void DeinitExample(void) {
+    frReleaseWorld(world);
+}
 
-        HandleBrickMovement(world, &brick);
+void UpdateExample(void) {
+    frSimulateWorld(world, DELTA_TIME);
 
+    HandleBrickMovement(world, &brick);
+
+    {
         BeginDrawing();
-        
+
         ClearBackground(RAYWHITE);
 
-        frDrawBody(wall1, BLACK);
-        frDrawBody(wall2, BLACK);
-        frDrawBody(wall3, BLACK);
+        for (int i = 0; i < MAX_WALL_COUNT; i++)
+            frDrawBody(walls[i], BLACK);
+
         frDrawBody(platform, BLACK);
 
         frDrawBody(box, DARKGRAY);
         frDrawBody(brick.body, RED);
 
         frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
-        
+
         Vector2 position = frGetBodyPosition(brick.body);
         Vector2 velocity = frGetBodyVelocity(brick.body);
 
         DrawTextEx(
             GetFontDefault(),
-            EXAMPLE_STRING,
+            TEXT_STRING_DATA,
             (Vector2) { 
-                0.5f * (SCREEN_WIDTH - MeasureText(EXAMPLE_STRING, 20)), 
+                0.5f * (SCREEN_WIDTH - MeasureText(TEXT_STRING_DATA, TEXT_FONT_SIZE)),
                 SCREEN_HEIGHT / 16.0f
             },
-            20.0f,
+            (float) TEXT_FONT_SIZE,
             2.0f, 
             Fade(GRAY, 0.85f)
         );
@@ -201,20 +230,14 @@ int main(void) {
 
         EndDrawing();
     }
-
-    frReleaseWorld(world);
-    
-    CloseWindow();
-
-    return 0;
 }
 
-static void HandleBrickMovement(frWorld *world, Brick *brick) {
+void HandleBrickMovement(frWorld *world, Brick *brick) {
     Vector2 position = frGetBodyPosition(brick->body);
     Vector2 velocity = frGetBodyVelocity(brick->body);
 
-    float half_brick_width = 0.5f * frNumberPixelsToMeters(brick->width);
-    float half_brick_height = 0.5f * frNumberPixelsToMeters(brick->height);
+    const float half_brick_width = 0.5f * frNumberPixelsToMeters(brick->width);
+    const float half_brick_height = 0.5f * frNumberPixelsToMeters(brick->height);
 
     if (position.x <= half_brick_width) 
         position.x = half_brick_width;
@@ -241,7 +264,7 @@ static void HandleBrickMovement(frWorld *world, Brick *brick) {
     frSetBodyVelocity(brick->body, velocity);
 }
 
-static void onCollisionPreSolve(frCollision *collision) {
+void onCollisionPreSolve(frCollision *collision) {
     frBody *b1 = collision->cache.bodies[0];
     frBody *b2 = collision->cache.bodies[1];
 

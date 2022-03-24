@@ -26,20 +26,29 @@
 #define SCREEN_WIDTH_IN_METERS  (frNumberPixelsToMeters(SCREEN_WIDTH))
 #define SCREEN_HEIGHT_IN_METERS (frNumberPixelsToMeters(SCREEN_HEIGHT))
 
-#define WORLD_RECTANGLE ((Rectangle) { \
-    .width = SCREEN_WIDTH_IN_METERS,   \
-    .height = SCREEN_HEIGHT_IN_METERS  \
+#define WORLD_RECTANGLE ((Rectangle) {      \
+    .x = -0.05f * SCREEN_WIDTH_IN_METERS,   \
+    .width = 1.1f * SCREEN_WIDTH_IN_METERS, \
+    .height = SCREEN_HEIGHT_IN_METERS       \
 })
 
-#define FLOOR_MATERIAL  ((frMaterial) { 1.25f, 1.25f, 0.5f, 0.25f })
+#define CIRCLE_MATERIAL  ((frMaterial) { 0.15f, 0.85f, 0.5f, 0.75f })
+#define CURSOR_MATERIAL  ((frMaterial) {  2.5f,  0.5f, 0.5f, 0.75f })
+#define WALL_MATERIAL    ((frMaterial) { 1.25f, 1.25f, 0.5f, 0.75f })
 
-#define BALL1_MATERIAL  ((frMaterial) { 0.3f, 0.85f, 0.65f, 0.5f })
-#define BALL2_MATERIAL  ((frMaterial) { 0.2f, 0.65f, 0.65f, 0.5f })
-#define BALL3_MATERIAL  ((frMaterial) { 0.1f, 0.5f, 0.65f, 0.5f })
+#define MAX_CIRCLE_COUNT  32
+#define MAX_WALL_COUNT    3
 
-#define CURSOR_MATERIAL ((frMaterial) { 2.5f, 0.5f, 0.75f, 0.5f })
+static void InitExample(void);
+static void DeinitExample(void);
+static void UpdateExample(void);
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+
+static frWorld *world;
+
+static frBody *circles[MAX_CIRCLE_COUNT], *walls[MAX_WALL_COUNT];
+static frBody *cursor;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -47,48 +56,80 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | bouncy.c");
     
-    frWorld *world = frCreateWorld(
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+
+    DeinitExample();
+    
+    CloseWindow();
+
+    return 0;
+}
+
+void InitExample(void) {
+    world = frCreateWorld(
         frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
     );
-    
-    frBody *floor = frCreateBodyFromShape(
+
+    const frVertices wall_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) { -0.2f * SCREEN_WIDTH, -0.18f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) { -0.2f * SCREEN_WIDTH,  0.18f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) {  0.2f * SCREEN_WIDTH,  0.18f * SCREEN_HEIGHT })
+        },
+        .count = 3
+    };
+
+    walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 80.0f }),
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 0.93f * SCREEN_HEIGHT }),
         frCreateRectangle(
-            FLOOR_MATERIAL, 
-            frNumberPixelsToMeters(0.7f * SCREEN_WIDTH), 
-            frNumberPixelsToMeters(50.0f)
+            WALL_MATERIAL, 
+            frNumberPixelsToMeters(SCREEN_WIDTH), 
+            frNumberPixelsToMeters(0.15f * SCREEN_HEIGHT)
+        )
+    );
+
+    walls[1] = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { 0.2f * SCREEN_WIDTH, 0.68f * SCREEN_HEIGHT }),
+        frCreatePolygon(WALL_MATERIAL, wall_vertices)
+    );
+
+    walls[2] = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { 1.05f * SCREEN_WIDTH, 0.5f * SCREEN_HEIGHT }),
+        frCreateRectangle(
+            WALL_MATERIAL, 
+            frNumberPixelsToMeters(0.1f * SCREEN_WIDTH), 
+            frNumberPixelsToMeters(SCREEN_HEIGHT)
         )
     );
     
-    frAddToWorld(world, floor);
-    
-    frBody *ball1 = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC,
-        FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.25f * SCREEN_WIDTH, 0.25f * SCREEN_HEIGHT }),
-        frCreateCircle(BALL1_MATERIAL, 1.5f)
-    );
-    
-    frBody *ball2 = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC,
-        FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, 0.25f * SCREEN_HEIGHT }),
-        frCreateCircle(BALL2_MATERIAL, 2.0f)
-    );
-    
-    frBody *ball3 = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC, 
-        FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.75f * SCREEN_WIDTH, 0.25f * SCREEN_HEIGHT }),
-        frCreateCircle(BALL3_MATERIAL, 2.75f)
-    );
-    
-    frAddToWorld(world, ball1);
-    frAddToWorld(world, ball2);
-    frAddToWorld(world, ball3);
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frAddToWorld(world, walls[i]);
+
+    for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
+        Vector2 position = FR_STRUCT_ZERO(Vector2);
+        
+        position.x = GetRandomValue(0.18f * SCREEN_WIDTH, 0.5f * SCREEN_WIDTH);
+        position.y = GetRandomValue(0.2f * SCREEN_HEIGHT, 0.35f * SCREEN_HEIGHT);
+
+        circles[i] = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
+            FR_FLAG_NONE,
+            frVec2PixelsToMeters(position),
+            frCreateCircle(CIRCLE_MATERIAL, 1.0f)
+        );
+
+        frAddToWorld(world, circles[i]);
+    }
     
     frBody *cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
@@ -98,41 +139,42 @@ int main(void) {
     );
     
     frAddToWorld(world, cursor);
+}
 
-    while (!WindowShouldClose()) {
-        for (int i = 0; i < frGetWorldBodyCount(world); i++) {
-            frBody *body = frGetWorldBody(world, i);
-            
-            if (!frIsInWorldBounds(world, body)) 
-                frRemoveFromWorld(world, body);
-        }
+void DeinitExample(void) {
+    frReleaseWorld(world);
+}
+
+void UpdateExample(void) {
+    for (int i = 0; i < frGetWorldBodyCount(world); i++) {
+        frBody *body = frGetWorldBody(world, i);
         
-        frSimulateWorld(world, DELTA_TIME);
-        
+        if (frGetBodyType(body) != FR_BODY_STATIC 
+            && !frIsInWorldBounds(world, body)) 
+            frRemoveFromWorld(world, body);
+    }
+
+    frSimulateWorld(world, DELTA_TIME);
+
+    {
         BeginDrawing();
-        
+
         ClearBackground(RAYWHITE);
-        
+
         frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
-        
-        frDrawBody(floor, BLACK);
-        
-        frDrawBody(ball1, RED);
-        frDrawBody(ball2, RED);
-        frDrawBody(ball3, RED);
-        
+
+        for (int i = 0; i < MAX_WALL_COUNT; i++)
+            frDrawBody(walls[i], BLACK);
+
+        for (int i = 0; i < MAX_CIRCLE_COUNT; i++)
+            frDrawBodyLines(circles[i], 2.0f, RED);
+
         frDrawBody(cursor, Fade(RED, 0.5f));
-        
+
         frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
-        
+
         DrawFPS(8, 8);
 
         EndDrawing();
     }
-    
-    frReleaseWorld(world);
-    
-    CloseWindow();
-
-    return 0;
 }

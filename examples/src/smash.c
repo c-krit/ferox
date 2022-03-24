@@ -52,7 +52,20 @@ typedef struct Box {
     RenderTexture rtex;
 } Box;
 
+static Texture2D rl_logo;
+
+static frWorld *world;
+
+static frBody *ball;
+
 static Box boxes[MAX_BOX_COUNT];
+
+static float box_width, box_height;
+static float half_box_width, half_box_height;
+
+void InitExample(void);
+void DeinitExample(void);
+void UpdateExample(void);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -60,25 +73,38 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | smash.c");
 
-    Texture2D rl_logo = LoadTexture("../res/images/raylib.png");
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+
+    DeinitExample();
     
-    frWorld *world = frCreateWorld(FR_STRUCT_ZERO(Vector2), WORLD_RECTANGLE);
+    CloseWindow();
 
-    const float BOX_WIDTH = rl_logo.width / TOTAL_WIDTH_IN_BOXES;
-    const float BOX_HEIGHT = rl_logo.height / TOTAL_HEIGHT_IN_BOXES;
+    return 0;
+}
 
-    const float HALF_BOX_WIDTH = 0.5f * BOX_WIDTH;
-    const float HALF_BOX_HEIGHT = 0.5f * BOX_HEIGHT;
+void InitExample(void) {
+    rl_logo = LoadTexture("../res/images/raylib.png");
+    
+    world = frCreateWorld(FR_STRUCT_ZERO(Vector2), WORLD_RECTANGLE);
+
+    box_width = rl_logo.width / TOTAL_WIDTH_IN_BOXES;
+    box_height = rl_logo.height / TOTAL_HEIGHT_IN_BOXES;
+
+    half_box_width = 0.5f * box_width;
+    half_box_height = 0.5f * box_height;
 
     for (int i = 0; i < MAX_BOX_COUNT; i++) {
         Vector2 offset = {
-            (i % TOTAL_WIDTH_IN_BOXES) * BOX_WIDTH,
-            (i / TOTAL_WIDTH_IN_BOXES) * BOX_HEIGHT
+            (i % TOTAL_WIDTH_IN_BOXES) * box_width,
+            (i / TOTAL_WIDTH_IN_BOXES) * box_height
         };
 
         Vector2 position = {
-            0.5f * (SCREEN_WIDTH - rl_logo.width) + offset.x + HALF_BOX_WIDTH,
-            0.5f * (SCREEN_HEIGHT - rl_logo.height) + offset.y + HALF_BOX_HEIGHT
+            0.5f * (SCREEN_WIDTH - rl_logo.width) + offset.x + half_box_width,
+            0.5f * (SCREEN_HEIGHT - rl_logo.height) + offset.y + half_box_height
         };
 
         boxes[i].body = frCreateBodyFromShape(
@@ -87,12 +113,12 @@ int main(void) {
             frVec2PixelsToMeters(position),
             frCreateRectangle(
                 BOX_MATERIAL,
-                frNumberPixelsToMeters(BOX_WIDTH),
-                frNumberPixelsToMeters(BOX_HEIGHT)
+                frNumberPixelsToMeters(box_width),
+                frNumberPixelsToMeters(box_height)
             )
         );
 
-        boxes[i].rtex = LoadRenderTexture(BOX_WIDTH, BOX_HEIGHT);
+        boxes[i].rtex = LoadRenderTexture(box_width, box_height);
 
         {
             BeginTextureMode(boxes[i].rtex);
@@ -104,8 +130,8 @@ int main(void) {
                 (Rectangle) {
                     .x = offset.x,
                     .y = offset.y,
-                    .width = BOX_WIDTH, 
-                    .height = -BOX_HEIGHT
+                    .width = box_width, 
+                    .height = -box_height
                 },
                 FR_STRUCT_ZERO(Vector2),
                 WHITE
@@ -117,7 +143,7 @@ int main(void) {
         frAddToWorld(world, boxes[i].body);
     }
 
-    frBody *ball = frCreateBodyFromShape(
+    ball = frCreateBodyFromShape(
         FR_BODY_DYNAMIC,
         FR_FLAG_INFINITE_INERTIA,
         (Vector2) { -BALL_RADIUS, -BALL_RADIUS },
@@ -125,36 +151,47 @@ int main(void) {
     );
 
     frAddToWorld(world, ball);
+}
 
-    while (!WindowShouldClose()) {
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            Vector2 position = frVec2PixelsToMeters(GetMousePosition());
+void DeinitExample(void) {
+    for (int i = 0; i < MAX_BOX_COUNT; i++)
+        UnloadRenderTexture(boxes[i].rtex);
 
-            Vector2 impulse = frVec2ScalarMultiply(
-                frVec2Subtract(
-                    frVec2PixelsToMeters(SCREEN_CENTER), 
-                    position
-                ),
-                0.15f
-            );
+    UnloadTexture(rl_logo);
+    
+    frReleaseWorld(world);
+}
 
-            frSetBodyVelocity(ball, FR_STRUCT_ZERO(Vector2));
-            frSetBodyPosition(ball, position);
-            
-            frApplyImpulse(ball, impulse);
-        }
+void UpdateExample(void) {
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 position = frVec2PixelsToMeters(GetMousePosition());
 
-        for (int i = 0; i < MAX_BOX_COUNT; i++) {
-            if (!frIsInWorldBounds(world, boxes[i].body)) {
-                frRemoveFromWorld(world, boxes[i].body);
-                frReleaseBody(boxes[i].body);
+        Vector2 impulse = frVec2ScalarMultiply(
+            frVec2Subtract(
+                frVec2PixelsToMeters(SCREEN_CENTER), 
+                position
+            ),
+            0.15f
+        );
 
-                boxes[i].body = NULL;
-            }
-        }
-
-        frSimulateWorld(world, DELTA_TIME);
+        frSetBodyVelocity(ball, FR_STRUCT_ZERO(Vector2));
+        frSetBodyPosition(ball, position);
         
+        frApplyImpulse(ball, impulse);
+    }
+
+    for (int i = 0; i < MAX_BOX_COUNT; i++) {
+        if (!frIsInWorldBounds(world, boxes[i].body)) {
+            frRemoveFromWorld(world, boxes[i].body);
+            frReleaseBody(boxes[i].body);
+
+            boxes[i].body = NULL;
+        }
+    }
+
+    frSimulateWorld(world, DELTA_TIME);
+
+    {
         BeginDrawing();
         
         ClearBackground(BACKGROUND_COLOR);
@@ -167,16 +204,16 @@ int main(void) {
             DrawTexturePro(
                 boxes[i].rtex.texture,
                 (Rectangle) {
-                    .width = BOX_WIDTH,
-                    .height = BOX_HEIGHT
+                    .width = box_width,
+                    .height = box_height
                 },
                 (Rectangle) {
                     .x = frNumberMetersToPixels(position.x), 
                     .y = frNumberMetersToPixels(position.y),
-                    .width = BOX_WIDTH,
-                    .height = BOX_HEIGHT
+                    .width = box_width,
+                    .height = box_height
                 },
-                (Vector2) { HALF_BOX_WIDTH, HALF_BOX_HEIGHT },
+                (Vector2) { half_box_width, half_box_height },
                 RAD2DEG * frGetBodyRotation(boxes[i].body),
                 WHITE
             );
@@ -207,15 +244,4 @@ int main(void) {
 
         EndDrawing();
     }
-
-    for (int i = 0; i < MAX_BOX_COUNT; i++)
-        UnloadRenderTexture(boxes[i].rtex);
-
-    UnloadTexture(rl_logo);
-    
-    frReleaseWorld(world);
-    
-    CloseWindow();
-
-    return 0;
 }

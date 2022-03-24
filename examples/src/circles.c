@@ -31,12 +31,21 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define WALL_MATERIAL    ((frMaterial) { 2.5f, 0.0f, 0.85f, 0.65f })
-#define CIRCLE_MATERIAL  ((frMaterial) { 7.5f, 0.0f, 0.85f, 0.65f })
+#define WALL_MATERIAL    ((frMaterial) { 2.5f, 0.0f, 0.65f, 0.85f })
+#define CIRCLE_MATERIAL  ((frMaterial) { 8.5f, 0.0f, 0.65f, 0.85f })
 
-#define MAX_CIRCLE_COUNT 192
+#define MAX_CIRCLE_COUNT  192
+#define MAX_WALL_COUNT    3
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+
+static frWorld *world;
+
+static frBody *circles[MAX_CIRCLE_COUNT], *walls[MAX_WALL_COUNT];
+
+void InitExample(void);
+void DeinitExample(void);
+void UpdateExample(void);
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -44,12 +53,25 @@ int main(void) {
     
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | circles.c");
     
-    frWorld *world = frCreateWorld(
+    InitExample();
+
+    while (!WindowShouldClose())
+        UpdateExample();
+    
+    DeinitExample();
+    
+    CloseWindow();
+
+    return 0;
+}
+
+void InitExample(void) {
+    world = frCreateWorld(
         frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
     );
 
-    frVertices wall1_vertices = {
+    const frVertices wall1_vertices = {
         .data = {
             frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
             frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT }),
@@ -58,7 +80,7 @@ int main(void) {
         .count = 3
     };
 
-    frVertices wall3_vertices = {
+    const frVertices wall3_vertices = {
         .data = {
             frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
             frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT }),
@@ -67,14 +89,14 @@ int main(void) {
         .count = 3
     };
 
-    frBody *wall1 = frCreateBodyFromShape(
+    walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.55f * SCREEN_HEIGHT }),
         frCreatePolygon(WALL_MATERIAL, wall1_vertices)
     );
     
-    frBody *wall2 = frCreateBodyFromShape(
+    walls[1] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 40.0f }),
@@ -85,22 +107,21 @@ int main(void) {
         )
     );
 
-    frBody *wall3 = frCreateBodyFromShape(
+    walls[2] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
         frVec2PixelsToMeters((Vector2) { 0.9f * SCREEN_WIDTH, 0.55f * SCREEN_HEIGHT }),
         frCreatePolygon(WALL_MATERIAL, wall3_vertices)
     );
-    
-    frAddToWorld(world, wall1);
-    frAddToWorld(world, wall2);
-    frAddToWorld(world, wall3);
+
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frAddToWorld(world, walls[i]);
 
     for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
         Vector2 position = FR_STRUCT_ZERO(Vector2);
         
         position.x = GetRandomValue(0.25f * SCREEN_WIDTH, 0.75f * SCREEN_WIDTH);
-        position.y = GetRandomValue(0.28f * SCREEN_HEIGHT, 0.36f * SCREEN_HEIGHT);
+        position.y = GetRandomValue(0.18f * SCREEN_HEIGHT, 0.36f * SCREEN_HEIGHT);
         
         frBody *circle = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
@@ -111,19 +132,24 @@ int main(void) {
         
         frAddToWorld(world, circle);
     }
+}
 
-    while (!WindowShouldClose()) { 
-        frSimulateWorld(world, DELTA_TIME);
-              
+void DeinitExample(void) {
+    frReleaseWorld(world);
+}
+
+void UpdateExample(void) {
+    frSimulateWorld(world, DELTA_TIME);
+    
+    {
         BeginDrawing();
         
         ClearBackground(RAYWHITE);
         
-        frDrawBody(wall1, BLACK);
-        frDrawBody(wall2, BLACK);
-        frDrawBody(wall3, BLACK);
+        for (int i = 0; i < MAX_WALL_COUNT; i++)
+            frDrawBody(walls[i], BLACK);
         
-        for (int i = 3; i < frGetWorldBodyCount(world); i++)
+        for (int i = MAX_WALL_COUNT; i < frGetWorldBodyCount(world); i++)
             frDrawBodyLines(frGetWorldBody(world, i), 2.0f, RED);
         
         frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
@@ -132,10 +158,4 @@ int main(void) {
 
         EndDrawing();
     }
-    
-    frReleaseWorld(world);
-    
-    CloseWindow();
-
-    return 0;
 }
