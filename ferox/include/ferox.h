@@ -85,7 +85,7 @@ extern "C" {
 
 /* | 사용자 설정 매크로 정의... | */
 
-#define FR_BROADPHASE_CELL_SIZE                   3.2f
+#define FR_BROADPHASE_CELL_SIZE                   3.5f
 #define FR_BROADPHASE_INVERSE_CELL_SIZE           (1.0f / (FR_BROADPHASE_CELL_SIZE))
 
 #define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32
@@ -101,7 +101,7 @@ extern "C" {
 #define FR_WORLD_ACCUMULATOR_LIMIT                200.0
 #define FR_WORLD_DEFAULT_GRAVITY                  ((Vector2) { .y = 9.8f })
 #define FR_WORLD_MAX_BODY_COUNT                   256
-#define FR_WORLD_MAX_ITERATIONS                   16
+#define FR_WORLD_MAX_ITERATIONS                   12
 
 /* | 자료형 정의... | */
 

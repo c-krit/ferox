@@ -31,9 +31,17 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define BRICK_MATERIAL  ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.75f })
-#define CURSOR_MATERIAL ((frMaterial) {  2.0f, 0.0f, 0.5f, 0.75f })
-#define WALL_MATERIAL   ((frMaterial) { 1.25f, 0.0f, 0.5f, 0.75f })
+#define TEXT_FONT_SIZE    40
+#define TEXT_STRING_DATA  "%d brick(s)!"
+
+#define BRICK_MATERIAL   ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.75f })
+#define CURSOR_MATERIAL  ((frMaterial) {  2.5f, 0.0f, 0.5f, 0.75f })
+#define WALL_MATERIAL    ((frMaterial) { 1.25f, 0.0f, 0.5f, 0.75f })
+
+#define MAX_WALL_COUNT   3
+
+#define BRICK_WIDTH      42.0f
+#define BRICK_HEIGHT     28.0f
 
 void InitExample(void);
 void DeinitExample(void);
@@ -41,8 +49,12 @@ void UpdateExample(void);
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
+static RenderTexture rtx;
+
 static frWorld *world;
-static frBody *wall, *cursor;
+
+static frBody *walls[MAX_WALL_COUNT];
+static frBody *cursor;
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -63,21 +75,76 @@ int main(void) {
 }
 
 void InitExample(void) {
+    rtx = LoadRenderTexture(BRICK_WIDTH, BRICK_HEIGHT);
+
+    {
+        BeginTextureMode(rtx);
+
+        ClearBackground(BLANK);
+
+        DrawRectangleRec(
+            (Rectangle) {
+                .width = BRICK_WIDTH,
+                .height = BRICK_HEIGHT
+            },
+            RED
+        );
+
+        EndTextureMode();
+    }
+
+    SetTextureFilter(rtx.texture, TEXTURE_FILTER_BILINEAR);
+
     world = frCreateWorld(
         frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
     );
 
-    wall = frCreateBodyFromShape(
+    const frVertices wall1_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT })
+        },
+        .count = 3
+    };
+
+    const frVertices wall3_vertices = {
+        .data = {
+            frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH, -0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) { -0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) {  0.1f * SCREEN_WIDTH,  0.45f * SCREEN_HEIGHT })
+        },
+        .count = 3
+    };
+
+    walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
-        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 60.0f }),
+        frVec2PixelsToMeters((Vector2) { 0.1f * SCREEN_WIDTH, 0.55f * SCREEN_HEIGHT }),
+        frCreatePolygon(WALL_MATERIAL, wall1_vertices)
+    );
+    
+    walls[1] = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { 0.5f * SCREEN_WIDTH, SCREEN_HEIGHT - 40.0f }),
         frCreateRectangle(
             WALL_MATERIAL,
-            frNumberPixelsToMeters(0.75f * SCREEN_WIDTH), 
+            frNumberPixelsToMeters(SCREEN_WIDTH),
             frNumberPixelsToMeters(80.0f)
         )
     );
+
+    walls[2] = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        FR_FLAG_NONE,
+        frVec2PixelsToMeters((Vector2) { 0.9f * SCREEN_WIDTH, 0.55f * SCREEN_HEIGHT }),
+        frCreatePolygon(WALL_MATERIAL, wall3_vertices)
+    );
+
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frAddToWorld(world, walls[i]);
     
     cursor = frCreateBodyFromShape(
         FR_BODY_KINEMATIC,
@@ -85,17 +152,18 @@ void InitExample(void) {
         FR_STRUCT_ZERO(Vector2),
         frCreateRectangle(
             CURSOR_MATERIAL, 
-            frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
-            frNumberPixelsToMeters(20.0f)
+            frNumberPixelsToMeters(BRICK_WIDTH), 
+            frNumberPixelsToMeters(BRICK_HEIGHT)
         )
     );
     
-    frAddToWorld(world, wall);
     frAddToWorld(world, cursor);
 }
 
 void DeinitExample(void) {
     frReleaseWorld(world);
+
+    UnloadRenderTexture(rtx);
 }
 
 void UpdateExample(void) {
@@ -108,8 +176,8 @@ void UpdateExample(void) {
             frVec2PixelsToMeters((Vector2) { GetMouseX(), GetMouseY() + 10.0f }),
             frCreateRectangle(
                 CURSOR_MATERIAL,
-                frNumberPixelsToMeters(0.04f * SCREEN_WIDTH), 
-                frNumberPixelsToMeters(20.0f)
+                frNumberPixelsToMeters(BRICK_WIDTH), 
+                frNumberPixelsToMeters(BRICK_HEIGHT)
             )
         );
         
@@ -132,12 +200,30 @@ void UpdateExample(void) {
         
         ClearBackground(RAYWHITE);
         
-        frDrawBody(wall, BLACK);
+        for (int i = 0; i < MAX_WALL_COUNT; i++)
+            frDrawBody(walls[i], BLACK);
         
-        for (int i = 2; i < frGetWorldBodyCount(world); i++) {
+        for (int i = MAX_WALL_COUNT + 1; i < frGetWorldBodyCount(world); i++) {
             frBody *body = frGetWorldBody(world, i);
 
-            frDrawBody(body, RED);
+            Vector2 position = frGetBodyPosition(body);
+
+            DrawTexturePro(
+                rtx.texture,
+                (Rectangle) {
+                    .width = BRICK_WIDTH,
+                    .height = BRICK_HEIGHT,
+                },
+                (Rectangle) {
+                    .x = frNumberMetersToPixels(position.x), 
+                    .y = frNumberMetersToPixels(position.y),
+                    .width = BRICK_WIDTH,
+                    .height = BRICK_HEIGHT
+                },
+                (Vector2) { 0.5f * BRICK_WIDTH, 0.5f * BRICK_HEIGHT },
+                RAD2DEG * frGetBodyRotation(body),
+                WHITE
+            );
         }
         
         frDrawBody(cursor, Fade(RED, 0.5f));
@@ -145,18 +231,18 @@ void UpdateExample(void) {
         frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
         
         const char *message = TextFormat(
-            "%d brick(s)!",
-            frGetWorldBodyCount(world) - 2
+            TEXT_STRING_DATA,
+            frGetWorldBodyCount(world) - (MAX_WALL_COUNT + 1)
         );
         
         DrawTextEx(
             GetFontDefault(),
             message,
             (Vector2) { 
-                0.5f * (SCREEN_WIDTH - MeasureText(message, 40)), 
+                0.5f * (SCREEN_WIDTH - MeasureText(message, TEXT_FONT_SIZE)), 
                 0.125f * SCREEN_HEIGHT
             },
-            40.0f,
+            TEXT_FONT_SIZE,
             2.0f, 
             Fade(GRAY, 0.85f)
         );

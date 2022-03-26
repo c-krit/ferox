@@ -62,14 +62,6 @@ $ make
   <img src="res/images/bullet.gif" width="640" alt="bullet.c">
 </details>
 
-### `circles.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/circles.gif" width="640" alt="circles.c">
-</details>
-
 ### `jump.c`
 
 <details>

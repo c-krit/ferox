@@ -32,12 +32,14 @@
     .height = SCREEN_HEIGHT_IN_METERS       \
 })
 
-#define CIRCLE_MATERIAL  ((frMaterial) { 0.15f, 0.85f, 0.5f, 0.75f })
-#define CURSOR_MATERIAL  ((frMaterial) {  2.5f,  0.5f, 0.5f, 0.75f })
-#define WALL_MATERIAL    ((frMaterial) { 1.25f, 1.25f, 0.5f, 0.75f })
+#define CIRCLE_MATERIAL ((frMaterial) {  0.1f, 0.85f, 0.35f, 0.5f })
+#define CURSOR_MATERIAL ((frMaterial) {  2.5f,  0.5f, 0.5f, 0.75f })
+#define WALL_MATERIAL   ((frMaterial) { 1.25f, 0.85f, 0.5f, 0.75f })
 
-#define MAX_CIRCLE_COUNT  32
+#define MAX_CIRCLE_COUNT  216
 #define MAX_WALL_COUNT    3
+
+#define CIRCLE_RADIUS     9.6f
 
 static void InitExample(void);
 static void DeinitExample(void);
@@ -45,10 +47,12 @@ static void UpdateExample(void);
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
+static RenderTexture rtx;
+
 static frWorld *world;
 
-static frBody *circles[MAX_CIRCLE_COUNT], *walls[MAX_WALL_COUNT];
-static frBody *cursor;
+static frBody *circles[MAX_CIRCLE_COUNT];
+static frBody *walls[MAX_WALL_COUNT];
 
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
@@ -69,6 +73,28 @@ int main(void) {
 }
 
 void InitExample(void) {
+    rtx = LoadRenderTexture(2 * CIRCLE_RADIUS, 2 * CIRCLE_RADIUS);
+
+    {
+        BeginTextureMode(rtx);
+
+        ClearBackground(BLANK);
+
+        DrawRing(
+            (Vector2) { CIRCLE_RADIUS, CIRCLE_RADIUS },
+            CIRCLE_RADIUS - 2.0f,
+            CIRCLE_RADIUS,
+            0.0f,
+            360.0f,
+            32,
+            RED
+        );
+
+        EndTextureMode();
+    }
+
+    SetTextureFilter(rtx.texture, TEXTURE_FILTER_BILINEAR);
+
     world = frCreateWorld(
         frVec2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 0.00001f),
         WORLD_RECTANGLE
@@ -125,24 +151,20 @@ void InitExample(void) {
             FR_BODY_DYNAMIC,
             FR_FLAG_NONE,
             frVec2PixelsToMeters(position),
-            frCreateCircle(CIRCLE_MATERIAL, 1.0f)
+            frCreateCircle(
+                CIRCLE_MATERIAL, 
+                frNumberPixelsToMeters(CIRCLE_RADIUS)
+            )
         );
 
         frAddToWorld(world, circles[i]);
     }
-    
-    frBody *cursor = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC,
-        FR_FLAG_NONE,
-        FR_STRUCT_ZERO(Vector2),
-        frCreateCircle(CURSOR_MATERIAL, 0.5f)
-    );
-    
-    frAddToWorld(world, cursor);
 }
 
 void DeinitExample(void) {
     frReleaseWorld(world);
+
+    UnloadRenderTexture(rtx);
 }
 
 void UpdateExample(void) {
@@ -161,15 +183,29 @@ void UpdateExample(void) {
 
         ClearBackground(RAYWHITE);
 
-        frSetBodyPosition(cursor, frVec2PixelsToMeters(GetMousePosition()));
-
         for (int i = 0; i < MAX_WALL_COUNT; i++)
             frDrawBody(walls[i], BLACK);
 
-        for (int i = 0; i < MAX_CIRCLE_COUNT; i++)
-            frDrawBodyLines(circles[i], 2.0f, RED);
+        for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
+            Vector2 position = frGetBodyPosition(circles[i]);
 
-        frDrawBody(cursor, Fade(RED, 0.5f));
+            DrawTexturePro(
+                rtx.texture,
+                (Rectangle) {
+                    .width = 2.0f * CIRCLE_RADIUS,
+                    .height = 2.0f * CIRCLE_RADIUS,
+                },
+                (Rectangle) {
+                    .x = frNumberMetersToPixels(position.x), 
+                    .y = frNumberMetersToPixels(position.y),
+                    .width = 2.0f * CIRCLE_RADIUS,
+                    .height = 2.0f * CIRCLE_RADIUS
+                },
+                (Vector2) { CIRCLE_RADIUS, CIRCLE_RADIUS },
+                RAD2DEG * frGetBodyRotation(circles[i]),
+                WHITE
+            );
+        }
 
         frDrawSpatialHash(frGetWorldSpatialHash(world), 0.25f, GRAY);
 

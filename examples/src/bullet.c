@@ -43,6 +43,7 @@
 #define MAX_ENEMY_COUNT            72
 
 const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+
 const int SEMO_DATA = 0, BULLET_DATA = 1, ENEMY_DATA = 2;
 
 static frRaycastHit hits[MAX_ENEMY_COUNT];
@@ -156,8 +157,7 @@ void UpdateExample(void) {
         if (!frIsInWorldBounds(world, body)) {
             int *user_data = (int *) frGetBodyUserData(body);
 
-            if (*user_data == ENEMY_DATA) 
-                enemy_count--;
+            if (*user_data == ENEMY_DATA) enemy_count--;
 
             frRemoveFromWorld(world, body);
             frReleaseBody(body);

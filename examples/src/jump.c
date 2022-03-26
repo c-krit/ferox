@@ -31,7 +31,7 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define TEXT_FONT_SIZE    20
+#define TEXT_FONT_SIZE    30
 #define TEXT_STRING_DATA  "PRESS SPACE TO JUMP!"
 
 #define BOX_MATERIAL       ((frMaterial) { 2.25f, 0.0f, 1.25f, 1.0f })
@@ -45,8 +45,8 @@
 #define BRICK_VERTICAL_SPEED    0.02f
 
 typedef struct Brick {
-    int width;
-    int height;
+    float width;
+    float height;
     bool is_jumping;
     bool on_ground;
     frBody *body;
@@ -59,7 +59,7 @@ static frWorld *world;
 static frBody *walls[MAX_WALL_COUNT];
 static frBody *platform, *box;
 
-static Brick brick = { .width = 40, .height = 80 };
+static Brick brick = { .width = 40.0f, .height = 80.0f };
 
 void InitExample(void);
 void DeinitExample(void);
@@ -130,6 +130,8 @@ void InitExample(void) {
 
     frSetBodyUserData(brick.body, (void *) &brick);
 
+    frAddToWorld(world, brick.body);
+
     walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
@@ -155,6 +157,9 @@ void InitExample(void) {
         frCreatePolygon(WALL_MATERIAL, wall3_vertices)
     );
 
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frAddToWorld(world, walls[i]);
+
     platform = frCreateBodyFromShape(
         FR_BODY_STATIC,
         FR_FLAG_NONE,
@@ -166,6 +171,8 @@ void InitExample(void) {
         )
     );
 
+    frAddToWorld(world, platform);
+
     box = frCreateBodyFromShape(
         FR_BODY_DYNAMIC,
         FR_FLAG_NONE,
@@ -176,13 +183,6 @@ void InitExample(void) {
             frNumberPixelsToMeters(40.0f)
         )
     );
-
-    frAddToWorld(world, brick.body);
-
-    for (int i = 0; i < MAX_WALL_COUNT; i++)
-        frAddToWorld(world, walls[i]);
-
-    frAddToWorld(world, platform);
 
     frAddToWorld(world, box);
 }
@@ -219,7 +219,7 @@ void UpdateExample(void) {
             TEXT_STRING_DATA,
             (Vector2) { 
                 0.5f * (SCREEN_WIDTH - MeasureText(TEXT_STRING_DATA, TEXT_FONT_SIZE)),
-                SCREEN_HEIGHT / 16.0f
+                0.125f * SCREEN_HEIGHT
             },
             (float) TEXT_FONT_SIZE,
             2.0f, 

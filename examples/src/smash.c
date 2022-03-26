@@ -36,7 +36,7 @@
 #define BALL_MATERIAL ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.75f })
 #define BOX_MATERIAL  ((frMaterial) { 1.75f, 0.0f, 0.75f, 0.5f })
 
-#define BALL_RADIUS 4.0f
+#define BALL_DEFAULT_RADIUS    4.0f
 
 #define TOTAL_WIDTH_IN_BOXES   8
 #define TOTAL_HEIGHT_IN_BOXES  8
@@ -49,7 +49,7 @@ const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
 
 typedef struct Box {
     frBody *body;
-    RenderTexture rtex;
+    RenderTexture rtx;
 } Box;
 
 static Texture2D rl_logo;
@@ -118,10 +118,10 @@ void InitExample(void) {
             )
         );
 
-        boxes[i].rtex = LoadRenderTexture(box_width, box_height);
+        boxes[i].rtx = LoadRenderTexture(box_width, box_height);
 
         {
-            BeginTextureMode(boxes[i].rtex);
+            BeginTextureMode(boxes[i].rtx);
 
             ClearBackground(BLACK);
 
@@ -146,8 +146,8 @@ void InitExample(void) {
     ball = frCreateBodyFromShape(
         FR_BODY_DYNAMIC,
         FR_FLAG_INFINITE_INERTIA,
-        (Vector2) { -BALL_RADIUS, -BALL_RADIUS },
-        frCreateCircle(BALL_MATERIAL, BALL_RADIUS)
+        (Vector2) { -BALL_DEFAULT_RADIUS, -BALL_DEFAULT_RADIUS },
+        frCreateCircle(BALL_MATERIAL, BALL_DEFAULT_RADIUS)
     );
 
     frAddToWorld(world, ball);
@@ -155,7 +155,7 @@ void InitExample(void) {
 
 void DeinitExample(void) {
     for (int i = 0; i < MAX_BOX_COUNT; i++)
-        UnloadRenderTexture(boxes[i].rtex);
+        UnloadRenderTexture(boxes[i].rtx);
 
     UnloadTexture(rl_logo);
     
@@ -202,7 +202,7 @@ void UpdateExample(void) {
             Vector2 position = frGetBodyPosition(boxes[i].body);
 
             DrawTexturePro(
-                boxes[i].rtex.texture,
+                boxes[i].rtx.texture,
                 (Rectangle) {
                     .width = box_width,
                     .height = box_height
@@ -230,8 +230,8 @@ void UpdateExample(void) {
 
         DrawRing(
             GetMousePosition(),
-            frNumberMetersToPixels(BALL_RADIUS) - 2.0f,
-            frNumberMetersToPixels(BALL_RADIUS),
+            frNumberMetersToPixels(BALL_DEFAULT_RADIUS) - 2.0f,
+            frNumberMetersToPixels(BALL_DEFAULT_RADIUS),
             0.0f,
             360.0f,
             32,
