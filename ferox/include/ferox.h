@@ -134,8 +134,8 @@ typedef enum frShapeType {
 typedef struct frMaterial {
     float density;
     float restitution;
-    float static_friction;
-    float dynamic_friction;
+    float staticFriction;
+    float dynamicFriction;
 } frMaterial;
 
 /* 도형 또는 강체의 위치와 회전 각도 (단위: rad.)를 나타내는 구조체. */
@@ -144,8 +144,8 @@ typedef struct frTransform {
     float rotation;
     struct {
         bool valid;
-        float sin_a;
-        float cos_a;
+        float sinA;
+        float cosA;
     } cache;
 } frTransform;
 
@@ -182,15 +182,15 @@ typedef void (*frCollisionCallback)(frCollision *collision);
 
 /* 강체 사이의 충돌 이벤트 처리에 사용되는 핸들러를 나타내는 구조체. */
 typedef struct frCollisionHandler {
-    frCollisionCallback pre_solve;
-    frCollisionCallback post_solve;
+    frCollisionCallback preSolve;
+    frCollisionCallback postSolve;
 } frCollisionHandler;
 
 /* 광선을 나타내는 구조체. */
 typedef struct frRay {
     Vector2 origin;
     Vector2 direction;
-    float max_distance;
+    float maxDistance;
     bool closest;
 } frRay;
 
@@ -219,8 +219,8 @@ extern "C" {
 
 /* | `broadphase` 모듈 함수... | */
 
-/* 경계 범위가 `bounds`이고 각 셀의 크기가 `cell_size`인 공간 해시맵의 메모리 주소를 반환한다. */
-frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cell_size);
+/* 경계 범위가 `bounds`이고 각 셀의 크기가 `cellSize`인 공간 해시맵의 메모리 주소를 반환한다. */
+frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cellSize);
 
 /* 공간 해시맵 `hash`에 할당된 메모리를 해제한다. */
 void frReleaseSpatialHash(frSpatialHash *hash);
@@ -246,8 +246,8 @@ float frGetSpatialHashCellSize(frSpatialHash *hash);
 /* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
 void frSetSpatialHashBounds(frSpatialHash *hash, Rectangle bounds);
 
-/* 공간 해시맵 `hash`의 각 셀의 크기를 `cell_size`로 설정한다. */
-void frSetSpatialHashCellSize(frSpatialHash *hash, float cell_size);
+/* 공간 해시맵 `hash`의 각 셀의 크기를 `cellSize`로 설정한다. */
+void frSetSpatialHashCellSize(frSpatialHash *hash, float cellSize);
 
 /* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */
 int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
@@ -414,7 +414,7 @@ void frIntegrateForBodyVelocities(frBody *b, double dt);
 void frResolveCollision(frCollision *collision);
 
 /* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
-void frCorrectBodyPositions(frCollision *collision, float inverse_dt);
+void frCorrectBodyPositions(frCollision *collision, float inverseDt);
 
 /* | `geometry` 모듈 함수... | */
 
@@ -504,11 +504,11 @@ void frInitClock(void);
 /* 단조 시계의 현재 시각 (단위: ms)을 반환한다. */
 double frGetCurrentTime(void);
 
-/* 단조 시계의 시각 `new_time`과 `old_time`의 차이를 반환한다. */
-double frGetTimeDifference(double new_time, double old_time);
+/* 단조 시계의 시각 `newTime`과 `oldTime`의 차이를 반환한다. */
+double frGetTimeDifference(double newTime, double oldTime);
 
-/* 단조 시계의 현재 시각과 `old_time`과의 차이를 반환한다. */
-double frGetTimeSince(double old_time);
+/* 단조 시계의 현재 시각과 `oldTime`과의 차이를 반환한다. */
+double frGetTimeSince(double oldTime);
 
 /* | `utils` 모듈 함수... | */
 
@@ -697,8 +697,8 @@ FR_API_INLINE Vector2 frVec2Rotate(Vector2 v, float angle) {
 /* 벡터 `v`를 `tx`의 값에 따라 회전시킨다. */
 FR_API_INLINE Vector2 frVec2RotateTx(Vector2 v, frTransform tx) {
     Vector2 result = {
-        (v.x * tx.cache.cos_a - v.y * tx.cache.sin_a),
-        (v.x * tx.cache.sin_a + v.y * tx.cache.cos_a)
+        (v.x * tx.cache.cosA - v.y * tx.cache.sinA),
+        (v.x * tx.cache.sinA + v.y * tx.cache.cosA)
     };
 
     if (!tx.cache.valid) result = frVec2Rotate(v, tx.rotation);

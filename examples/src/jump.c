@@ -95,7 +95,7 @@ void InitExample(void) {
     frSetWorldCollisionHandler(
         world,
         (frCollisionHandler) {
-            .pre_solve = onCollisionPreSolve
+            .preSolve = onCollisionPreSolve
         }
     );
 

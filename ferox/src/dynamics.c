@@ -27,12 +27,12 @@
 /* 강체의 물리량을 나타내는 구조체. */
 typedef struct frMotionData {
     float mass;
-    float inverse_mass;
+    float inverseMass;
     float inertia;
-    float inverse_inertia;
+    float inverseInertia;
     Vector2 velocity;
-    float angular_velocity;
-    float gravity_scale;
+    float angularVelocity;
+    float gravityScale;
     Vector2 force;
     float torque;
 } frMotionData;
@@ -137,7 +137,7 @@ float frGetBodyMass(frBody *b) {
 
 /* 강체 `b`의 질량의 역수를 반환한다. */
 float frGetBodyInverseMass(frBody *b) {
-    return (b != NULL) ? b->motion.inverse_mass : 0.0f;
+    return (b != NULL) ? b->motion.inverseMass : 0.0f;
 }
 
 /* 강체 `b`의 관성 모멘트를 반환한다. */
@@ -147,7 +147,7 @@ float frGetBodyInertia(frBody *b) {
 
 /* 강체 `b`의 관성 모멘트의 역수를 반환한다. */
 float frGetBodyInverseInertia(frBody *b) {
-    return (b != NULL) ? b->motion.inverse_inertia : 0.0f;
+    return (b != NULL) ? b->motion.inverseInertia : 0.0f;
 }
 
 /* 강체 `b`의 속도를 반환한다. */
@@ -157,12 +157,12 @@ Vector2 frGetBodyVelocity(frBody *b) {
 
 /* 강체 `b`의 각속도를 반환한다. */
 float frGetBodyAngularVelocity(frBody *b) {
-    return (b != NULL) ? b->motion.angular_velocity : 0.0f;
+    return (b != NULL) ? b->motion.angularVelocity : 0.0f;
 }
 
 /* 강체 `b`의 중력 가속률을 반환한다. */
 float frGetBodyGravityScale(frBody *b) {
-    return (b != NULL) ? b->motion.gravity_scale : 0.0f;
+    return (b != NULL) ? b->motion.gravityScale : 0.0f;
 }
 
 /* 강체 `b`의 위치와 회전 각도 (단위: rad.)를 반환한다. */
@@ -231,14 +231,14 @@ void frSetBodyVelocity(frBody *b, Vector2 v) {
 
 /* 강체 `b`의 각속도를 `a`로 설정한다. */
 void frSetBodyAngularVelocity(frBody *b, double a) {
-    if (b != NULL) b->motion.angular_velocity = a;
+    if (b != NULL) b->motion.angularVelocity = a;
 }
 
 /* 강체 `b`의 중력 가속률을 `scale`로 설정한다. */
 void frSetBodyGravityScale(frBody *b, float scale) {
     if (b == NULL || b->type != FR_BODY_DYNAMIC) return;
     
-    b->motion.gravity_scale = scale;
+    b->motion.gravityScale = scale;
 }
 
 /* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
@@ -249,8 +249,8 @@ void frSetBodyTransform(frBody *b, frTransform tx) {
     b->tx.rotation = frNormalizeAngle(tx.rotation, PI);
 
     b->tx.cache.valid = true;
-    b->tx.cache.sin_a = sinf(b->tx.rotation);
-    b->tx.cache.cos_a = cosf(b->tx.rotation);
+    b->tx.cache.sinA = sinf(b->tx.rotation);
+    b->tx.cache.cosA = cosf(b->tx.rotation);
     
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
@@ -271,8 +271,8 @@ void frSetBodyRotation(frBody *b, float rotation) {
     b->tx.rotation = frNormalizeAngle(rotation, PI);
 
     b->tx.cache.valid = true;
-    b->tx.cache.sin_a = sinf(b->tx.rotation);
-    b->tx.cache.cos_a = cosf(b->tx.rotation);
+    b->tx.cache.sinA = sinf(b->tx.rotation);
+    b->tx.cache.cosA = cosf(b->tx.rotation);
 
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
@@ -284,35 +284,35 @@ void frSetBodyUserData(frBody *b, void *data) {
 
 /* 강체 `b`에 중력 가속도 `gravity`를 적용한다. */
 void frApplyGravity(frBody *b, Vector2 gravity) {
-    if (b == NULL || b->motion.inverse_mass <= 0.0f) return;
+    if (b == NULL || b->motion.inverseMass <= 0.0f) return;
     
     b->motion.force = frVec2Add(
         b->motion.force,
         frVec2ScalarMultiply(
             gravity,
-            b->motion.gravity_scale * b->motion.mass
+            b->motion.gravityScale * b->motion.mass
         )
     );
 }
 
 /* 강체 `b`에 충격량 `impulse`를 적용한다. */
 void frApplyImpulse(frBody *b, Vector2 impulse) {
-    if (b == NULL || b->motion.inverse_mass <= 0.0f) return;
+    if (b == NULL || b->motion.inverseMass <= 0.0f) return;
     
     b->motion.velocity = frVec2Add(
         b->motion.velocity,
         frVec2ScalarMultiply(
             impulse,
-            b->motion.inverse_mass
+            b->motion.inverseMass
         )
     );
 }
 
 /* 강체 `b` 위의 점 `p`에 각운동량 `impulse`를 적용한다. */
 void frApplyTorqueImpulse(frBody *b, Vector2 p, Vector2 impulse) {
-    if (b == NULL || b->motion.inverse_inertia <= 0.0f) return;
+    if (b == NULL || b->motion.inverseInertia <= 0.0f) return;
     
-    b->motion.angular_velocity += b->motion.inverse_inertia 
+    b->motion.angularVelocity += b->motion.inverseInertia 
         * frVec2CrossProduct(p, impulse);
 }
 
@@ -329,12 +329,12 @@ void frIntegrateForBodyPosition(frBody *b, double dt) {
     if (b == NULL || b->type == FR_BODY_STATIC) return;
     
     frSetBodyPosition(b, frVec2Add(b->tx.position, frVec2ScalarMultiply(b->motion.velocity, dt)));
-    frSetBodyRotation(b, b->tx.rotation + (b->motion.angular_velocity * dt));
+    frSetBodyRotation(b, b->tx.rotation + (b->motion.angularVelocity * dt));
 }
 
 /* 단위 시간 `dt` 이후의 강체 `b`의 속도와 각속도를 계산한다. */
 void frIntegrateForBodyVelocities(frBody *b, double dt) {
-    if (b == NULL || b->motion.inverse_mass <= 0.0f) return;
+    if (b == NULL || b->motion.inverseMass <= 0.0f) return;
 
     const float half_dt = 0.5f * dt;
     
@@ -342,11 +342,11 @@ void frIntegrateForBodyVelocities(frBody *b, double dt) {
         b->motion.velocity,
         frVec2ScalarMultiply(
             b->motion.force, 
-            b->motion.inverse_mass * half_dt
+            b->motion.inverseMass * half_dt
         )
     );
     
-    b->motion.angular_velocity += (b->motion.torque * b->motion.inverse_inertia) * half_dt;
+    b->motion.angularVelocity += (b->motion.torque * b->motion.inverseInertia) * half_dt;
 }
 
 /* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
@@ -358,7 +358,7 @@ void frResolveCollision(frCollision *collision) {
 
     if (b1 == NULL || b2 == NULL) return;
 
-    if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
+    if (b1->motion.inverseMass + b2->motion.inverseMass <= 0.0f) {
         if (frGetBodyType(b1) == FR_BODY_STATIC) b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
         if (frGetBodyType(b2) == FR_BODY_STATIC) b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
         
@@ -367,47 +367,47 @@ void frResolveCollision(frCollision *collision) {
     
     float epsilon = fmaxf(0.0f, fminf(b1->material.restitution, b2->material.restitution));
     
-    float static_mu = b1->material.static_friction * b2->material.static_friction;
-    float dynamic_mu = b1->material.dynamic_friction * b2->material.dynamic_friction;
+    float staticMu = b1->material.staticFriction * b2->material.staticFriction;
+    float dynamicMu = b1->material.dynamicFriction * b2->material.dynamicFriction;
 
     // 대체로 운동 마찰 계수는 정지 마찰 계수보다 작은 값을 가진다.
-    if (static_mu < dynamic_mu) dynamic_mu = FR_DYNAMICS_DYNAMIC_FRICTION_MULTIPLIER * static_mu;
+    if (staticMu < dynamicMu) dynamicMu = FR_DYNAMICS_DYNAMIC_FRICTION_MULTIPLIER * staticMu;
     
     for (int i = 0; i < collision->count; i++) {
         Vector2 r1 = frVec2Subtract(collision->points[i], frGetBodyPosition(b1));
         Vector2 r2 = frVec2Subtract(collision->points[i], frGetBodyPosition(b2));
         
-        Vector2 r1_normal = frVec2LeftNormal(r1);
-        Vector2 r2_normal = frVec2LeftNormal(r2);
+        Vector2 r1Normal = frVec2LeftNormal(r1);
+        Vector2 r2Normal = frVec2LeftNormal(r2);
         
         // `b1`이 측정한 `b2`의 속도 (`b1`에 대한 `b2`의 상대 속도)를 계산한다.
-        Vector2 relative_velocity = frVec2Subtract(
+        Vector2 relativeVelocity = frVec2Subtract(
             frVec2Add(
                 b2->motion.velocity,
-                frVec2ScalarMultiply(r2_normal, b2->motion.angular_velocity)
+                frVec2ScalarMultiply(r2Normal, b2->motion.angularVelocity)
             ),
             frVec2Add(
                 b1->motion.velocity, 
-                frVec2ScalarMultiply(r1_normal, b1->motion.angular_velocity)
+                frVec2ScalarMultiply(r1Normal, b1->motion.angularVelocity)
             )
         );
         
-        float relative_velocity_dot = frVec2DotProduct(relative_velocity, collision->direction);
+        float relativeVelocityDot = frVec2DotProduct(relativeVelocity, collision->direction);
         
         // 두 강체가 서로 충돌하는 방향으로 진행하고 있지 않으면 계산을 종료한다.
-        if (relative_velocity_dot > 0.0f) return;
+        if (relativeVelocityDot > 0.0f) return;
         
-        float r1_normal_dot = frVec2DotProduct(r1_normal, collision->direction);
-        float r2_normal_dot = frVec2DotProduct(r2_normal, collision->direction);
+        float r1NormalDot = frVec2DotProduct(r1Normal, collision->direction);
+        float r2NormalDot = frVec2DotProduct(r2Normal, collision->direction);
         
-        float inverse_mass_sum = (b1->motion.inverse_mass + b2->motion.inverse_mass)
-            + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
-            + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
+        float inverseMassSum = (b1->motion.inverseMass + b2->motion.inverseMass)
+            + b1->motion.inverseInertia * (r1NormalDot * r1NormalDot)
+            + b2->motion.inverseInertia * (r2NormalDot * r2NormalDot);
 
-        float impulse_param = (-(1.0f + epsilon) * relative_velocity_dot)
-            / (collision->count * inverse_mass_sum);
+        float impulseParam = (-(1.0f + epsilon) * relativeVelocityDot)
+            / (collision->count * inverseMassSum);
 
-        Vector2 impulse = frVec2ScalarMultiply(collision->direction, impulse_param);
+        Vector2 impulse = frVec2ScalarMultiply(collision->direction, impulseParam);
 
         frApplyImpulse(b1, frVec2Negate(impulse));
         frApplyTorqueImpulse(b1, r1, frVec2Negate(impulse));
@@ -416,39 +416,39 @@ void frResolveCollision(frCollision *collision) {
         frApplyTorqueImpulse(b2, r2, impulse);
         
         // 마찰력 적용을 위해 상대 속도를 다시 계산한다.
-        relative_velocity = frVec2Subtract(
+        relativeVelocity = frVec2Subtract(
             frVec2Add(
                 b2->motion.velocity,
-                frVec2ScalarMultiply(r2_normal, b2->motion.angular_velocity)
+                frVec2ScalarMultiply(r2Normal, b2->motion.angularVelocity)
             ),
             frVec2Add(
                 b1->motion.velocity, 
-                frVec2ScalarMultiply(r1_normal, b1->motion.angular_velocity)
+                frVec2ScalarMultiply(r1Normal, b1->motion.angularVelocity)
             )
         );
 
-        relative_velocity_dot = frVec2DotProduct(relative_velocity, collision->direction);
+        relativeVelocityDot = frVec2DotProduct(relativeVelocity, collision->direction);
         
         Vector2 tangent = frVec2Normalize(
             frVec2Subtract(
-                relative_velocity,
-                frVec2ScalarMultiply(collision->direction, relative_velocity_dot)
+                relativeVelocity,
+                frVec2ScalarMultiply(collision->direction, relativeVelocityDot)
             )
         );
 
-        r1_normal_dot = frVec2DotProduct(r1_normal, tangent);
-        r2_normal_dot = frVec2DotProduct(r2_normal, tangent);
+        r1NormalDot = frVec2DotProduct(r1Normal, tangent);
+        r2NormalDot = frVec2DotProduct(r2Normal, tangent);
 
-        inverse_mass_sum = (b1->motion.inverse_mass + b2->motion.inverse_mass)
-            + b1->motion.inverse_inertia * (r1_normal_dot * r1_normal_dot)
-            + b2->motion.inverse_inertia * (r2_normal_dot * r2_normal_dot);
+        inverseMassSum = (b1->motion.inverseMass + b2->motion.inverseMass)
+            + b1->motion.inverseInertia * (r1NormalDot * r1NormalDot)
+            + b2->motion.inverseInertia * (r2NormalDot * r2NormalDot);
 
-        float friction_param = -frVec2DotProduct(relative_velocity, tangent)
-            / (collision->count * inverse_mass_sum);
+        float frictionParam = -frVec2DotProduct(relativeVelocity, tangent)
+            / (collision->count * inverseMassSum);
         
-        Vector2 friction = (fabsf(friction_param) < impulse_param * static_mu)
-            ? frVec2ScalarMultiply(tangent, friction_param)
-            : frVec2ScalarMultiply(tangent, -impulse_param * dynamic_mu);
+        Vector2 friction = (fabsf(frictionParam) < impulseParam * staticMu)
+            ? frVec2ScalarMultiply(tangent, frictionParam)
+            : frVec2ScalarMultiply(tangent, -impulseParam * dynamicMu);
         
         frApplyImpulse(b1, frVec2Negate(friction));
         frApplyTorqueImpulse(b1, r1, frVec2Negate(friction));
@@ -459,7 +459,7 @@ void frResolveCollision(frCollision *collision) {
 }
 
 /* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
-void frCorrectBodyPositions(frCollision *collision, float inverse_dt) {
+void frCorrectBodyPositions(frCollision *collision, float inverseDt) {
     if (collision == NULL || !collision->check) return;
 
     frBody *b1 = collision->cache.bodies[0];
@@ -467,23 +467,23 @@ void frCorrectBodyPositions(frCollision *collision, float inverse_dt) {
 
     if (b1 == NULL || b2 == NULL) return;
     
-    if (b1->motion.inverse_mass + b2->motion.inverse_mass <= 0.0f) {
+    if (b1->motion.inverseMass + b2->motion.inverseMass <= 0.0f) {
         if (frGetBodyType(b1) == FR_BODY_STATIC) b1->motion.velocity = FR_STRUCT_ZERO(Vector2);
         if (frGetBodyType(b2) == FR_BODY_STATIC) b2->motion.velocity = FR_STRUCT_ZERO(Vector2);
         
         return;
     }
     
-    float max_depth = fmaxf(collision->depths[0], collision->depths[1]);
+    float maxDepth = fmaxf(collision->depths[0], collision->depths[1]);
 
-    if (max_depth <= FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) return;
+    if (maxDepth <= FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD) return;
     
     // 충돌 방향은 무조건 `b1`에서 `b2`로 향한다.
     Vector2 correction = frVec2ScalarMultiply(
         collision->direction,
         FR_DYNAMICS_CORRECTION_DEPTH_SCALE * (
-            (inverse_dt * (max_depth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD)) 
-            / (b1->motion.inverse_mass + b2->motion.inverse_mass)
+            (inverseDt * (maxDepth - FR_DYNAMICS_CORRECTION_DEPTH_THRESHOLD)) 
+            / (b1->motion.inverseMass + b2->motion.inverseMass)
         )
     );
     
@@ -491,14 +491,14 @@ void frCorrectBodyPositions(frCollision *collision, float inverse_dt) {
         b1, 
         frVec2Subtract(
             b1->tx.position, 
-            frVec2ScalarMultiply(correction, b1->motion.inverse_mass)
+            frVec2ScalarMultiply(correction, b1->motion.inverseMass)
         )
     );
     frSetBodyPosition(
         b2, 
         frVec2Add(
             b2->tx.position, 
-            frVec2ScalarMultiply(correction, b2->motion.inverse_mass)
+            frVec2ScalarMultiply(correction, b2->motion.inverseMass)
         )
     );
 }
@@ -512,7 +512,7 @@ static void frResetBodyMass(frBody *b) {
     
     if (b->type == FR_BODY_STATIC) {
         b->motion.velocity = FR_STRUCT_ZERO(Vector2);
-        b->motion.angular_velocity = 0.0f;
+        b->motion.angularVelocity = 0.0f;
     } else if (b->type == FR_BODY_DYNAMIC) {
         if (b->shape != NULL) {
             if (!(b->flags & FR_FLAG_INFINITE_MASS))
@@ -523,9 +523,9 @@ static void frResetBodyMass(frBody *b) {
         }
     }
     
-    if (b->motion.mass == 0.0f) b->motion.inverse_mass = 0.0f;
-    else b->motion.inverse_mass = 1.0f / b->motion.mass;
+    if (b->motion.mass == 0.0f) b->motion.inverseMass = 0.0f;
+    else b->motion.inverseMass = 1.0f / b->motion.mass;
     
-    if (b->motion.inertia == 0.0f) b->motion.inverse_inertia = 0.0f;
-    else b->motion.inverse_inertia = 1.0f / b->motion.inertia;
+    if (b->motion.inertia == 0.0f) b->motion.inverseInertia = 0.0f;
+    else b->motion.inverseInertia = 1.0f / b->motion.inertia;
 }

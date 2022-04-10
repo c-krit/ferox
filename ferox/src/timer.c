@@ -54,12 +54,12 @@ double frGetCurrentTime(void) {
     return stm_ms(stm_now());
 }
 
-/* 단조 시계의 시각 `new_time`과 `old_time`의 차이를 반환한다. */
-double frGetTimeDifference(double new_time, double old_time) {
-    return new_time - old_time;
+/* 단조 시계의 시각 `newTime`과 `oldTime`의 차이를 반환한다. */
+double frGetTimeDifference(double newTime, double oldTime) {
+    return newTime - oldTime;
 }
 
 /* 단조 시계의 현재 시각과 `old_time`과의 차이를 반환한다. */
-double frGetTimeSince(double old_time) {
-    return frGetTimeDifference(frGetCurrentTime(), old_time);
+double frGetTimeSince(double oldTime) {
+    return frGetTimeDifference(frGetCurrentTime(), oldTime);
 }

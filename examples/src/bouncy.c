@@ -32,8 +32,8 @@
     .height = SCREEN_HEIGHT_IN_METERS       \
 })
 
-#define CIRCLE_MATERIAL ((frMaterial) { 0.05f, 0.85f, 0.25f, 0.5f })
-#define WALL_MATERIAL   ((frMaterial) { 2.25f, 0.85f, 0.5f, 0.75f })
+#define CIRCLE_MATERIAL ((frMaterial) { 0.05f, 0.85f, 0.5f, 0.35f })
+#define WALL_MATERIAL   ((frMaterial) { 2.25f, 0.85f, 0.75f, 0.5f })
 
 #define MAX_CIRCLE_COUNT  216
 #define MAX_WALL_COUNT    3

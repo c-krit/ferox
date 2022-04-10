@@ -32,9 +32,9 @@
     .height = 1.5f * SCREEN_HEIGHT_IN_METERS \
 })
 
-#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 0.5f, 0.75f })
-#define BULLET_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.75f })
-#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.75f })
+#define SEMO_MATERIAL   ((frMaterial) { 2.0f, 0.0f, 0.5f, 0.35f })
+#define BULLET_MATERIAL ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.35f })
+#define ENEMY_MATERIAL  ((frMaterial) { 1.0f, 0.0f, 0.5f, 0.35f })
 
 #define SEMO_HORIZONTAL_SPEED      0.026f
 #define SEMO_WEAPON_FIRE_RATE      (0.1f * TARGET_FPS)
@@ -88,7 +88,7 @@ void InitExample(void) {
     frSetWorldCollisionHandler(
         world,
         (frCollisionHandler) { 
-            .pre_solve = onCollisionPreSolve
+            .preSolve = onCollisionPreSolve
         }
     );
 

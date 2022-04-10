@@ -33,7 +33,7 @@
     .height = SCREEN_HEIGHT_IN_METERS  \
 })
 
-#define BALL_MATERIAL ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.75f })
+#define BALL_MATERIAL ((frMaterial) { 0.75f, 0.0f, 0.85f, 0.65f })
 #define BOX_MATERIAL  ((frMaterial) { 1.75f, 0.0f, 0.75f, 0.5f })
 
 #define BALL_DEFAULT_RADIUS    4.0f

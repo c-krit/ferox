@@ -34,8 +34,8 @@ typedef struct frSpatialEntry {
 /* 공간 해시맵을 나타내는 구조체. */
 typedef struct frSpatialHash {
     Rectangle bounds;
-    float cell_size;
-    float inverse_cell_size;
+    float cellSize;
+    float inverseCellSize;
     frSpatialEntry *map;
 } frSpatialHash;
 
@@ -44,15 +44,15 @@ typedef struct frSpatialHash {
 /* C 표준 라이브러리의 `qsort()` 함수 호출에 사용되는 비교 함수이다. */
 static int frQuickSortCallback(const void *x, const void *y);
 
-/* 경계 범위가 `bounds`이고 각 셀의 크기가 `cell_size`인 공간 해시맵의 메모리 주소를 반환한다. */
-frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cell_size) {
-    if (cell_size <= 0.0f) return NULL;
+/* 경계 범위가 `bounds`이고 각 셀의 크기가 `cellSize`인 공간 해시맵의 메모리 주소를 반환한다. */
+frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cellSize) {
+    if (cellSize <= 0.0f) return NULL;
     
     frSpatialHash *result = calloc(1, sizeof(frSpatialHash));
     
     result->bounds = bounds;
-    result->cell_size = cell_size;
-    result->inverse_cell_size = 1.0f / cell_size;
+    result->cellSize = cellSize;
+    result->inverseCellSize = 1.0f / cellSize;
     
     return result;
 }
@@ -152,7 +152,7 @@ Rectangle frGetSpatialHashBounds(frSpatialHash *hash) {
 
 /* 공간 해시맵 `hash`의 각 셀의 크기를 반환한다. */
 float frGetSpatialHashCellSize(frSpatialHash *hash) {
-    return (hash != NULL) ? hash->cell_size : 0.0f;
+    return (hash != NULL) ? hash->cellSize : 0.0f;
 }
 
 /* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
@@ -160,15 +160,15 @@ void frSetSpatialHashBounds(frSpatialHash *hash, Rectangle bounds) {
     if (hash != NULL) hash->bounds = bounds;
 }
 
-/* 공간 해시맵 `hash`의 각 셀의 크기를 `cell_size`로 설정한다. */
-void frSetSpatialHashCellSize(frSpatialHash *hash, float cell_size) {
-    if (hash != NULL) hash->cell_size = cell_size;
+/* 공간 해시맵 `hash`의 각 셀의 크기를 `cellSize`로 설정한다. */
+void frSetSpatialHashCellSize(frSpatialHash *hash, float cellSize) {
+    if (hash != NULL) hash->cellSize = cellSize;
 }
 
 /* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */
 int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v) {
     return (hash != NULL) 
-        ? (int) (v.y * hash->inverse_cell_size) * hash->bounds.width + (int) (v.x * hash->inverse_cell_size)
+        ? (int) (v.y * hash->inverseCellSize) * hash->bounds.width + (int) (v.x * hash->inverseCellSize)
         : -1;
 }
 

@@ -159,10 +159,10 @@ const float ARROW_HEAD_LENGTH = 16.0f;
 
         Rectangle bounds = frGetSpatialHashBounds(hm);
 
-        const int v_count = bounds.width * FR_BROADPHASE_INVERSE_CELL_SIZE;
-        const int h_count = bounds.height * FR_BROADPHASE_INVERSE_CELL_SIZE;
+        const int vCount = bounds.width * FR_BROADPHASE_INVERSE_CELL_SIZE;
+        const int hCount = bounds.height * FR_BROADPHASE_INVERSE_CELL_SIZE;
         
-        for (int i = 0; i <= v_count; i++)
+        for (int i = 0; i <= vCount; i++)
             DrawLineEx(
                 frVec2MetersToPixels((Vector2) { FR_BROADPHASE_CELL_SIZE * i, 0.0f }),
                 frVec2MetersToPixels((Vector2) { FR_BROADPHASE_CELL_SIZE * i, bounds.height }),
@@ -170,7 +170,7 @@ const float ARROW_HEAD_LENGTH = 16.0f;
                 color
             );
     
-        for (int i = 0; i <= h_count; i++)
+        for (int i = 0; i <= hCount; i++)
             DrawLineEx(
                 frVec2MetersToPixels((Vector2) { 0.0f, FR_BROADPHASE_CELL_SIZE * i }), 
                 frVec2MetersToPixels((Vector2) { bounds.width, FR_BROADPHASE_CELL_SIZE * i }),

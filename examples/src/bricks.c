@@ -34,9 +34,9 @@
 #define TEXT_FONT_SIZE    40
 #define TEXT_STRING_DATA  "%d brick(s)!"
 
-#define BRICK_MATERIAL   ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.75f })
-#define CURSOR_MATERIAL  ((frMaterial) {  2.5f, 0.0f, 0.5f, 0.75f })
-#define WALL_MATERIAL    ((frMaterial) { 1.25f, 0.0f, 0.5f, 0.75f })
+#define BRICK_MATERIAL   ((frMaterial) { 0.75f, 0.0f, 0.5f, 0.35f })
+#define CURSOR_MATERIAL  ((frMaterial) {  2.5f, 0.0f, 0.5f, 0.35f })
+#define WALL_MATERIAL    ((frMaterial) { 1.25f, 0.0f, 0.5f, 0.35f })
 
 #define MAX_WALL_COUNT   3
 

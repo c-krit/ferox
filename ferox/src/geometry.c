@@ -28,7 +28,7 @@
 typedef struct frShape {
     frShapeType type;
     frMaterial material;
-    bool is_rect;
+    bool isRect;
     float area;
     union {
         struct {
@@ -40,6 +40,10 @@ typedef struct frShape {
         } polygon;
     };
 } frShape;
+
+/* | `geometry` 모듈 상수... | */
+
+const float INVERSE_TWELVE = (1.0f / 12.0f);
 
 /* | `geometry` 모듈 함수... | */
 
@@ -82,7 +86,7 @@ frShape *frCreateRectangle(frMaterial material, float width, float height) {
 
     result->type = FR_SHAPE_POLYGON;
     result->material = material;
-    result->is_rect = true;
+    result->isRect = true;
     
     frSetPolygonVertices(result, vertices);
     
@@ -121,7 +125,7 @@ frShape *frCloneShape(frShape *s) {
     
     result->type = s->type;
     result->material = s->material;
-    result->is_rect = s->is_rect;
+    result->isRect = s->isRect;
     result->area = s->area;
     
     if (result->type == FR_SHAPE_CIRCLE) {
@@ -179,7 +183,7 @@ float frGetShapeInertia(frShape *s) {
     if (s->type == FR_SHAPE_CIRCLE) {
         result = 0.5f * frGetShapeMass(s) * (frGetCircleRadius(s) * frGetCircleRadius(s));
     } else if (s->type == FR_SHAPE_POLYGON) {
-        float x_inertia = 0.0f, y_inertia = 0.0f;
+        float xInertia = 0.0f, yInertia = 0.0f;
         
         // https://en.wikipedia.org/wiki/Second_moment_of_area#Any_polygon
         for (int j = s->polygon.vertices.count - 1, i = 0; i < s->polygon.vertices.count; j = i, i++) {
@@ -188,11 +192,11 @@ float frGetShapeInertia(frShape *s) {
             
             float cross = frVec2CrossProduct(v1, v2);
             
-            x_inertia += cross * ((v1.y * v1.y) + (v1.y * v2.y) + (v2.y * v2.y));
-            y_inertia += cross * ((v1.x * v1.x) + (v1.x * v2.x) + (v2.x * v2.x));
+            xInertia += cross * ((v1.y * v1.y) + (v1.y * v2.y) + (v2.y * v2.y));
+            yInertia += cross * ((v1.x * v1.x) + (v1.x * v2.x) + (v2.x * v2.x));
         }
         
-        result = fabsf((x_inertia + y_inertia) / 12.0f);
+        result = fabsf((xInertia + yInertia) * INVERSE_TWELVE);
     }
     
     return s->material.density * result;
@@ -213,28 +217,28 @@ Rectangle frGetShapeAABB(frShape *s, frTransform tx) {
         
         return result;
     } else if (s->type == FR_SHAPE_POLYGON) {
-        Vector2 min_vertex = { FLT_MAX, FLT_MAX };
-        Vector2 max_vertex = { -FLT_MAX, -FLT_MAX };
+        Vector2 minVertex = { FLT_MAX, FLT_MAX };
+        Vector2 maxVertex = { -FLT_MAX, -FLT_MAX };
         
         // AABB의 X좌표와 Y좌표의 최솟값과 최댓값을 구한다.
         for (int i = 0; i < s->polygon.vertices.count; i++) {
             Vector2 vertex = frVec2Transform(s->polygon.vertices.data[i], tx);
             
-            if (min_vertex.x > vertex.x) min_vertex.x = vertex.x;
-            if (min_vertex.y > vertex.y) min_vertex.y = vertex.y;
+            if (minVertex.x > vertex.x) minVertex.x = vertex.x;
+            if (minVertex.y > vertex.y) minVertex.y = vertex.y;
                 
-            if (max_vertex.x < vertex.x) max_vertex.x = vertex.x;
-            if (max_vertex.y < vertex.y) max_vertex.y = vertex.y;
+            if (maxVertex.x < vertex.x) maxVertex.x = vertex.x;
+            if (maxVertex.y < vertex.y) maxVertex.y = vertex.y;
         }
         
-        float delta_x = max_vertex.x - min_vertex.x;
-        float delta_y = max_vertex.y - min_vertex.y;
+        float deltaX = maxVertex.x - minVertex.x;
+        float deltaY = maxVertex.y - minVertex.y;
         
-        result.x = min_vertex.x;
-        result.y = min_vertex.y;
+        result.x = minVertex.x;
+        result.y = minVertex.y;
         
-        result.width = delta_x;
-        result.height = delta_y;
+        result.width = deltaX;
+        result.height = deltaY;
         
         return result;
     }
@@ -281,7 +285,7 @@ frVertices frGetPolygonNormals(frShape *s) {
 
 /* 다각형 `s`가 직사각형인지 확인한다. */
 bool frIsShapeRectangle(frShape *s) {
-    return (s != NULL) && (s->type == FR_SHAPE_POLYGON) && s->is_rect;
+    return (s != NULL) && (s->type == FR_SHAPE_POLYGON) && s->isRect;
 }
 
 /* 원 `s`의 반지름을 `radius`로 변경한다. */
@@ -323,7 +327,7 @@ void frSetPolygonVertices(frShape *s, frVertices vertices) {
         s->polygon.vertices.data[i] = vertices.data[i];
     
     // 직사각형은 이미 볼록 다각형이므로 변형하지 않는다.
-    if (!s->is_rect) frComputeConvex(s);
+    if (!s->isRect) frComputeConvex(s);
 
     frComputeArea(s);
 
@@ -358,12 +362,12 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
         return false;
     
     if (s->type == FR_SHAPE_CIRCLE) {
-        float delta_x = p.x - tx.position.x;
-        float delta_y = p.y - tx.position.y;
+        float deltaX = p.x - tx.position.x;
+        float deltaY = p.y - tx.position.y;
         
         float radius = frGetCircleRadius(s);
         
-        return (delta_x * delta_x) + (delta_y * delta_y) <= radius * radius;
+        return (deltaX * deltaX) + (deltaY * deltaY) <= radius * radius;
     } else if (s->type == FR_SHAPE_POLYGON) {
         frRaycastHit raycast = frComputeShapeRaycast(
             s, tx, 
@@ -381,7 +385,7 @@ static void frComputeArea(frShape *s) {
     } else if (s->type == FR_SHAPE_CIRCLE) {
         s->area = PI * (s->circle.radius * s->circle.radius);
     } else if (s->type == FR_SHAPE_POLYGON) {
-        if (s->is_rect) {
+        if (s->isRect) {
             frVertices *vertices = &(s->polygon.vertices);
 
             float width = vertices->data[2].x - vertices->data[1].x;
@@ -389,26 +393,18 @@ static void frComputeArea(frShape *s) {
 
             s->area = width * height;
         } else {
-            float twice_area_sum = 0.0f;
+            float twiceAreaSum = 0.0f;
 
             for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
-                float twice_area = frVec2CrossProduct(
+                float twiceArea = frVec2CrossProduct(
                     frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
                     frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
                 );
 
-                Vector2 thrice_centroid = frVec2Add(
-                    s->polygon.vertices.data[0],
-                    frVec2Add(
-                        s->polygon.vertices.data[i], 
-                        s->polygon.vertices.data[i + 1]
-                    )
-                );
-
-                twice_area_sum += twice_area;
+                twiceAreaSum += twiceArea;
             }
 
-            s->area = fabsf(0.5f * twice_area_sum);
+            s->area = fabsf(0.5f * twiceAreaSum);
         }
     }
 }
@@ -431,50 +427,50 @@ static frVertices frJarvisMarch(frVertices *vertices) {
 
     frVertices result = FR_STRUCT_ZERO(frVertices);
 
-    int leftmost_index = 0, pivot_index = 0, next_index = 0, vertex_count = 0;
+    int leftmostIndex = 0, pivotIndex = 0, nextIndex = 0, vertexCount = 0;
     
     // 주어진 꼭짓점 배열에서 X좌표 값이 가장 작은 꼭짓점 L을 찾는다.
     for (int i = 1; i < vertices->count; i++)
-        if (vertices->data[leftmost_index].x > vertices->data[i].x)
-            leftmost_index = i;
+        if (vertices->data[leftmostIndex].x > vertices->data[i].x)
+            leftmostIndex = i;
     
-    result.data[vertex_count++] = vertices->data[leftmost_index];
+    result.data[vertexCount++] = vertices->data[leftmostIndex];
     
     // 기준점 P를 방금 찾은 꼭짓점 L로 설정한다.
-    pivot_index = leftmost_index;
+    pivotIndex = leftmostIndex;
     
     while (1) {
         // 기준점 P의 바로 다음에 오는 꼭짓점 Q를 찾는다.
         for (int i = 0; i < vertices->count; i++) {
-            if (i == pivot_index)
+            if (i == pivotIndex)
                 continue;
             
-            next_index = i;
+            nextIndex = i;
             
             break;
         }
         
         // 기준점 P와 꼭짓점 Q 사이에 오는 꼭짓점 R을 찾는다.
         for (int i = 0; i < vertices->count; i++) {
-            if (i == pivot_index || i == next_index)
+            if (i == pivotIndex || i == nextIndex)
                 continue;
             
             // 기준점 P, 꼭짓점 R과 꼭짓점 Q가 반시계 방향으로 정렬되어 있는지 확인한다.
-            if (frVec2CCW(vertices->data[pivot_index], vertices->data[i], vertices->data[next_index]))
-                next_index = i;
+            if (frVec2CCW(vertices->data[pivotIndex], vertices->data[i], vertices->data[nextIndex]))
+                nextIndex = i;
         }
         
         // 꼭짓점 Q가 시작점인 꼭짓점 L이 되면 탐색을 종료한다.
-        if (next_index == leftmost_index)
+        if (nextIndex == leftmostIndex)
             break;
         
-        pivot_index = next_index;
+        pivotIndex = nextIndex;
         
         // 새로 찾은 꼭짓점을 배열에 저장한다.
-        result.data[vertex_count++] = vertices->data[next_index];
+        result.data[vertexCount++] = vertices->data[nextIndex];
     }
     
-    result.count = vertex_count;
+    result.count = vertexCount;
     
     return result;
 }

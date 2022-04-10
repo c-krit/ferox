@@ -52,8 +52,8 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
 /* 최적화된 분리 축 정리를 이용하여, 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
 
-/* 선분 `e`에서 벡터 `v`와의 내적이 `min_dot`보다 작은 부분을 모두 잘라낸다. */
-static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float min_dot);
+/* 선분 `e`에서 벡터 `v`와의 내적이 `minDot`보다 작은 부분을 모두 잘라낸다. */
+static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float minDot);
 
 /* `o1`에서 `v1` 방향으로 진행하는 광선이 `o2`에서 `v2` 방향으로 진행하는 광선과 만나는지 계산한다. */
 static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector2 v2, float *distance);
@@ -98,7 +98,7 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
                 &distance
             );
             
-            result.check = (distance >= 0.0f) && (distance <= ray.max_distance);
+            result.check = (distance >= 0.0f) && (distance <= ray.maxDistance);
             result.inside = (distance < 0.0f);
             
             if (result.check) {
@@ -131,7 +131,7 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
                     &distance
                 );
                 
-                if (intersects && distance <= ray.max_distance) {
+                if (intersects && distance <= ray.maxDistance) {
                     if (result.distance > distance) {
                         result.distance = distance;
                         
@@ -181,7 +181,7 @@ static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
     
     frVertices vertices = frGetPolygonVertices(s);
     
-    float max_dot = -FLT_MAX;
+    float maxDot = -FLT_MAX;
     int result = 0;
 
     v = frVec2Rotate(v, -tx.rotation);
@@ -189,8 +189,8 @@ static int frGetPolygonFurthestIndex(frShape *s, frTransform tx, Vector2 v) {
     for (int i = 0; i < vertices.count; i++) {
         float dot = frVec2DotProduct(vertices.data[i], v);
         
-        if (max_dot < dot) {
-            max_dot = dot;
+        if (maxDot < dot) {
+            maxDot = dot;
             result = i;
         }
     }
@@ -214,27 +214,27 @@ static frVertices frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 
         
         return result;
     } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-        int furthest_index = frGetPolygonFurthestIndex(s, tx, v);
+        int furthestIndex = frGetPolygonFurthestIndex(s, tx, v);
         
         frVertices vertices = frGetPolygonVertices(s);
 
-        int prev_index = (furthest_index == 0) ? vertices.count - 1 : furthest_index - 1;
-        int next_index = (furthest_index == vertices.count - 1) ? 0 : furthest_index + 1;
+        int prevIndex = (furthestIndex == 0) ? vertices.count - 1 : furthestIndex - 1;
+        int nextIndex = (furthestIndex == vertices.count - 1) ? 0 : furthestIndex + 1;
 
-        Vector2 furthest_vertex = frVec2Transform(vertices.data[furthest_index], tx);
+        Vector2 furthestVertex = frVec2Transform(vertices.data[furthestIndex], tx);
 
-        Vector2 prev_vertex = frVec2Transform(vertices.data[prev_index], tx);
-        Vector2 next_vertex = frVec2Transform(vertices.data[next_index], tx);
+        Vector2 prevVertex = frVec2Transform(vertices.data[prevIndex], tx);
+        Vector2 nextVertex = frVec2Transform(vertices.data[nextIndex], tx);
 
-        Vector2 left_v = frVec2Normalize(frVec2Subtract(furthest_vertex, prev_vertex));
-        Vector2 right_v = frVec2Normalize(frVec2Subtract(furthest_vertex, next_vertex));
+        Vector2 leftV = frVec2Normalize(frVec2Subtract(furthestVertex, prevVertex));
+        Vector2 rightV = frVec2Normalize(frVec2Subtract(furthestVertex, nextVertex));
 
-        if (frVec2DotProduct(left_v, v) < frVec2DotProduct(right_v, v)) {
-            result.data[0] = prev_vertex;
-            result.data[1] = furthest_vertex;
+        if (frVec2DotProduct(leftV, v) < frVec2DotProduct(rightV, v)) {
+            result.data[0] = prevVertex;
+            result.data[1] = furthestVertex;
         } else {
-            result.data[0] = furthest_vertex;
-            result.data[1] = next_vertex;
+            result.data[0] = furthestVertex;
+            result.data[1] = nextVertex;
         }
         
         result.count = 2;
@@ -256,24 +256,24 @@ static int frGetSeparatingAxisIndex(
     
     frVertices normals = frGetPolygonNormals(s1);
     
-    float max_distance = -FLT_MAX;
+    float maxDistance = -FLT_MAX;
     
     for (int i = 0; i < normals.count; i++) {
         Vector2 vertex = frVec2Transform(frGetPolygonVertex(s1, i), tx1);
         Vector2 normal = frVec2RotateTx(normals.data[i], tx1);
         
-        int furthest_index = frGetPolygonFurthestIndex(s2, tx2, frVec2Negate(normal));
-        Vector2 furthest_vertex = frVec2Transform(frGetPolygonVertex(s2, furthest_index), tx2);
+        int furthestIndex = frGetPolygonFurthestIndex(s2, tx2, frVec2Negate(normal));
+        Vector2 furthestVertex = frVec2Transform(frGetPolygonVertex(s2, furthestIndex), tx2);
         
-        float distance = frVec2DotProduct(normal, frVec2Subtract(furthest_vertex, vertex));
+        float distance = frVec2DotProduct(normal, frVec2Subtract(furthestVertex, vertex));
         
-        if (max_distance < distance) {
-            max_distance = distance;
+        if (maxDistance < distance) {
+            maxDistance = distance;
             result = i;
         }
     }
     
-    *depth = max_distance;
+    *depth = maxDistance;
     
     return result;
 }
@@ -287,22 +287,22 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
 
     Vector2 diff = frVec2Subtract(tx2.position, tx1.position);
 
-    float radius_sum = frGetCircleRadius(s1) + frGetCircleRadius(s2);
-    float magnitude_sqr = frVec2MagnitudeSqr(diff);
+    float radiusSum = frGetCircleRadius(s1) + frGetCircleRadius(s2);
+    float magnitudeSqr = frVec2MagnitudeSqr(diff);
     
-    if (radius_sum * radius_sum < magnitude_sqr) return result;
+    if (radiusSum * radiusSum < magnitudeSqr) return result;
 
-    float diff_magnitude = sqrtf(magnitude_sqr);
+    float diffMagnitude = sqrtf(magnitudeSqr);
 
     result.check = true;
 
-    if (diff_magnitude > 0.0f) {
-        result.direction = frVec2ScalarMultiply(diff, 1.0f / diff_magnitude);
+    if (diffMagnitude > 0.0f) {
+        result.direction = frVec2ScalarMultiply(diff, 1.0f / diffMagnitude);
         
         frVertices e = frGetShapeSignificantEdge(s1, tx1, result.direction);
         
         result.points[0] = result.points[1] = e.data[0];
-        result.depths[0] = result.depths[1] = radius_sum - diff_magnitude;
+        result.depths[0] = result.depths[1] = radiusSum - diffMagnitude;
     } else {
         result.direction = (Vector2) { .x = 1.0f };
         
@@ -326,11 +326,11 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
     frCollision result = FR_STRUCT_ZERO(frCollision);
         
     frShape *circle = s1, *polygon = s2;
-    frTransform circle_tx = tx1, polygon_tx = tx2;
+    frTransform circleTx = tx1, polygonTx = tx2;
     
     if (frGetShapeType(s1) == FR_SHAPE_POLYGON && frGetShapeType(s2) == FR_SHAPE_CIRCLE) {
         circle = s2, polygon = s1;
-        circle_tx = tx2, polygon_tx = tx1;
+        circleTx = tx2, polygonTx = tx1;
     }
 
     frVertices vertices = frGetPolygonVertices(polygon);
@@ -338,12 +338,12 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
     // 다각형의 꼭짓점과 법선 벡터를 변환하는 대신, 원의 중심을 다각형을 기준으로 변환한다.
     Vector2 center = frVec2Rotate(
-        frVec2Subtract(circle_tx.position, polygon_tx.position), 
-        -polygon_tx.rotation
+        frVec2Subtract(circleTx.position, polygonTx.position), 
+        -polygonTx.rotation
     );
 
-    float radius = frGetCircleRadius(circle), max_distance = -FLT_MAX;
-    int normal_index = -1;
+    float radius = frGetCircleRadius(circle), maxDistance = -FLT_MAX;
+    int normalIndex = -1;
 
     // 다각형에서 원의 중심과 거리가 가장 가까운 변을 찾는다.
     for (int i = 0; i < vertices.count; i++) {
@@ -355,34 +355,34 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         // 꼭짓점 하나라도 원의 바깥쪽에 있다면, 계산을 종료한다.
         if (distance > radius) return result;
         
-        if (max_distance < distance) {
-            max_distance = distance;
-            normal_index = i;
+        if (maxDistance < distance) {
+            maxDistance = distance;
+            normalIndex = i;
         }
     }
 
     // 다각형이 원의 중심을 포함하고 있다면, 계산을 종료한다.
-    if (max_distance < 0.0f) {
+    if (maxDistance < 0.0f) {
         result.check = true;
 
-        result.direction = frVec2Negate(frVec2RotateTx(normals.data[normal_index], polygon_tx));
+        result.direction = frVec2Negate(frVec2RotateTx(normals.data[normalIndex], polygonTx));
 
         if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
             result.direction = frVec2Negate(result.direction);
 
         result.points[0] = result.points[1] = frVec2Add(
-            circle_tx.position,
+            circleTx.position,
             frVec2ScalarMultiply(result.direction, -radius)
         );
 
-        result.depths[0] = result.depths[1] = radius - max_distance;
+        result.depths[0] = result.depths[1] = radius - maxDistance;
 
         result.count = 1;
     } else {
-        Vector2 v1 = (normal_index > 0)
-            ? vertices.data[normal_index - 1]
+        Vector2 v1 = (normalIndex > 0)
+            ? vertices.data[normalIndex - 1]
             : vertices.data[vertices.count - 1];
-        Vector2 v2 = vertices.data[normal_index];
+        Vector2 v2 = vertices.data[normalIndex];
 
         /*
             1. 원이 `v1`을 포함하는 선분과 만나는가?
@@ -401,41 +401,41 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 
             if (magnitude_sqr > radius * radius) return result;
 
-            result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff1), polygon_tx));
+            result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff1), polygonTx));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
             
-            result.points[0] = result.points[1] = frVec2Transform(v1, polygon_tx);
+            result.points[0] = result.points[1] = frVec2Transform(v1, polygonTx);
             result.depths[0] = result.depths[1] = radius - sqrtf(magnitude_sqr);
         } else if (v2_dot <= 0.0f) {
             float magnitude_sqr = frVec2MagnitudeSqr(diff2);
 
             if (magnitude_sqr > radius * radius) return result;
             
-            result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff2), polygon_tx));
+            result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff2), polygonTx));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
 
-            result.points[0] = result.points[1] = frVec2Transform(v2, polygon_tx);
+            result.points[0] = result.points[1] = frVec2Transform(v2, polygonTx);
             result.depths[0] = result.depths[1] = radius - sqrtf(magnitude_sqr);
         } else {
-            Vector2 normal = normals.data[normal_index];
+            Vector2 normal = normals.data[normalIndex];
 
             if (frVec2DotProduct(diff1, normal) > radius) return result;
 
-            result.direction = frVec2Negate(frVec2RotateTx(normal, polygon_tx));
+            result.direction = frVec2Negate(frVec2RotateTx(normal, polygonTx));
 
             if (frVec2DotProduct(frVec2Subtract(tx2.position, tx1.position), result.direction) < 0.0f)
                 result.direction = frVec2Negate(result.direction);
 
             result.points[0] = result.points[1] = frVec2Add(
-                circle_tx.position,
+                circleTx.position,
                 frVec2ScalarMultiply(result.direction, -radius)
             );
 
-            result.depths[0] = result.depths[1] = radius - max_distance;
+            result.depths[0] = result.depths[1] = radius - maxDistance;
         }
 
         result.check = true;
@@ -476,36 +476,36 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
     frVertices e1 = frGetShapeSignificantEdge(s1, tx1, direction);
     frVertices e2 = frGetShapeSignificantEdge(s2, tx2, frVec2Negate(direction));
     
-    frVertices ref_e = e1, inc_e = e2;
-    frTransform ref_tx = tx1, inc_tx = tx2;
+    frVertices refEdge = e1, incEdge = e2;
+    frTransform refTx = tx1, incTx = tx2;
 
     float dot1 = frVec2DotProduct(frVec2Subtract(e1.data[1], e1.data[0]), direction);
     float dot2 = frVec2DotProduct(frVec2Subtract(e2.data[1], e2.data[0]), direction);
 
     if (fabsf(dot1) > fabsf(dot2)) {
-        ref_e = e2;
-        inc_e = e1;
+        refEdge = e2;
+        incEdge = e1;
 
-        ref_tx = tx2;
-        inc_tx = tx1;
+        refTx = tx2;
+        incTx = tx1;
     }
 
-    Vector2 ref_v = frVec2Normalize(frVec2Subtract(ref_e.data[1], ref_e.data[0]));
+    Vector2 refV = frVec2Normalize(frVec2Subtract(refEdge.data[1], refEdge.data[0]));
 
-    float ref_dot1 = frVec2DotProduct(ref_e.data[0], ref_v);
-    float ref_dot2 = frVec2DotProduct(ref_e.data[1], ref_v);
+    float refDot1 = frVec2DotProduct(refEdge.data[0], refV);
+    float refDot2 = frVec2DotProduct(refEdge.data[1], refV);
 
-    inc_e = frClipEdgeWithAxis(inc_e, ref_v, ref_dot1);
-    inc_e = frClipEdgeWithAxis(inc_e, frVec2Negate(ref_v), -ref_dot2);
+    incEdge = frClipEdgeWithAxis(incEdge, refV, refDot1);
+    incEdge = frClipEdgeWithAxis(incEdge, frVec2Negate(refV), -refDot2);
 
-    Vector2 ref_normal_v = frVec2RightNormal(ref_v);
+    Vector2 refNormal = frVec2RightNormal(refV);
 
-    float max_depth = frVec2DotProduct(ref_e.data[0], ref_normal_v);
+    float max_depth = frVec2DotProduct(refEdge.data[0], refNormal);
 
-    result.points[0] = inc_e.data[0], result.points[1] = inc_e.data[1];
+    result.points[0] = incEdge.data[0], result.points[1] = incEdge.data[1];
 
-    result.depths[0] = frVec2DotProduct(result.points[0], ref_normal_v) - max_depth;
-    result.depths[1] = frVec2DotProduct(result.points[1], ref_normal_v) - max_depth;
+    result.depths[0] = frVec2DotProduct(result.points[0], refNormal) - max_depth;
+    result.depths[1] = frVec2DotProduct(result.points[1], refNormal) - max_depth;
 
     result.count = 2;
 
@@ -526,50 +526,50 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
 
 /* 최적화된 분리 축 정리를 이용하여, 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
 static frCollision frComputeCollisionSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
-    frShapeType s1_type = frGetShapeType(s1);
-    frShapeType s2_type = frGetShapeType(s2);
+    frShapeType type1 = frGetShapeType(s1);
+    frShapeType type2 = frGetShapeType(s2);
     
-    if (s1_type == FR_SHAPE_UNKNOWN || s2_type == FR_SHAPE_UNKNOWN)
+    if (type1 == FR_SHAPE_UNKNOWN || type2 == FR_SHAPE_UNKNOWN)
         return FR_STRUCT_ZERO(frCollision);
-    else if (s1_type == FR_SHAPE_CIRCLE && s2_type == FR_SHAPE_CIRCLE)
+    else if (type1 == FR_SHAPE_CIRCLE && type2 == FR_SHAPE_CIRCLE)
         return frComputeCollisionCirclesSAT(s1, tx1, s2, tx2);
-    else if (s1_type == FR_SHAPE_CIRCLE && s2_type == FR_SHAPE_POLYGON
-        || s1_type == FR_SHAPE_POLYGON && s2_type == FR_SHAPE_CIRCLE)
+    else if (type1 == FR_SHAPE_CIRCLE && type2 == FR_SHAPE_POLYGON
+        || type1 == FR_SHAPE_POLYGON && type2 == FR_SHAPE_CIRCLE)
         return frComputeCollisionCirclePolySAT(s1, tx1, s2, tx2);
-    else if (s1_type == FR_SHAPE_POLYGON && s2_type == FR_SHAPE_POLYGON)
+    else if (type1 == FR_SHAPE_POLYGON && type2 == FR_SHAPE_POLYGON)
         return frComputeCollisionPolysSAT(s1, tx1, s2, tx2);
 }
 
-/* 선분 `e`에서 벡터 `v`와의 내적이 `min_dot`보다 작은 부분을 모두 잘라낸다. */
-static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float min_dot) {
+/* 선분 `e`에서 벡터 `v`와의 내적이 `minDot`보다 작은 부분을 모두 잘라낸다. */
+static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float minDot) {
     frVertices result = FR_STRUCT_ZERO(frVertices);
     
-    float p1_dot = frVec2DotProduct(e.data[0], v) - min_dot;
-    float p2_dot = frVec2DotProduct(e.data[1], v) - min_dot;
+    float p1Dot = frVec2DotProduct(e.data[0], v) - minDot;
+    float p2Dot = frVec2DotProduct(e.data[1], v) - minDot;
     
-    bool inside_p1 = (p1_dot >= 0.0f), inside_p2 = (p2_dot >= 0.0f);
+    bool insideP1 = (p1Dot >= 0.0f), insideP2 = (p2Dot >= 0.0f);
     
-    if (inside_p1 && inside_p2) {
+    if (insideP1 && insideP2) {
         result.data[0] = e.data[0];
         result.data[1] = e.data[1];
         
         result.count = 2;
     } else {
-        Vector2 e_v = frVec2Subtract(e.data[1], e.data[0]);
+        Vector2 edgeV = frVec2Subtract(e.data[1], e.data[0]);
         
-        float distance = p1_dot / (p1_dot - p2_dot);
+        float distance = p1Dot / (p1Dot - p2Dot);
         
         Vector2 midpoint = frVec2Add(
             e.data[0], 
-            frVec2ScalarMultiply(e_v, distance)
+            frVec2ScalarMultiply(edgeV, distance)
         );
         
-        if (inside_p1 && !inside_p2) {
+        if (insideP1 && !insideP2) {
             result.data[0] = e.data[0];
             result.data[1] = midpoint;
 
             result.count = 2;
-        } else if (!inside_p1 && inside_p2) {
+        } else if (!insideP1 && insideP2) {
             result.data[0] = e.data[1];
             result.data[1] = midpoint;
 
@@ -595,10 +595,10 @@ static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector
     
     Vector2 diff = frVec2Subtract(o2, o1);
 
-    float inverse_cross = 1.0f / cross;
+    float inverseCross = 1.0f / cross;
 
-    float t = frVec2CrossProduct(diff, v2) * inverse_cross;
-    float u = frVec2CrossProduct(diff, v1) * inverse_cross;
+    float t = frVec2CrossProduct(diff, v2) * inverseCross;
+    float u = frVec2CrossProduct(diff, v1) * inverseCross;
 
     // 두 광선은 평행하지 않으면서 서로 만나지 않는다.
     if (t < 0.0f || u < 0.0f || u > 1.0f) result = false;
@@ -616,13 +616,13 @@ static bool frComputeIntersectionRayCircle(Vector2 o, Vector2 v, Vector2 c, floa
     
     float dot = frVec2DotProduct(diff, v);
     
-    float height_sqr = frVec2MagnitudeSqr(diff) - (dot * dot);
-    float base_sqr = (r * r) - height_sqr;
+    float heightSqr = frVec2MagnitudeSqr(diff) - (dot * dot);
+    float baseSqr = (r * r) - heightSqr;
     
     // 광선과 원은 서로 만나지 않는다.
-    if (dot < 0.0f || base_sqr < 0.0f) result = false;
+    if (dot < 0.0f || baseSqr < 0.0f) result = false;
     
-    *distance = dot - sqrtf(base_sqr);
+    *distance = dot - sqrtf(baseSqr);
     
     return result;
 }
