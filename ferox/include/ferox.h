@@ -85,7 +85,7 @@ extern "C" {
 
 /* | 사용자 설정 매크로 정의... | */
 
-#define FR_BROADPHASE_CELL_SIZE                   3.5f
+#define FR_BROADPHASE_CELL_SIZE                   3.2f
 #define FR_BROADPHASE_INVERSE_CELL_SIZE           (1.0f / (FR_BROADPHASE_CELL_SIZE))
 
 #define FR_DEBUG_CIRCLE_SEGMENT_COUNT             32

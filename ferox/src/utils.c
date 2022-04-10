@@ -25,13 +25,13 @@
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
 
+/* | `utils` 모듈 매크로 정의... | */
+
+#define TWO_PI (2.0f * PI)
+
 /* | `utils` 모듈 상수... | */
 
-/* Using a variable to calculate the value of another during compile-time
-    also upsets MSVC(kek) so i just changed TWO_PI inside INVERSE_TWO_PI
-    to it's actual value.
-    */
-const float TWO_PI = (2.0f * PI), INVERSE_TWO_PI = (1.0f / (2.0f * PI));
+const float INVERSE_TWO_PI = (1.0f / TWO_PI);
 
 /* | `utils` 모듈 함수... | */
 

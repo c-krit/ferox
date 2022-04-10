@@ -80,19 +80,14 @@ void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
-            /* Due to a macro expansion down the line (more specifically
-                STBDS_ADDRESSOF inside stbds_hmgeti), "x + y" gets expanded
-                as &(x + y) which throws some really bad errors if you're using
-                MSVC to compile. An easy fix is to simply give it an address via
-                a variable
-                */
-            int xyvalue = x + y;
-            frSpatialEntry *entry = hmgetp_null(hash->map, xyvalue);
+            const int key = x + y;
+
+            frSpatialEntry *entry = hmgetp_null(hash->map, key);
             
             if (entry != NULL) {
                 arrput(entry->values, value);
             } else {
-                frSpatialEntry entry = { x + y, NULL };
+                frSpatialEntry entry = { .key = key };
 
                 arrput(entry.values, value);
                 hmputs(hash->map, entry);

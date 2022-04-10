@@ -32,9 +32,8 @@
     .height = SCREEN_HEIGHT_IN_METERS       \
 })
 
-#define CIRCLE_MATERIAL ((frMaterial) {  0.1f, 0.85f, 0.35f, 0.5f })
-#define CURSOR_MATERIAL ((frMaterial) {  2.5f,  0.5f, 0.5f, 0.75f })
-#define WALL_MATERIAL   ((frMaterial) { 1.25f, 0.85f, 0.5f, 0.75f })
+#define CIRCLE_MATERIAL ((frMaterial) { 0.05f, 0.85f, 0.25f, 0.5f })
+#define WALL_MATERIAL   ((frMaterial) { 2.25f, 0.85f, 0.5f, 0.75f })
 
 #define MAX_CIRCLE_COUNT  216
 #define MAX_WALL_COUNT    3
@@ -86,7 +85,7 @@ void InitExample(void) {
             CIRCLE_RADIUS,
             0.0f,
             360.0f,
-            32,
+            16,
             RED
         );
 
@@ -142,10 +141,10 @@ void InitExample(void) {
         frAddToWorld(world, walls[i]);
 
     for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
-        Vector2 position = FR_STRUCT_ZERO(Vector2);
-        
-        position.x = GetRandomValue(0.18f * SCREEN_WIDTH, 0.5f * SCREEN_WIDTH);
-        position.y = GetRandomValue(0.2f * SCREEN_HEIGHT, 0.35f * SCREEN_HEIGHT);
+        Vector2 position = {
+            GetRandomValue(0.25f * SCREEN_WIDTH, 0.75f * SCREEN_WIDTH),
+            GetRandomValue(0.1f * SCREEN_HEIGHT, 0.35f * SCREEN_HEIGHT)
+        };
 
         circles[i] = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
@@ -186,20 +185,22 @@ void UpdateExample(void) {
         for (int i = 0; i < MAX_WALL_COUNT; i++)
             frDrawBody(walls[i], BLACK);
 
+        const Rectangle source = (Rectangle) {
+            .width = 2.0f * CIRCLE_RADIUS,
+            .height = 2.0f * CIRCLE_RADIUS
+        };
+
         for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
             Vector2 position = frGetBodyPosition(circles[i]);
 
             DrawTexturePro(
                 rtx.texture,
-                (Rectangle) {
-                    .width = 2.0f * CIRCLE_RADIUS,
-                    .height = 2.0f * CIRCLE_RADIUS,
-                },
+                source,
                 (Rectangle) {
                     .x = frNumberMetersToPixels(position.x), 
                     .y = frNumberMetersToPixels(position.y),
-                    .width = 2.0f * CIRCLE_RADIUS,
-                    .height = 2.0f * CIRCLE_RADIUS
+                    .width = source.width,
+                    .height = source.height
                 },
                 (Vector2) { CIRCLE_RADIUS, CIRCLE_RADIUS },
                 RAD2DEG * frGetBodyRotation(circles[i]),
