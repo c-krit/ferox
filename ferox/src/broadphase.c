@@ -80,7 +80,14 @@ void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
-            frSpatialEntry *entry = hmgetp_null(hash->map, x + y);
+            /* Due to a macro expansion down the line (more specifically
+                STBDS_ADDRESSOF inside stbds_hmgeti), "x + y" gets expanded
+                as &(x + y) which throws some really bad errors if you're using
+                MSVC to compile. An easy fix is to simply give it an address via
+                a variable
+                */
+            int value = x + y;
+            frSpatialEntry *entry = hmgetp_null(hash->map, value);
             
             if (entry != NULL) {
                 arrput(entry->values, value);
@@ -124,7 +131,9 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
-            frSpatialEntry *entry = hmgetp_null(hash->map, x + y);
+            // See comment inside function "frAddToSpatialHash"
+            int value = x + y;
+            frSpatialEntry *entry = hmgetp_null(hash->map, value);
 
             if (entry != NULL) 
                 for (int j = 0; j < arrlen(entry->values); j++)
