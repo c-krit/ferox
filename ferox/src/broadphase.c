@@ -86,8 +86,8 @@ void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
                 MSVC to compile. An easy fix is to simply give it an address via
                 a variable
                 */
-            int value = x + y;
-            frSpatialEntry *entry = hmgetp_null(hash->map, value);
+            int xyvalue = x + y;
+            frSpatialEntry *entry = hmgetp_null(hash->map, xyvalue);
             
             if (entry != NULL) {
                 arrput(entry->values, value);
@@ -132,8 +132,8 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
             // See comment inside function "frAddToSpatialHash"
-            int value = x + y;
-            frSpatialEntry *entry = hmgetp_null(hash->map, value);
+            int xyvalue = x + y;
+            frSpatialEntry *entry = hmgetp_null(hash->map, xyvalue);
 
             if (entry != NULL) 
                 for (int j = 0; j < arrlen(entry->values); j++)
