@@ -20,7 +20,7 @@ A lightweight 2D collision detection and physics library written in C.
 ## Features
 
 <div align="center">
-<img src="examples/res/images/bricks.gif" width="600" alt="Bricks!">
+<img src="examples/res/images/readme.gif" width="640" alt="c-krit/ferox: demo">
 </div>
 
 <br />

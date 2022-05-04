@@ -19,7 +19,9 @@
 
 ## 주요 기능
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/bricks.gif" width="600" alt="Bricks!">  
+<div align="center">
+<img src="examples/res/images/readme.gif" width="640" alt="c-krit/ferox: demo">
+</div>
 
 **이 프로젝트는 제가 물리 엔진의 구조를 이해하기 위해 만들었으며, 새로운 기능이 자주 추가되지 않을 수도 있습니다.**
 
