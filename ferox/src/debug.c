@@ -78,9 +78,9 @@ const float ARROW_HEAD_LENGTH = 16.0f;
                 color
             );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-            frVertices world_vertices = frGetWorldVerticesInPixels(b);
+            frVertices worldVertices = frGetWorldVerticesInPixels(b);
             
-            DrawTriangleFan(world_vertices.data, world_vertices.count, color);
+            DrawTriangleFan(worldVertices.data, worldVertices.count, color);
         }
     }
 
@@ -103,10 +103,10 @@ const float ARROW_HEAD_LENGTH = 16.0f;
                 color
             );
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-            frVertices world_vertices = frGetWorldVerticesInPixels(b);
+            frVertices worldVertices = frGetWorldVerticesInPixels(b);
                 
-            for (int j = world_vertices.count - 1, i = 0; i < world_vertices.count; j = i, i++)
-                DrawLineEx(world_vertices.data[j], world_vertices.data[i], thick, color);
+            for (int j = worldVertices.count - 1, i = 0; i < worldVertices.count; j = i, i++)
+                DrawLineEx(worldVertices.data[j], worldVertices.data[i], thick, color);
         }
     }
 

@@ -114,7 +114,7 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
             
             return result;
         } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-            int intersection_count = 0;
+            int intersectionCount = 0;
             
             frVertices vertices = frGetPolygonVertices(s);
             
@@ -143,12 +143,12 @@ frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
                         result.normal = frVec2LeftNormal(diff);
                     }
                     
-                    intersection_count++;
+                    intersectionCount++;
                 }
             }
             
-            result.inside = (intersection_count & 1);
-            result.check = (!result.inside) && (intersection_count > 0);
+            result.inside = (intersectionCount & 1);
+            result.check = (!result.inside) && (intersectionCount > 0);
             
             return result;
         }
@@ -393,13 +393,13 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
         */
         Vector2 diff1 = frVec2Subtract(center, v1), diff2 = frVec2Subtract(center, v2);
 
-        float v1_dot = frVec2DotProduct(diff1, frVec2Subtract(v2, v1));
-        float v2_dot = frVec2DotProduct(diff2, frVec2Subtract(v1, v2));
+        float v1Dot = frVec2DotProduct(diff1, frVec2Subtract(v2, v1));
+        float v2Dot = frVec2DotProduct(diff2, frVec2Subtract(v1, v2));
 
-        if (v1_dot <= 0.0f) {
-            float magnitude_sqr = frVec2MagnitudeSqr(diff1);
+        if (v1Dot <= 0.0f) {
+            float magnitudeSqr = frVec2MagnitudeSqr(diff1);
 
-            if (magnitude_sqr > radius * radius) return result;
+            if (magnitudeSqr > radius * radius) return result;
 
             result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff1), polygonTx));
 
@@ -407,11 +407,11 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
                 result.direction = frVec2Negate(result.direction);
             
             result.points[0] = result.points[1] = frVec2Transform(v1, polygonTx);
-            result.depths[0] = result.depths[1] = radius - sqrtf(magnitude_sqr);
-        } else if (v2_dot <= 0.0f) {
-            float magnitude_sqr = frVec2MagnitudeSqr(diff2);
+            result.depths[0] = result.depths[1] = radius - sqrtf(magnitudeSqr);
+        } else if (v2Dot <= 0.0f) {
+            float magnitudeSqr = frVec2MagnitudeSqr(diff2);
 
-            if (magnitude_sqr > radius * radius) return result;
+            if (magnitudeSqr > radius * radius) return result;
             
             result.direction = frVec2Normalize(frVec2RotateTx(frVec2Negate(diff2), polygonTx));
 
@@ -419,7 +419,7 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
                 result.direction = frVec2Negate(result.direction);
 
             result.points[0] = result.points[1] = frVec2Transform(v2, polygonTx);
-            result.depths[0] = result.depths[1] = radius - sqrtf(magnitude_sqr);
+            result.depths[0] = result.depths[1] = radius - sqrtf(magnitudeSqr);
         } else {
             Vector2 normal = normals.data[normalIndex];
 
