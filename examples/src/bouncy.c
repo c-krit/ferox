@@ -32,7 +32,7 @@
     .height = SCREEN_HEIGHT_IN_METERS       \
 })
 
-#define CIRCLE_MATERIAL ((frMaterial) { 0.05f, 0.85f, 0.5f, 0.35f })
+#define CIRCLE_MATERIAL ((frMaterial) { 0.1f, 0.85f, 0.5f, 0.35f })
 #define WALL_MATERIAL   ((frMaterial) { 2.25f, 0.85f, 0.75f, 0.5f })
 
 #define MAX_CIRCLE_COUNT  216
@@ -142,8 +142,8 @@ void InitExample(void) {
 
     for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
         Vector2 position = {
-            GetRandomValue(0.25f * SCREEN_WIDTH, 0.75f * SCREEN_WIDTH),
-            GetRandomValue(0.1f * SCREEN_HEIGHT, 0.35f * SCREEN_HEIGHT)
+            GetRandomValue(0.28f * SCREEN_WIDTH, 0.75f * SCREEN_WIDTH),
+            GetRandomValue(0.12f * SCREEN_HEIGHT, 0.36f * SCREEN_HEIGHT)
         };
 
         circles[i] = frCreateBodyFromShape(
@@ -170,8 +170,7 @@ void UpdateExample(void) {
     for (int i = 0; i < frGetWorldBodyCount(world); i++) {
         frBody *body = frGetWorldBody(world, i);
         
-        if (frGetBodyType(body) != FR_BODY_STATIC 
-            && !frIsInWorldBounds(world, body)) 
+        if (frGetBodyType(body) != FR_BODY_STATIC && !frIsInWorldBounds(world, body))
             frRemoveFromWorld(world, body);
     }
 
