@@ -25,6 +25,8 @@
 _COLOR_BEGIN := $(shell tput setaf 2)
 _COLOR_END := $(shell tput sgr0)
 
+# TODO: Edit this value to match your raylib installation path
+# (if you're building this project for Windows!)
 RAYLIB_PATH ?= ../raylib
 
 PROJECT_NAME := ferox
@@ -60,13 +62,17 @@ ifneq ($(BUILD),STANDALONE)
 	TARGETS := $(LIBRARY_PATH)/lib$(PROJECT_PATH).a
 endif
 
-HOST_PLATFORM := LINUX
+HOST_PLATFORM := UNKNOWN
 
 ifeq ($(OS),Windows_NT)
-	PROJECT_PREFIX := $(PROJECT_FULL_NAME):
+	ifeq "$(findstring ;,$(PATH))" ";"
+		PROJECT_PREFIX := $(PROJECT_FULL_NAME):
+	endif
+
+# MINGW-W64 or MSYS2...?
 	HOST_PLATFORM := WINDOWS
 else
-	UNAME = $(shell uname)
+	UNAME = $(shell uname 2>/dev/null)
 
 	ifeq ($(UNAME),Linux)
 		HOST_PLATFORM = LINUX

@@ -126,9 +126,9 @@ void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **queries) {
     
     for (int y = y0; y <= y1; y += hash->bounds.width) {
         for (int x = x0; x <= x1; x++) {
-            // See comment inside function "frAddToSpatialHash"
-            int xyvalue = x + y;
-            frSpatialEntry *entry = hmgetp_null(hash->map, xyvalue);
+            const int key = x + y;
+
+            frSpatialEntry *entry = hmgetp_null(hash->map, key);
 
             if (entry != NULL) 
                 for (int j = 0; j < arrlen(entry->values); j++)
