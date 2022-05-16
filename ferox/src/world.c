@@ -100,8 +100,8 @@ void frClearWorld(frWorld *world) {
     
     frClearSpatialHash(world->hash);
     
-    arrdeln(world->bodies, 0, arrlen(world->bodies));
-    arrdeln(world->collisions, 0, arrlen(world->collisions));
+    arrsetlen(world->bodies, 0);
+    arrsetlen(world->collisions, 0);
 }
 
 /* 세계 `world`에서 강체 `b`를 제거한다. */
@@ -111,6 +111,7 @@ bool frRemoveFromWorld(frWorld *world, frBody *b) {
     for (int i = 0; i < arrlen(world->bodies); i++) {
         if (world->bodies[i] == b) {
             arrdeln(world->bodies, i, 1);
+
             return true;
         }
     }
@@ -200,30 +201,28 @@ void frSimulateWorld(frWorld *world, double dt) {
 int frQueryWorldSpatialHash(frWorld *world, Rectangle rec, frBody **bodies) {
     if (world == NULL || bodies == NULL) return 0;
 
-    arrdeln(world->queries, 0, arrlen(world->queries));
+    arrsetlen(world->queries, 0);
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
 
     frQuerySpatialHash(world->hash, rec, &world->queries);
 
-    if (arrlen(world->queries) <= 0) return 0;
+    int result = arrlen(world->queries);
 
-    int count = 0;
-
-    for (int i = 0; i < arrlen(world->queries); i++)
-        bodies[count++] = world->bodies[world->queries[i]];
+    for (int i = 0; i < result; i++)
+        bodies[i] = world->bodies[world->queries[i]];
 
     frClearSpatialHash(world->hash);
 
-    return count;
+    return result;
 }
 
 /* 세계 `world`의 모든 강체에 광선을 투사한다. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits) {
     if (world == NULL || hits == NULL) return 0;
 
-    arrdeln(world->queries, 0, arrlen(world->queries));
+    arrsetlen(world->queries, 0);
 
     for (int i = 0; i < arrlen(world->bodies); i++) 
         frAddToSpatialHash(world->hash, frGetBodyAABB(world->bodies[i]), i);
@@ -317,7 +316,7 @@ static void frPreUpdateWorld(frWorld *world) {
             }
         }
         
-        arrdeln(world->queries, 0, arrlen(world->queries));
+        arrsetlen(world->queries, 0);
     }
 }
 
@@ -328,7 +327,7 @@ static void frPostUpdateWorld(frWorld *world) {
     for (int i = 0; i < arrlen(world->bodies); i++)
         frClearBodyForces(world->bodies[i]);
     
-    arrdeln(world->collisions, 0, arrlen(world->collisions));
+    arrsetlen(world->collisions, 0);
     
     frClearSpatialHash(world->hash);
 }

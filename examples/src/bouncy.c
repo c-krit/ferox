@@ -33,9 +33,9 @@
 })
 
 #define CIRCLE_MATERIAL ((frMaterial) { 0.1f, 0.85f, 0.5f, 0.35f })
-#define WALL_MATERIAL   ((frMaterial) { 2.25f, 0.85f, 0.75f, 0.5f })
+#define WALL_MATERIAL   ((frMaterial) { 2.25f, 0.85f, 0.5f, 0.35f })
 
-#define MAX_CIRCLE_COUNT  216
+#define MAX_CIRCLE_COUNT  240
 #define MAX_WALL_COUNT    3
 
 #define CIRCLE_RADIUS     9.6f
@@ -101,7 +101,7 @@ void InitExample(void) {
 
     const frVertices wall_vertices = {
         .data = {
-            frVec2PixelsToMeters((Vector2) { -0.2f * SCREEN_WIDTH, -0.18f * SCREEN_HEIGHT }),
+            frVec2PixelsToMeters((Vector2) { -0.2f * SCREEN_WIDTH, -0.28f * SCREEN_HEIGHT }),
             frVec2PixelsToMeters((Vector2) { -0.2f * SCREEN_WIDTH,  0.18f * SCREEN_HEIGHT }),
             frVec2PixelsToMeters((Vector2) {  0.2f * SCREEN_WIDTH,  0.18f * SCREEN_HEIGHT })
         },
@@ -142,8 +142,8 @@ void InitExample(void) {
 
     for (int i = 0; i < MAX_CIRCLE_COUNT; i++) {
         Vector2 position = {
-            GetRandomValue(0.28f * SCREEN_WIDTH, 0.75f * SCREEN_WIDTH),
-            GetRandomValue(0.12f * SCREEN_HEIGHT, 0.36f * SCREEN_HEIGHT)
+            GetRandomValue(0.2f * SCREEN_WIDTH, 0.78f * SCREEN_WIDTH),
+            GetRandomValue(0.08f * SCREEN_HEIGHT, 0.32f * SCREEN_HEIGHT)
         };
 
         circles[i] = frCreateBodyFromShape(
