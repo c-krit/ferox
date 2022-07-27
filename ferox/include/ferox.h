@@ -39,13 +39,13 @@
     #define DEG2RAD (PI / 180.0f)
     #define RAD2DEG (180.0f / PI)
 
-    /* 2차원 벡터를 나타내는 구조체. */
+    /* A struct that represents a two-dimensional vector. */
     typedef struct Vector2 {
         float x;
         float y;
     } Vector2;
 
-    /* 직사각형을 나타내는 구조체. */
+    /* A struct that represents a rectangle. */
     typedef struct Rectangle {
         float x;
         float y;
@@ -56,7 +56,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    /* 직사각형 `rec1`과 `rec2`가 서로 충돌하는지 확인한다. */
+    /* Returns `true` if `rec1` collides with `rec2`. */
     bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2) {
         return ((rec1.x + rec1.width) - rec2.x) >= 0 && ((rec2.x + rec2.width) - rec1.x) >= 0
             && ((rec1.y + rec1.height) - rec2.y) >= 0 && ((rec2.y + rec2.height) - rec1.y) >= 0;
@@ -67,7 +67,7 @@ extern "C" {
 
 #endif
 
-/* | 라이브러리 매크로 정의... | */
+/* | Macro Definitions (Global) | */
 
 #ifdef _MSC_VER
     #define FR_API_INLINE __forceinline
@@ -78,12 +78,12 @@ extern "C" {
         #define FR_API_INLINE inline __attribute__((always_inline))
     #endif
 #else
-    #define FR_API_INLINE
+    #define FR_API_INLINE inline
 #endif
 
 #define FR_STRUCT_ZERO(T)                         ((T) { 0 })
 
-/* | 사용자 설정 매크로 정의... | */
+/* | Macro Definitions (Configuration) | */
 
 #define FR_BROADPHASE_CELL_SIZE                   3.2f
 #define FR_BROADPHASE_INVERSE_CELL_SIZE           (1.0f / (FR_BROADPHASE_CELL_SIZE))
@@ -103,9 +103,9 @@ extern "C" {
 #define FR_WORLD_MAX_BODY_COUNT                   256
 #define FR_WORLD_MAX_ITERATIONS                   12
 
-/* | 자료형 정의... | */
+/* | Data Type Definitions | */
 
-/* 강체의 종류를 나타내는 구조체. */
+/* A struct that represents the type of a rigid body. */
 typedef enum frBodyType {
     FR_BODY_UNKNOWN = -1,
     FR_BODY_STATIC,
@@ -113,24 +113,24 @@ typedef enum frBodyType {
     FR_BODY_DYNAMIC
 } frBodyType;
 
-/* 강체의 비트 플래그를 나타내는 열거형. */
+/* An enum that represents the property flag of a rigid body. */
 typedef enum frBodyFlag {
     FR_FLAG_NONE = 0x00,
     FR_FLAG_INFINITE_MASS = 0x01,
     FR_FLAG_INFINITE_INERTIA = 0x02
 } frBodyFlag;
 
-/* 강체의 비트 플래그 조합을 나타내는 자료형. */
+/* A data type that represents the property flags of a rigid body. */
 typedef uint8_t frBodyFlags;
 
-/* 도형의 종류를 나타내는 열거형. */
+/* A struct that represents the type of a collision shape. */
 typedef enum frShapeType {
     FR_SHAPE_UNKNOWN,
     FR_SHAPE_CIRCLE,
     FR_SHAPE_POLYGON
 } frShapeType;
 
-/* 도형의 재질을 나타내는 구조체. */
+/* A struct that represents the material of a collision shape. */
 typedef struct frMaterial {
     float density;
     float restitution;
@@ -138,7 +138,10 @@ typedef struct frMaterial {
     float dynamicFriction;
 } frMaterial;
 
-/* 도형 또는 강체의 위치와 회전 각도 (단위: rad.)를 나타내는 구조체. */
+/* 
+    A struct that represents the position (in meters) 
+    and rotation (in radians) of an object. 
+*/
 typedef struct frTransform {
     Vector2 position;
     float rotation;
@@ -149,44 +152,44 @@ typedef struct frTransform {
     } cache;
 } frTransform;
 
-/* 다각형의 꼭짓점 배열을 나타내는 구조체. */
+/* A struct that represents the vertices of a polygon. */
 typedef struct frVertices {
     Vector2 data[FR_GEOMETRY_MAX_VERTEX_COUNT];
     int count;
 } frVertices;
 
-/* 도형을 나타내는 구조체. */
+/* A struct that represents a collision shape. */
 typedef struct frShape frShape;
 
-/* 강체를 나타내는 구조체. */
+/* A struct that represents a rigid body. */
 typedef struct frBody frBody;
 
-/* 강체 사이의 충돌 정보를 나타내는 구조체. */
+/* A struct that represents information for a set of two rigid bodies. */
 typedef struct frSolverCache {
     frBody *bodies[2];
     /* TODO: ... */
 } frSolverCache;
 
-/* 도형 사이의 충돌을 나타내는 구조체. */
+/* A struct that represents the details of a collision. */
 typedef struct frCollision {
-    bool check;
-    frSolverCache cache;
-    Vector2 direction;
-    Vector2 points[2];
-    float depths[2];
-    int count;
+    bool check;           // Returns `true` if two collision shapes collide with each other.
+    frSolverCache cache;  // The struct that contains rigid bodies that collided with each other.
+    Vector2 direction;    // The direction of the collision in a unit vector form.
+    Vector2 points[2];    // The points of the collision between two collision shapes.
+    float depths[2];      // The penetration depths of the collision.
+    int count;            // The number of points for this collision.
 } frCollision;
 
-/* 강체 사이의 충돌 이벤트 발생 시에 호출되는 함수를 가리키는 포인터. */
+/* A callback which will be executed when a collision event occurs. */
 typedef void (*frCollisionCallback)(frCollision *collision);
 
-/* 강체 사이의 충돌 이벤트 처리에 사용되는 핸들러를 나타내는 구조체. */
+/* A struct that represents the collision event handler of a world. */
 typedef struct frCollisionHandler {
     frCollisionCallback preSolve;
     frCollisionCallback postSolve;
 } frCollisionHandler;
 
-/* 광선을 나타내는 구조체. */
+/* A struct that represents a ray. */
 typedef struct frRay {
     Vector2 origin;
     Vector2 direction;
@@ -194,406 +197,418 @@ typedef struct frRay {
     bool closest;
 } frRay;
 
-/* 광선 투사의 결과를 나타내는 구조체. */
+/* A struct that represents the details of a raycast hit. */
 typedef struct frRaycastHit {
-    bool check;
+    bool check;          // Returns `true` if the ray collides with `shape` or `body`.
     union {
-        frShape *shape;
+        frShape *shape; 
         frBody *body;
-    };
-    Vector2 point;
-    Vector2 normal;
-    float distance;
-    bool inside;
+    };                   // The collision shape or the body that was hit by the raycast.
+    Vector2 point;       // The point at which the raycast hit `shape` or `body`.
+    Vector2 normal;      // The normal vector of the raycast hit.
+    float distance;      // The distance from the ray's starting point to `shape` or `body`.
+    bool inside;         // Returns `true` if the ray's starting point is inside `shape` or `body`.
 } frRaycastHit;
 
-/* 공간 해시맵을 나타내는 구조체. */
+/* A struct that represents a spatial hash. */
 typedef struct frSpatialHash frSpatialHash;
 
-/* 물리 법칙이 존재하는 세계를 나타내는 구조체. */
+/* A struct that represents the world that holds rigid bodies. */
 typedef struct frWorld frWorld;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* | `broadphase` 모듈 함수... | */
+/* | Module Functions (`broadphase`) | */
 
-/* 경계 범위가 `bounds`이고 각 셀의 크기가 `cellSize`인 공간 해시맵의 메모리 주소를 반환한다. */
+/* Creates a new spatial hash from the given bounds and the size of each cell. */
 frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cellSize);
 
-/* 공간 해시맵 `hash`에 할당된 메모리를 해제한다. */
+/* Releases the memory allocated for `hash`. */
 void frReleaseSpatialHash(frSpatialHash *hash);
 
-/* 공간 해시맵 `hash`에 직사각형 `rec`로 생성한 키와 `value`를 추가한다. */
+/* Generates a new key from `rec` and inserts the key-`value` pair to `hash`. */
 void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value);
 
-/* 공간 해시맵 `hash`의 모든 키와 값을 제거한다. */
+/* Removes all key-value pairs from `hash`. */
 void frClearSpatialHash(frSpatialHash *hash);
 
-/* 공간 해시맵 `hash`에서 키가 `key`인 값을 제거한다. */
+/* Removes a `key`-value pair from `hash`. */
 void frRemoveFromSpatialHash(frSpatialHash *hash, int key);
 
-/* 공간 해시맵 `hash`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 강체의 인덱스를 반환한다. */
+/* Returns the values of all pairs that collides with `rec` in `hash`. */
 void frQuerySpatialHash(frSpatialHash *hash, Rectangle rec, int **result);
 
-/* 공간 해시맵 `hash`의 경계 범위를 반환한다. */
+/* Returns the bounds of `hash`. */
 Rectangle frGetSpatialHashBounds(frSpatialHash *hash);
 
-/* 공간 해시맵 `hash`의 각 셀의 크기를 반환한다. */
+/* Returns the size of each cell of `hash`. */
 float frGetSpatialHashCellSize(frSpatialHash *hash);
 
-/* 공간 해시맵 `hash`의 경계 범위를 `bounds`로 설정한다. */
+/* Sets the bounds of `hash` to `bounds`. */
 void frSetSpatialHashBounds(frSpatialHash *hash, Rectangle bounds);
 
-/* 공간 해시맵 `hash`의 각 셀의 크기를 `cellSize`로 설정한다. */
+/* Sets the size of each cell of `hash` to `cellSize`. */
 void frSetSpatialHashCellSize(frSpatialHash *hash, float cellSize);
 
-/* 공간 해시맵 `hash`에서 벡터 `v`와 대응하는 키를 반환한다. */
+/* Returns the key of `hash` that corresponds to `v`. */
 int frComputeSpatialHashKey(frSpatialHash *hash, Vector2 v);
 
-/* | `collision` 모듈 함수... | */
+/* | Module Functions (`collision`) | */
 
-/* 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
+/* 
+    Computes the collision between `s1` with position and rotation from `tx1` and `s2` 
+    with position and rotation from `tx2`.
+*/
 frCollision frComputeShapeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
 
-/* 강체 `b1`에서 `b2`로의 충돌을 계산한다. */
+/* Computes the collision between `b1` and `b2`. */
 frCollision frComputeBodyCollision(frBody *b1, frBody *b2);
 
-/* 도형 `s`에 광선을 투사한다. */
+/* Casts a `ray` to the collision shape `s`. */
 frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray);
 
-/* 강체 `b`에 광선을 투사한다. */
+/* Casts a `ray` to the rigid body `b`. */
 frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray);
 
 /* | `debug` 모듈 함수... | */
 
 #ifndef FEROX_STANDALONE
-    /* 게임 화면에 점 `p1`에서 `p2`로 향하는 화살표를 그린다. */
+    /* Draws an arrow that points from `p1` to `p2`. */
     void frDrawArrow(Vector2 p1, Vector2 p2, float thick, Color color);
 
-    /* 게임 화면에 강체 `b`의 도형을 그린다. */
+    /* Draws the collision shape of `b`. */
     void frDrawBody(frBody *b, Color color);
 
-    /* 게임 화면에 강체 `b`의 도형 테두리를 그린다. */
+    /* Draws the border of the collision shape of `b`. */
     void frDrawBodyLines(frBody *b, float thick, Color color);
 
-    /* 게임 화면에 강체 `b`의 AABB와 질량 중심을 그린다. */
+    /* Draws the AABB and the center of mass of `b`. */
     void frDrawBodyAABB(frBody *b, float thick, Color color);
 
-    /* 게임 화면에 강체 `b`의 물리량 정보를 그린다. */
+    /* Draws the properties of `b`. */
     void frDrawBodyProperties(frBody *b, Color color);
 
-    /* 게임 화면에 공간 해시맵 `hm`을 그린다. */
+    /* Draws the border of `hm`. */
     void frDrawSpatialHash(frSpatialHash *hm, float thick, Color color);
-
-    /* 무작위 색상을 반환한다. */
-    Color frGetRandomColor(void);
 #endif
 
-/* | `dynamics` 모듈 함수... | */
+/* | Module Functions (`dynamics`) | */
 
-/* 종류가 `type`이고 위치가 `p`인 강체를 생성한다. */
+/* Creates a new rigid body from the given type, flags, and position (in meters). */
 frBody *frCreateBody(frBodyType type, frBodyFlags flags, Vector2 p);
 
-/* 종류가 `type`이고 위치가 `p`이며 충돌 처리용 도형이 `s`인 강체를 생성한다. */
+/* 
+    Creates a new rigid body from the given type, flags, position (in meters), 
+    and a collision shape.
+*/
 frBody *frCreateBodyFromShape(frBodyType type, frBodyFlags flags, Vector2 p, frShape *s);
 
-/* 강체 `b`에 할당된 메모리를 해제한다. */
+/* Releases the memory allocated for `b`. */
 void frReleaseBody(frBody *b);
 
-/* 강체 `b에 충돌 처리용 도형 `s`를 추가한다. */
+/* Attaches the collision shape `s` to `b`. */
 void frAttachShapeToBody(frBody *b, frShape *s);
 
-/* 강체 `b`에서 충돌 처리용 도형을 제거한다. */ 
+/* Detaches the collision shape `s` from `b`. */
 void frDetachShapeFromBody(frBody *b);
 
-/* 구조체 `frBody`의 크기를 반환한다. */
+/* Returns the size of the struct `frBody`. */
 size_t frGetBodyStructSize(void);
 
-/* 강체 `b`의 종류를 반환한다. */
+/* Returns the type of `b`. */
 frBodyType frGetBodyType(frBody *b);
 
-/* 강체 `b`의 비트 플래그 조합을 반환한다. */
+/* Returns the property flags of `b`. */
 frBodyFlags frGetBodyFlags(frBody *b);
 
-/* 강체 `b`의 재질을 반환한다. */
+/* Returns the material of `b`. */
 frMaterial frGetBodyMaterial(frBody *b);
 
-/* 강체 `b`의 질량을 반환한다. */
+/* Returns the mass of `b`. */
 float frGetBodyMass(frBody *b);
 
-/* 강체 `b`의 질량의 역수를 반환한다. */
+/* Returns the inverse mass of `b`. */
 float frGetBodyInverseMass(frBody *b);
 
-/* 강체 `b`의 관성 모멘트를 반환한다. */
+/* Returns the moment of inertia for `b`. */
 float frGetBodyInertia(frBody *b);
 
-/* 강체 `b`의 관성 모멘트의 역수를 반환한다. */
+/* Returns the inverse moment of inertia for `b`. */
 float frGetBodyInverseInertia(frBody *b);
 
-/* 강체 `b`의 속도를 반환한다. */
+/* Returns the velocity of `b`. */
 Vector2 frGetBodyVelocity(frBody *b);
 
-/* 강체 `b`의 각속도를 반환한다. */
+/* Returns the angular velocity of `b`. */
 float frGetBodyAngularVelocity(frBody *b);
 
-/* 강체 `b`의 중력 가속률을 반환한다. */
+/* Returns the gravity scale of `b`. */
 float frGetBodyGravityScale(frBody *b);
 
-/* 강체 `b`의 위치와 회전 각도 (단위: rad.)를 반환한다. */
+/* Returns the position (in meters) and rotation (in radians) of `b`. */
 frTransform frGetBodyTransform(frBody *b);
 
-/* 강체 `b`의 위치를 반환한다. */
+/* Returns the position (in meters) of `b`. */
 Vector2 frGetBodyPosition(frBody *b);
 
-/* 강체 `b`의 회전 각도 (단위: rad.)를 반환한다. */
+/* Returns the rotation (in radians) of `b`. */
 float frGetBodyRotation(frBody *b);
 
-/* 강체 `b`의 충돌 처리용 도형을 반환한다. */
+/* Returns the collision shape of `b`. */
 frShape *frGetBodyShape(frBody *b);
 
-/* 강체 `b`의 AABB를 반환한다. */
+/* Returns the AABB (Axis-Aligned Bounding Box) of `b`. */
 Rectangle frGetBodyAABB(frBody *b);
 
-/* 강체 `b`의 사용자 데이터를 반환한다. */
+/* Returns the user data of `b`. */
 void *frGetBodyUserData(frBody *b);
 
-/* 세계 기준 좌표 `p`를 강체 `b`를 기준으로 한 좌표로 변환한다. */
+/* Converts the world coordinates `p` to a position relative to `b`'s transform value. */
 Vector2 frGetLocalPoint(frBody *b, Vector2 p);
 
-/* 강체 `b`를 기준으로 한 좌표 `p`를 세계 기준 좌표로 변환한다. */
+/* Converts the position relative to `b`'s transform value `p` to world coordinates. */
 Vector2 frGetWorldPoint(frBody *b, Vector2 p);
 
-/* 강체 `b`의 종류를 `type`으로 설정한다. */
+/* Sets the type of `b` to `type`. */
 void frSetBodyType(frBody *b, frBodyType type);
 
-/* 강체 `b`의 비트 플래그 조합을 `flags`으로 설정한다. */
+/* Sets the property flags of `b` to `flags`. */
 void frSetBodyFlags(frBody *b, frBodyFlags flags);
 
-/* 강체 `b`의 속도를 `v`로 설정한다. */
+/* Sets the velocity of `b` to `v`. */
 void frSetBodyVelocity(frBody *b, Vector2 v);
 
-/* 강체 `b`의 각속도를 `a`로 설정한다. */
+/* Sets the angular velocity of `b` to `a`. */
 void frSetBodyAngularVelocity(frBody *b, double a);
 
-/* 강체 `b`의 중력 가속률을 `scale`로 설정한다. */
+/* Sets the gravity scale value of `b` to `gravity_scale`. */
 void frSetBodyGravityScale(frBody *b, float scale);
 
-/* 강체 `b`의 위치와 회전 각도를 `tx`의 값으로 설정한다. */ 
+/* Sets the transform value of `b` to `tx`. */ 
 void frSetBodyTransform(frBody *b, frTransform tx);
 
-/* 강체 `b`의 위치를 `p`로 설정한다. */
+/* Sets the position of `b` to `p`. */
 void frSetBodyPosition(frBody *b, Vector2 p);
 
-/* 강체 `b`의 회전 각도를 `rotation`으로 설정한다. */
+/* Sets the rotation of `b` to `rotation`. */
 void frSetBodyRotation(frBody *b, float rotation);
 
-/* 강체 `b`의 사용자 데이터를 `data`로 설정한다. */
+/* Sets the user data of `b` to `data`. */
 void frSetBodyUserData(frBody *b, void *data);
 
-/* 강체 `b`에 작용하는 모든 힘을 제거한다. */
+/* Clears all forces that are applied to `b`. */
 void frClearBodyForces(frBody *b);
 
-/* 강체 `b`에 중력 가속도 `gravity`를 적용한다. */
+/* Applies a `gravity` vector to `b`. */
 void frApplyGravity(frBody *b, Vector2 gravity);
 
-/* 강체 `b`에 충격량 `impulse`를 적용한다. */
+/* Applies an `impulse` vector to `b`. */
 void frApplyImpulse(frBody *b, Vector2 impulse);
 
-/* 강체 `b` 위의 점 `p`에 각운동량 `impulse`를 적용한다. */
+/* Applies a torque `impulse` to a position `point` of `b`. */
 void frApplyTorqueImpulse(frBody *b, Vector2 p, Vector2 impulse);
 
-/* 단위 시간 `dt` 이후의 강체 `b`의 위치를 계산한다. */
+/* Integrates the position of `b` with `dt`. */
 void frIntegrateForBodyPosition(frBody *b, double dt);
 
-/* 단위 시간 `dt` 이후의 강체 `b`의 속도와 각속도를 계산한다. */
+/* Integrates the velocities of `b` with `dt`. */
 void frIntegrateForBodyVelocities(frBody *b, double dt);
 
-/* 강체 `b1`과 `b2` 사이의 충돌을 해결한다. */
+/* Resolves the collision between two rigid bodies. */
 void frResolveCollision(frCollision *collision);
 
-/* 강체 `b1`과 `b2`의 위치를 적절하게 보정한다. */
+/* Corrects the positions of two rigid bodies. */
 void frCorrectBodyPositions(frCollision *collision, float inverseDt);
 
-/* | `geometry` 모듈 함수... | */
+/* | Module Functions (`geometry`) | */
 
-/* 반지름이 `radius`인 원을 나타내는 도형을 생성한다. */
+/* 
+    Creates a new circle-shaped collision shape 
+    from the given material and radius (in meters).
+*/
 frShape *frCreateCircle(frMaterial material, float radius);
 
-/* 가로 길이가 `width`이고 세로 길이가 `height`인 직사각형을 나타내는 도형을 생성한다. */
+/* 
+    Creates a new rectangle-shaped collision shape 
+    from the given material, width and height (in meters). 
+*/
 frShape *frCreateRectangle(frMaterial material, float width, float height);
 
-/* 꼭짓점 배열이 `vertices`인 다각형을 나타내는 도형을 생성한다. */
+/* 
+    Creates a new polygon-shaped collision shape 
+    from the given material and vertices.
+*/
 frShape *frCreatePolygon(frMaterial material, frVertices vertices);
 
-/* 형태가 정해지지 않은 도형을 생성한다. */
+/* Creates an empty shape. */
 frShape *frCreateShape(void);
 
-/* 도형 `s`와 형태가 같은 새로운 도형을 반환한다. */
+/* Returns a clone of `s`. */
 frShape *frCloneShape(frShape *s);
 
-/* 도형 `s`에 할당된 메모리를 해제한다. */
+/* Releases the memory allocated for `s`. */
 void frReleaseShape(frShape *s);
 
-/* 구조체 `frShape`의 크기를 반환한다. */
+/* Returns the size of the struct `frShape`. */
 size_t frGetShapeStructSize(void);
 
-/* 도형 `s`의 종류를 반환한다. */
+/* Returns the type of `s`. */
 frShapeType frGetShapeType(frShape *s);
 
-/* 도형 `s`의 재질을 반환한다. */
+/* Returns the material of `s`. */
 frMaterial frGetShapeMaterial(frShape *s);
 
-/* 도형 `s`의 넓이를 반환한다. */
+/* Returns the area of `s`. */
 float frGetShapeArea(frShape *s);
 
-/* 도형 `s`의 질량을 반환한다. */
+/* Returns the mass of `s`. */
 float frGetShapeMass(frShape *s);
 
-/* 도형 `s`의 관성 모멘트를 반환한다. */
+/* Returns the moment of inertia for `s`. */
 float frGetShapeInertia(frShape *s);
 
-/* 도형 `s`의 AABB를 반환한다. */
+/* Returns the AABB (Axis-Aligned Bounding Box) of `s`. */
 Rectangle frGetShapeAABB(frShape *s, frTransform tx);
 
-/* 원 `s`의 반지름을 반환한다. */
+/* Returns the radius of the circle collision shape `s`. */
 float frGetCircleRadius(frShape *s);
 
-/* 직사각형 `s`의 가로 및 세로 길이를 반환한다. */
+/* Returns the width and height of the rectangle collision shape `s`. */
 Vector2 frGetRectangleDimensions(frShape *s);
 
-/* 다각형 `s`의 `index + 1`번째 꼭짓점을 반환한다. */
+/* Returns a vertex of the polygon collision shape `s`. */
 Vector2 frGetPolygonVertex(frShape *s, int index);
 
-/* 다각형 `s`의 `index + 1`번째 법선 벡터를 반환한다. */
+/* Returns a normal of the polygon collision shape `s`. */
 Vector2 frGetPolygonNormal(frShape *s, int index);
 
-/* 다각형 `s`의 꼭짓점 배열을 반환한다. */
+/* Returns the vertices of the polygon collision shape `s`. */
 frVertices frGetPolygonVertices(frShape *s);
 
-/* 다각형 `s`의 법선 벡터 배열을 반환한다. */
+/* Returns the normals of the polygon collision shape `s`. */
 frVertices frGetPolygonNormals(frShape *s);
 
-/* 다각형 `s`가 직사각형인지 확인한다. */
+/* Returns `true` if `s` is a rectangle collision shape. */
 bool frIsShapeRectangle(frShape *s);
 
-/* 원 `s`의 반지름을 `radius`로 변경한다. */
+/* Sets the radius of circle collision shape `s` to `radius`. */
 void frSetCircleRadius(frShape *s, float radius);
 
-/* 직사각형 `s`의 가로 및 세로 길이를 `wh`의 X값과 Y값으로 설정한다. */
+/* Sets the dimensions (width and height) for a rectangle to `wh`. */
 void frSetRectangleDimensions(frShape *s, Vector2 wh);
 
-/* 다각형 `s`의 꼭짓점 배열을 `vertices`로 변경한다. */
+/* Sets the vertices of polygon collision shape `s` to `vertices`. */
 void frSetPolygonVertices(frShape *s, frVertices vertices);
 
-/* 도형 `s`의 재질을 `material`로 설정한다. */
+/* Sets the material of `s` to `material`. */
 void frSetShapeMaterial(frShape *s, frMaterial material);
 
-/* 도형 `s`의 종류를 `type`으로 변경한다. */
+/* Sets the type of `s` to `type`. */
 void frSetShapeType(frShape *s, frShapeType type);
 
-/* 점 `p`가 도형 `s`의 내부에 있는지 확인한다. */
+/* Returns `true` if `s` contains the point `p`. */
 bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p);
 
-/* | `timer` 모듈 함수... | */
+/* | Module Functions (`timer`) | */
 
-/* 단조 시계를 초기화한다. */
+/* Initializes a monotonic clock. */
 void frInitClock(void);
 
-/* 단조 시계의 현재 시각 (단위: ms)을 반환한다. */
+/* Returns the current time (in milliseconds) of the monotonic clock. */
 double frGetCurrentTime(void);
 
-/* 단조 시계의 시각 `newTime`과 `oldTime`의 차이를 반환한다. */
+/* Returns the difference between `newTime` and `oldTime`. */
 double frGetTimeDifference(double newTime, double oldTime);
 
-/* 단조 시계의 현재 시각과 `oldTime`과의 차이를 반환한다. */
+/* Returns the difference between the current time and `oldTime`. */
 double frGetTimeSince(double oldTime);
 
-/* | `utils` 모듈 함수... | */
+/* | Module Functions (`utils`) | */
 
-/* 각도 `angle` (단위: rad.)을 정규화하여, 구간 `[center - π/2, center + π/2]`에 포함되도록 한다. */
+/* Normalizes `angle` (in radians) to range `[center - π/2, center + π/2]`. */
 float frNormalizeAngle(float angle, float center);
 
-/* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
+/* Returns `true` if `f1` and `f2` are approximately equal. */
 bool frNumberApproxEquals(float f1, float f2);
 
-/* | `world` 모듈 함수... | */
+/* | Module Functions (`world`) | */
 
-/* 중력 가속도가 `gravity`이고 경계 범위가 `bounds`인 세계를 생성한다. */ 
+/* Creates a new world from the given `gravity` vector and world `bounds` in meters. */
 frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds);
 
-/* 세계 `world`에 할당된 메모리를 해제한다. */
+/* Removes all rigid bodies from `world`, then releases the memory allocated for `world`. */
 void frReleaseWorld(frWorld *world);
 
-/* 세계 `world`에 강체 `b`를 추가한다. */
+/* Adds `b` to `world`. */
 bool frAddToWorld(frWorld *world, frBody *b);
 
-/* 세계 `world`의 모든 강체를 제거한다. */
+/* Removes all rigid bodies from `world`. */
 void frClearWorld(frWorld *world);
 
-/* 세계 `world`에서 강체 `b`를 제거한다. */
+/* Removes `b` from `world`. */
 bool frRemoveFromWorld(frWorld *world, frBody *b);
 
-/* 구조체 `frWorld`의 크기를 반환한다. */
+/* Returns the size of the struct `frWorld`. */
 size_t frGetWorldStructSize(void);
 
-/* 세계 `world`에서 인덱스가 `index`인 강체의 메모리 주소를 반환한다. */
+/* Returns the rigid body at the `index` in `world`'s array of rigid bodies. */
 frBody *frGetWorldBody(frWorld *world, int index);
 
-/* 세계 `world`의 충돌 핸들러를 반환한다. */
+/* Returns the collision event handler for `world`. */
 frCollisionHandler frGetWorldCollisionHandler(frWorld *world);
 
-/* 세계 `world`의 강체 배열의 크기를 반환한다. */
+/* Returns the length of `world`'s array of rigid bodies. */
 int frGetWorldBodyCount(frWorld *world);
 
-/* 세계 `world`의 경계 범위를 반환한다. */
+/* Returns the bounds of `world`. */
 Rectangle frGetWorldBounds(frWorld *world);
 
-/* 세계 `world`의 공간 해시맵을 반환한다. */
+/* Returns the spatial hash of `world`. */
 frSpatialHash *frGetWorldSpatialHash(frWorld *world);
 
-/* 세계 `world`의 중력 가속도를 반환한다. */
+/* Returns the gravity vector of `world`. */
 Vector2 frGetWorldGravity(frWorld *world);
 
-/* 강체 `b`가 세계 `world`의 경계 범위 안에 있는지 확인한다. */
+/* Returns `true` if `b` collides with the bounds of `world`. */
 bool frIsInWorldBounds(frWorld *world, frBody *b);
 
-/* 세계 `world`의 경계 범위를 `bounds`로 설정한다. */
+/* Sets the world bounds of `world` to `bounds`. */
 void frSetWorldBounds(frWorld *world, Rectangle bounds);
 
-/* 세계 `world`의 충돌 핸들러를 `handler`로 설정한다. */
+/* Sets the collision event handler for `world` to `handler`. */
 void frSetWorldCollisionHandler(frWorld *world, frCollisionHandler handler);
 
-/* 세계 `world`의 중력 가속도를 `gravity`로 설정한다. */
+/* Sets the gravity vector of `world` to `gravity`. */
 void frSetWorldGravity(frWorld *world, Vector2 gravity);
 
-/* 세계 `world`의 시간을 `dt` (단위: ms) 만큼 흐르게 한다. */
+/* Simulates the `world` for the time step `dt` (in milliseconds). */
 void frSimulateWorld(frWorld *world, double dt);
 
-/* 세계 `world`에서 직사각형 `rec`와 경계 범위가 겹치는 모든 강체를 반환한다. */
+/* Query the `world` for rigid bodies that collides with `rec`. */
 int frQueryWorldSpatialHash(frWorld *world, Rectangle rec, frBody **bodies);
 
-/* 세계 `world`의 모든 강체에 광선을 투사한다. */
+/* Casts a `ray` to all rigid bodies in `world`. */
 int frComputeWorldRaycast(frWorld *world, frRay ray, frRaycastHit *hits);
 
-/* | 인라인 함수... | */
+/* | Inline Functions... | */
 
-/* 픽셀 단위의 값 `value`를 미터 단위의 값으로 변환한다. */
+/* Converts `value` (in pixels) to meters. */
 FR_API_INLINE float frNumberPixelsToMeters(float value) {
     return (FR_GLOBAL_PIXELS_PER_METER > 0.0f)
         ? (value / FR_GLOBAL_PIXELS_PER_METER)
         : 0.0f;
 }
 
-/* 미터 단위의 값 `value`를 픽셀 단위의 값으로 변환한다. */
+/* Converts `value` (in meters) to pixels. */
 FR_API_INLINE float frNumberMetersToPixels(float value) {
     return (FR_GLOBAL_PIXELS_PER_METER > 0.0f)
         ? (value * FR_GLOBAL_PIXELS_PER_METER)
         : 0.0f;
 }
 
-/* 픽셀 단위의 `Rectangle` 구조체 `rec`을 미터 단위로 변환한다. */
+/* Converts the components of `rec` (in pixels) to meters. */
 FR_API_INLINE Rectangle frRecPixelsToMeters(Rectangle rec) {
     return (Rectangle) {
         .x = frNumberPixelsToMeters(rec.x),
@@ -603,7 +618,7 @@ FR_API_INLINE Rectangle frRecPixelsToMeters(Rectangle rec) {
     };
 }
 
-/* 미터 단위의 `Rectangle` 구조체 `rec`을 픽셀 단위로 변환한다. */
+/* Converts the components of `rec` (in meters) to pixels. */
 FR_API_INLINE Rectangle frRecMetersToPixels(Rectangle rec) {
     return (Rectangle) {
         .x = frNumberMetersToPixels(rec.x),
@@ -613,48 +628,48 @@ FR_API_INLINE Rectangle frRecMetersToPixels(Rectangle rec) {
     };
 }
 
-/* 벡터 `v1`과 `v2`의 합을 반환한다. */
+/* Adds `v1` and `v2`. */
 FR_API_INLINE Vector2 frVec2Add(Vector2 v1, Vector2 v2) {
     return (Vector2) { v1.x + v2.x, v1.y + v2.y };
 }
 
-/* 벡터 `v1`과 `v2`의 차를 반환한다. */
+/* Subtracts `v2` from `v1`. */
 FR_API_INLINE Vector2 frVec2Subtract(Vector2 v1, Vector2 v2) {
     return (Vector2) { v1.x - v2.x, v1.y - v2.y };
 }
 
-/* 벡터 `v`의 각 성분에 `value`를 곱한 새로운 벡터를 반환한다. */
+/* Multiplies `v` by `value`. */
 FR_API_INLINE Vector2 frVec2ScalarMultiply(Vector2 v, float value) {
     return (Vector2) { v.x * value, v.y * value };
 }
 
-/* 벡터 `v1`과 `v2`의 외적을 반환한다. */
+/* Returns the cross product of `v1` and `v2`. */
 FR_API_INLINE float frVec2CrossProduct(Vector2 v1, Vector2 v2) {
     // 평면 벡터의 외적은 스칼라 값이다.
     return (v1.x * v2.y) - (v1.y * v2.x);
 }
 
-/* 벡터 `v1`과 `v2`의 내적을 반환한다. */
+/* Returns the dot product of `v1` and `v2`. */
 FR_API_INLINE float frVec2DotProduct(Vector2 v1, Vector2 v2) {
     return (v1.x * v2.x) + (v1.y * v2.y);
 }
 
-/* 벡터 `v`의 크기의 제곱을 반환한다. */
+/* Returns the squared magnitude of `v`. */
 FR_API_INLINE float frVec2MagnitudeSqr(Vector2 v) {
     return frVec2DotProduct(v, v);
 }
 
-/* 벡터 `v`의 크기를 반환한다. */
+/* Returns the magnitude of `v`. */
 FR_API_INLINE float frVec2Magnitude(Vector2 v) {
     return sqrtf(frVec2MagnitudeSqr(v));
 }
 
-/* 벡터 `v`와 크기가 같고 방향이 반대인 새로운 벡터를 반환한다. */
+/* Returns the negated vector of `v`. */
 FR_API_INLINE Vector2 frVec2Negate(Vector2 v) {
     return (Vector2) { -v.x, -v.y };
 }
 
-/* 벡터 `v`와 방향이 같은 새로운 단위 벡터를 반환한다. */
+/* Converts `v` to a unit vector. */
 FR_API_INLINE Vector2 frVec2Normalize(Vector2 v) {
     const float magnitude = frVec2Magnitude(v);
     
@@ -663,27 +678,27 @@ FR_API_INLINE Vector2 frVec2Normalize(Vector2 v) {
         : FR_STRUCT_ZERO(Vector2);
 }
 
-/* 벡터 `v1`과 `v2`가 이루는 각도 (단위: rad.)를 반환한다. */
+/* Returns the angle (in radians) between `v1` and `v2`. */
 FR_API_INLINE float frVec2Angle(Vector2 v1, Vector2 v2) {
     return atan2f(v2.y, v2.x) - atan2f(v1.y, v1.x);
 }
 
-/* 벡터 `v1`의 모든 성분이 `v2`의 모든 성분과 근접한 값인지 확인한다. */
+/* Returns `true` if `v1` and `v2` are approximately equal. */
 FR_API_INLINE bool frVec2ApproxEquals(Vector2 v1, Vector2 v2) {
     return frNumberApproxEquals(v1.x, v2.x) && frNumberApproxEquals(v1.y, v2.y);
 }
 
-/* 벡터 `v`의 왼쪽 방향에서 수직을 이루는 법선 벡터를 반환한다. */
+/* Returns the left normal of `v`. */
 FR_API_INLINE Vector2 frVec2LeftNormal(Vector2 v) {
     return frVec2Normalize((Vector2) { -v.y, v.x });
 }
 
-/* 벡터 `v`의 오른쪽 방향에서 수직을 이루는 법선 벡터를 반환한다. */
+/* Returns the right normal of `v`. */
 FR_API_INLINE Vector2 frVec2RightNormal(Vector2 v) {
     return frVec2Normalize((Vector2) { v.y, -v.x });
 }
 
-/* 벡터 `v`를 영점을 기준으로 `angle` (rad.)만큼 회전시킨다. */
+/* Rotates `v` around the origin. */
 FR_API_INLINE Vector2 frVec2Rotate(Vector2 v, float angle) {
     const float sin_angle = sinf(angle);
     const float cos_angle = cosf(angle);
@@ -694,7 +709,7 @@ FR_API_INLINE Vector2 frVec2Rotate(Vector2 v, float angle) {
     };
 }
 
-/* 벡터 `v`를 `tx`의 값에 따라 회전시킨다. */
+/* Rotates `v` with the properties of `tx`. */
 FR_API_INLINE Vector2 frVec2RotateTx(Vector2 v, frTransform tx) {
     Vector2 result = {
         (v.x * tx.cache.cosA - v.y * tx.cache.sinA),
@@ -706,24 +721,24 @@ FR_API_INLINE Vector2 frVec2RotateTx(Vector2 v, frTransform tx) {
     return result;
 }
 
-/* 벡터 `v`를 `tx`의 값에 따라 평행 이동하고 회전시킨다. */
+/* Transforms `v` with the properties of `tx`. */
 FR_API_INLINE Vector2 frVec2Transform(Vector2 v, frTransform tx) {
     return frVec2Add(tx.position, frVec2RotateTx(v, tx));
 }
 
-/* 벡터 `v1`, `v2`와 `v3`가 반시계 방향으로 정렬되어 있는지 확인한다. */
+/* Returns `true` if `v1`, `v2` and `v3` are ordered counter-clockwise. */
 FR_API_INLINE bool frVec2CCW(Vector2 v1, Vector2 v2, Vector2 v3) {
     return (v3.y - v1.y) * (v2.x - v1.x) < (v2.y - v1.y) * (v3.x - v1.x);
 }
 
-/* 픽셀 단위 벡터 `v`를 미터 단위 벡터로 변환한다. */
+/* Converts the components of `v` (in pixels) to meters. */
 FR_API_INLINE Vector2 frVec2PixelsToMeters(Vector2 v) {
     return (FR_GLOBAL_PIXELS_PER_METER > 0.0f)
         ? frVec2ScalarMultiply(v, 1.0f / FR_GLOBAL_PIXELS_PER_METER)
         : FR_STRUCT_ZERO(Vector2);
 }
 
-/* 미터 단위 벡터 `v`를 픽셀 단위 벡터로 변환한다. */
+/* Converts the components of `v` (in meters) to pixels. */
 FR_API_INLINE Vector2 frVec2MetersToPixels(Vector2 v) {
     return (FR_GLOBAL_PIXELS_PER_METER > 0.0f)
         ? frVec2ScalarMultiply(v, FR_GLOBAL_PIXELS_PER_METER)
