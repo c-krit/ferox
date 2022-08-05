@@ -30,61 +30,7 @@ $ make
 
 ---
 
-### `arrow.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/arrow.gif" width="640" alt="arrow.c">
-</details>
-
-### `bouncy.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/bouncy.gif" width="640" alt="bouncy.c">
-</details>
-
-### `bricks.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/bricks.gif" width="640" alt="bricks.c">
-</details>
-
-### `bullet.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/bullet.gif" width="640" alt="bullet.c">
-</details>
-
-### `jump.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/jump.gif" width="640" alt="jump.c">
-</details>
-
-### `laser.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/laser.gif" width="640" alt="laser.c">
-</details>
-
-### `smash.c`
-
-<details>
-  <summary>예제 보기</summary>
-
-  <img src="res/images/smash.gif" width="640" alt="smash.c">
-</details>
+TODO: ...
 
 ## License
 

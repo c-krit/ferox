@@ -22,7 +22,7 @@
 
 .PHONY: all clean
 
-_COLOR_BEGIN := $(shell tput setaf 2)
+_COLOR_BEGIN := $(shell tput setaf 8)
 _COLOR_END := $(shell tput sgr0)
 
 # TODO: Edit this value to match your raylib installation path
@@ -81,7 +81,7 @@ endif
 
 CC := gcc
 AR := ar
-CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu11
+CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2
 
 ifeq ($(BUILD),STANDALONE)
 	CFLAGS += -DFEROX_STANDALONE
@@ -104,7 +104,7 @@ endif
 all: pre-build build post-build
 
 pre-build:
-	@echo "$(PROJECT_PREFIX) Using: '$(CC)' and '$(AR)' to build a static library."
+	@echo "$(PROJECT_PREFIX) Using: '$(CC)' and '$(AR)' to build this project."
     
 build: $(TARGETS)
 

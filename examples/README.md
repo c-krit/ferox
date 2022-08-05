@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
+<img src="res/images/logo.png" alt="c-krit/ferox"><br>
 
 [![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)](https://github.com/c-krit/ferox/releases)
 [![codefactor badge](https://www.codefactor.io/repository/github/c-krit/ferox/badge)](https://www.codefactor.io/repository/github/c-krit/ferox)
@@ -30,61 +30,7 @@ $ make
 
 ---
 
-### `arrow.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/arrow.gif" width="640" alt="arrow.c">
-</details>
-
-### `bouncy.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/bouncy.gif" width="640" alt="bouncy.c">
-</details>
-
-### `bricks.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/bricks.gif" width="640" alt="bricks.c">
-</details>
-
-### `bullet.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/bullet.gif" width="640" alt="bullet.c">
-</details>
-
-### `jump.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/jump.gif" width="640" alt="jump.c">
-</details>
-
-### `laser.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/laser.gif" width="640" alt="laser.c">
-</details>
-
-### `smash.c`
-
-<details>
-  <summary>Show Example</summary>
-
-  <img src="res/images/smash.gif" width="640" alt="smash.c">
-</details>
+TODO: ...
 
 ## License
 

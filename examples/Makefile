@@ -22,7 +22,7 @@
 
 .PHONY: all clean
 
-_COLOR_BEGIN := $(shell tput setaf 2)
+_COLOR_BEGIN := $(shell tput setaf 8)
 _COLOR_END := $(shell tput sgr0)
 
 RAYLIB_PATH ?= ../../raylib
@@ -49,13 +49,7 @@ SOURCE_PATH := src
 INCLUDE_PATH += $(SOURCE_PATH)/external
 
 EXAMPLES := \
-	arrow   \
-	bouncy  \
-	bricks  \
-	bullet  \
-	jump    \
-	laser   \
-	smash
+	basic
 
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)
@@ -74,9 +68,9 @@ else
 endif
 
 CC := gcc
-CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2 -std=gnu99
+CFLAGS := -D_DEFAULT_SOURCE -g $(INCLUDE_PATH:%=-I%) -O2
 LDFLAGS := $(LIBRARY_PATH:%=-L%)
-LDLIBS := -lferox -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+LDLIBS := -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 
 PLATFORM := $(HOST_PLATFORM)
 
@@ -92,9 +86,10 @@ else ifeq ($(PLATFORM),WEB)
 	TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%.html)
 
 	CC := emcc
+	CFLAGS += -DPLATFORM_$(PLATFORM) -Wno-limited-postlink-optimizations
 
 # https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
-	WEBFLAGS := -s ASYNCIFY -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3
+	WEBFLAGS := -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3
 	WEBFLAGS += --preload-file $(RESOURCE_PATH) --shell-file $(RESOURCE_PATH)/html/shell.html
 endif
 
@@ -108,7 +103,7 @@ build: $(TARGETS)
 $(BINARY_PATH)/%: $(SOURCE_PATH)/%.c
 	@mkdir -p $(BINARY_PATH)
 	@echo "$(PROJECT_PREFIX) Compiling: $@ (from $<)"
-	@$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS) $(WEBFLAGS)
+	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS) $(WEBFLAGS)
     
 $(BINARY_PATH)/%.exe: $(SOURCE_PATH)/%.c
 	@mkdir -p $(BINARY_PATH)
