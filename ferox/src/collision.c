@@ -41,25 +41,45 @@ static int frGetSeparatingAxisIndex(
 );
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
+static frCollision frComputeCollisionCirclesSAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+);
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 다각형 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
+static frCollision frComputeCollisionCirclePolySAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+);
 
 /* 최적화된 분리 축 정리를 이용하여, 다각형 `s1`에서 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
+static frCollision frComputeCollisionPolysSAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+);
 
 /* 최적화된 분리 축 정리를 이용하여, 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2);
+static frCollision frComputeCollisionSAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+);
 
 /* 선분 `e`에서 벡터 `v`와의 내적이 `minDot`보다 작은 부분을 모두 잘라낸다. */
 static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float minDot);
 
 /* `o1`에서 `v1` 방향으로 진행하는 광선이 `o2`에서 `v2` 방향으로 진행하는 광선과 만나는지 계산한다. */
-static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector2 v2, float *distance);
+static bool frComputeIntersectionRays(
+    Vector2 o1, Vector2 v1, 
+    Vector2 o2, Vector2 v2, 
+    float *distance
+);
 
 /* `o`에서 `v` 방향으로 진행하는 광선이 중심점이 `c`이고 반지름이 `r`인 원과 만나는지 계산한다. */
-static bool frComputeIntersectionRayCircle(Vector2 o, Vector2 v, Vector2 c, float r, float *distance);
+static bool frComputeIntersectionRayCircle(
+    Vector2 o, Vector2 v, 
+    Vector2 c, float r, 
+    float *distance
+);
 
 /* 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
 frCollision frComputeShapeCollision(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
@@ -82,83 +102,80 @@ frCollision frComputeBodyCollision(frBody *b1, frBody *b2) {
 
 /* 도형 `s`에 광선을 투사한다. */
 frRaycastHit frComputeShapeRaycast(frShape *s, frTransform tx, frRay ray) {
-    if (s == NULL || frGetShapeType(s) == FR_SHAPE_UNKNOWN) {
-        return FR_STRUCT_ZERO(frRaycastHit);
-    } else {
-        frRaycastHit result = { .shape = s, .distance = FLT_MAX };
+    if (s == NULL || frGetShapeType(s) == FR_SHAPE_UNKNOWN) return FR_STRUCT_ZERO(frRaycastHit);
 
-        ray.direction = frVec2Normalize(ray.direction);
+    frRaycastHit result = { .shape = s, .distance = FLT_MAX };
 
-        float distance = FLT_MAX;
+    ray.direction = frVec2Normalize(ray.direction);
+
+    float distance = FLT_MAX;
+    
+    if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
+        bool intersects = frComputeIntersectionRayCircle(
+            ray.origin, ray.direction,
+            tx.position, frGetCircleRadius(s),
+            &distance
+        );
         
-        if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
-            bool intersects = frComputeIntersectionRayCircle(
-                ray.origin, ray.direction,
-                tx.position, frGetCircleRadius(s),
+        result.check = (distance >= 0.0f) && (distance <= ray.maxDistance);
+        result.inside = (distance < 0.0f);
+        
+        if (result.check) {
+            result.distance = distance;
+            
+            result.point = frVec2Add(
+                ray.origin, 
+                frVec2ScalarMultiply(ray.direction, result.distance)
+            );
+
+            result.normal = frVec2LeftNormal(frVec2Subtract(ray.origin, result.point));
+        }
+        
+        return result;
+    } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
+        int intersectionCount = 0;
+        
+        frVertices vertices = frGetPolygonVertices(s);
+        
+        // 다각형의 변 중에 광선과 교차하는 변이 존재하는지 확인한다.
+        for (int j = vertices.count - 1, i = 0; i < vertices.count; j = i, i++) {
+            Vector2 v1 = frVec2Transform(vertices.data[i], tx);
+            Vector2 v2 = frVec2Transform(vertices.data[j], tx);
+
+            Vector2 diff = frVec2Subtract(v1, v2);
+            
+            bool intersects = frComputeIntersectionRays(
+                ray.origin, ray.direction, 
+                v2, diff, 
                 &distance
             );
             
-            result.check = (distance >= 0.0f) && (distance <= ray.maxDistance);
-            result.inside = (distance < 0.0f);
-            
-            if (result.check) {
-                result.distance = distance;
-                
-                result.point = frVec2Add(
-                    ray.origin, 
-                    frVec2ScalarMultiply(ray.direction, result.distance)
-                );
-
-                result.normal = frVec2LeftNormal(frVec2Subtract(ray.origin, result.point));
-            }
-            
-            return result;
-        } else if (frGetShapeType(s) == FR_SHAPE_POLYGON) {
-            int intersectionCount = 0;
-            
-            frVertices vertices = frGetPolygonVertices(s);
-            
-            // 다각형의 변 중에 광선과 교차하는 변이 존재하는지 확인한다.
-            for (int j = vertices.count - 1, i = 0; i < vertices.count; j = i, i++) {
-                Vector2 v1 = frVec2Transform(vertices.data[i], tx);
-                Vector2 v2 = frVec2Transform(vertices.data[j], tx);
-
-                Vector2 diff = frVec2Subtract(v1, v2);
-                
-                bool intersects = frComputeIntersectionRays(
-                    ray.origin, ray.direction, 
-                    v2, diff, 
-                    &distance
-                );
-                
-                if (intersects && distance <= ray.maxDistance) {
-                    if (result.distance > distance) {
-                        result.distance = distance;
-                        
-                        result.point = frVec2Add(
-                            ray.origin, 
-                            frVec2ScalarMultiply(ray.direction, result.distance)
-                        );
-
-                        result.normal = frVec2LeftNormal(diff);
-                    }
+            if (intersects && distance <= ray.maxDistance) {
+                if (result.distance > distance) {
+                    result.distance = distance;
                     
-                    intersectionCount++;
+                    result.point = frVec2Add(
+                        ray.origin, 
+                        frVec2ScalarMultiply(ray.direction, result.distance)
+                    );
+
+                    result.normal = frVec2LeftNormal(diff);
                 }
+                
+                intersectionCount++;
             }
-            
-            result.inside = (intersectionCount & 1);
-            result.check = (!result.inside) && (intersectionCount > 0);
-            
-            return result;
         }
+        
+        result.inside = (intersectionCount & 1);
+        result.check = (!result.inside) && (intersectionCount > 0);
+        
+        return result;
     }
 }
 
 /* 강체 `b`에 광선을 투사한다. */
 frRaycastHit frComputeBodyRaycast(frBody *b, frRay ray) {
-    if (b == NULL || frGetBodyShape(b) == NULL)
-        return FR_STRUCT_ZERO(frRaycastHit);
+    if (b == NULL || frGetBodyShape(b) == NULL) return FR_STRUCT_ZERO(frRaycastHit);
     
     frRaycastHit result = frComputeShapeRaycast(
         frGetBodyShape(b), frGetBodyTransform(b), 
@@ -205,11 +222,7 @@ static frVertices frGetShapeSignificantEdge(frShape *s, frTransform tx, Vector2 
     frVertices result = FR_STRUCT_ZERO(frVertices);
     
     if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
-        result.data[0] = frVec2Transform(
-            frVec2ScalarMultiply(v, frGetCircleRadius(s)), 
-            tx
-        );
-        
+        result.data[0] = frVec2Transform(frVec2ScalarMultiply(v, frGetCircleRadius(s)), tx);
         result.count = 1;
         
         return result;
@@ -273,13 +286,16 @@ static int frGetSeparatingAxisIndex(
         }
     }
     
-    *depth = maxDistance;
+    if (depth != NULL) *depth = maxDistance;
     
     return result;
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
+static frCollision frComputeCollisionCirclesSAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+) {
     if (frGetShapeType(s1) != FR_SHAPE_CIRCLE || frGetShapeType(s2) != FR_SHAPE_CIRCLE)
         return FR_STRUCT_ZERO(frCollision);
 
@@ -318,7 +334,10 @@ static frCollision frComputeCollisionCirclesSAT(frShape *s1, frTransform tx1, fr
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 원 `s1`에서 다각형 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
+static frCollision frComputeCollisionCirclePolySAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+) {
     if (frGetShapeType(s1) == FR_SHAPE_UNKNOWN || frGetShapeType(s2) == FR_SHAPE_UNKNOWN 
         || frGetShapeType(s1) == frGetShapeType(s2))
         return FR_STRUCT_ZERO(frCollision);
@@ -447,7 +466,10 @@ static frCollision frComputeCollisionCirclePolySAT(frShape *s1, frTransform tx1,
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 다각형 `s1`에서 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
+static frCollision frComputeCollisionPolysSAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+) {
     if (frGetShapeType(s1) != FR_SHAPE_POLYGON || frGetShapeType(s2) != FR_SHAPE_POLYGON)
         return FR_STRUCT_ZERO(frCollision);
 
@@ -525,7 +547,10 @@ static frCollision frComputeCollisionPolysSAT(frShape *s1, frTransform tx1, frSh
 }
 
 /* 최적화된 분리 축 정리를 이용하여, 도형 `s1`에서 `s2`로의 충돌을 계산한다. */
-static frCollision frComputeCollisionSAT(frShape *s1, frTransform tx1, frShape *s2, frTransform tx2) {
+static frCollision frComputeCollisionSAT(
+    frShape *s1, frTransform tx1, 
+    frShape *s2, frTransform tx2
+) {
     frShapeType type1 = frGetShapeType(s1);
     frShapeType type2 = frGetShapeType(s2);
     
@@ -557,7 +582,7 @@ static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float minDot) {
     } else {
         Vector2 edgeV = frVec2Subtract(e.data[1], e.data[0]);
         
-        float distance = p1Dot / (p1Dot - p2Dot);
+        const float distance = p1Dot / (p1Dot - p2Dot);
         
         Vector2 midpoint = frVec2Add(
             e.data[0], 
@@ -581,7 +606,11 @@ static frVertices frClipEdgeWithAxis(frVertices e, Vector2 v, float minDot) {
 }
 
 /* `o1`에서 `v1` 방향으로 진행하는 광선이 `o2`에서 `v2` 방향으로 진행하는 광선과 만나는지 계산한다. */
-static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector2 v2, float *distance) {
+static bool frComputeIntersectionRays(
+    Vector2 o1, Vector2 v1, 
+    Vector2 o2, Vector2 v2, 
+    float *distance
+) {
     bool result = true;
     
     float cross = frVec2CrossProduct(v1, v2);
@@ -609,7 +638,11 @@ static bool frComputeIntersectionRays(Vector2 o1, Vector2 v1, Vector2 o2, Vector
 }
 
 /* `o`에서 `v` 방향으로 진행하는 광선이 중심점이 `c`이고 반지름이 `r`인 원과 만나는지 계산한다. */
-static bool frComputeIntersectionRayCircle(Vector2 o, Vector2 v, Vector2 c, float r, float *distance) {
+static bool frComputeIntersectionRayCircle(
+    Vector2 o, Vector2 v, 
+    Vector2 c, float r, 
+    float *distance
+) {
     bool result = true;
     
     Vector2 diff = frVec2Subtract(c, o);

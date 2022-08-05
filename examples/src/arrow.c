@@ -120,10 +120,12 @@ void UpdateExample(void) {
             frAttachShapeToBody(cursor_clone, circle);
         }
     } else if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)) {
-        float rotation = DEG2RAD * GetRandomValue(0, 360);
-        
-        frSetBodyRotation(cursor, rotation);
-        frSetBodyRotation(cursor_clone, rotation);
+        if (use_polygon_cursor) {
+            float rotation = DEG2RAD * GetRandomValue(0, 360);
+            
+            frSetBodyRotation(cursor, rotation);
+            frSetBodyRotation(cursor_clone, rotation);
+        }
     }
 
     {

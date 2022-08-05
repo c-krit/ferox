@@ -49,7 +49,7 @@ static int frQuickSortCallback(const void *x, const void *y);
 frSpatialHash *frCreateSpatialHash(Rectangle bounds, float cellSize) {
     if (cellSize <= 0.0f) return NULL;
     
-    frSpatialHash *result = calloc(1, sizeof(frSpatialHash));
+    frSpatialHash *result = calloc(1, sizeof(*result));
     
     result->bounds = bounds;
     result->cellSize = cellSize;
@@ -74,7 +74,7 @@ void frReleaseSpatialHash(frSpatialHash *hash) {
 void frAddToSpatialHash(frSpatialHash *hash, Rectangle rec, int value) {
     if (hash == NULL || !CheckCollisionRecs(hash->bounds, rec)) return;
     
-    int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x });    
+    int x0 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x }); 
     int x1 = frComputeSpatialHashKey(hash, (Vector2) { .x = rec.x + rec.width });
     
     int y0 = frComputeSpatialHashKey(hash, (Vector2) { .y = rec.y });

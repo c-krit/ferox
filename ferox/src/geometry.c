@@ -43,7 +43,7 @@ typedef struct frShape {
 
 /* | `geometry` 모듈 상수... | */
 
-const float INVERSE_TWELVE = (1.0f / 12.0f);
+static const float INVERSE_TWELVE = (1.0f / 12.0f);
 
 /* | `geometry` 모듈 함수... | */
 
@@ -110,7 +110,7 @@ frShape *frCreatePolygon(frMaterial material, frVertices vertices) {
 
 /* 형태가 정해지지 않은 도형을 생성한다. */
 frShape *frCreateShape(void) {
-    frShape *result = calloc(1, sizeof(frShape));
+    frShape *result = calloc(1, sizeof(*result));
     
     result->type = FR_SHAPE_UNKNOWN;
     
@@ -128,9 +128,9 @@ frShape *frCloneShape(frShape *s) {
     result->isRect = s->isRect;
     result->area = s->area;
     
-    if (result->type == FR_SHAPE_CIRCLE) {
+    if (result->type == FR_SHAPE_CIRCLE)
         result->circle.radius = s->circle.radius;
-    } else if (result->type == FR_SHAPE_POLYGON) {
+    else if (result->type == FR_SHAPE_POLYGON) {
         result->polygon.vertices.count = s->polygon.vertices.count;
         result->polygon.normals.count = s->polygon.normals.count;
         
@@ -190,7 +190,7 @@ float frGetShapeInertia(frShape *s) {
             Vector2 v1 = s->polygon.vertices.data[j];
             Vector2 v2 = s->polygon.vertices.data[i];
             
-            float cross = frVec2CrossProduct(v1, v2);
+            const float cross = frVec2CrossProduct(v1, v2);
             
             xInertia += cross * ((v1.y * v1.y) + (v1.y * v2.y) + (v2.y * v2.y));
             yInertia += cross * ((v1.x * v1.x) + (v1.x * v2.x) + (v2.x * v2.x));
@@ -206,8 +206,7 @@ float frGetShapeInertia(frShape *s) {
 Rectangle frGetShapeAABB(frShape *s, frTransform tx) {
     Rectangle result = FR_STRUCT_ZERO(Rectangle);
     
-    if (s == NULL || s->type == FR_SHAPE_UNKNOWN) 
-        return result;
+    if (s == NULL || s->type == FR_SHAPE_UNKNOWN) return result;
     
     if (s->type == FR_SHAPE_CIRCLE) {
         result.x = tx.position.x - (s->circle.radius);
@@ -369,10 +368,9 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
         
         return (deltaX * deltaX) + (deltaY * deltaY) <= radius * radius;
     } else if (s->type == FR_SHAPE_POLYGON) {
-        frRaycastHit raycast = frComputeShapeRaycast(
-            s, tx, 
-            (frRay) { p, (Vector2) { .x = 1.0f }, FLT_MAX }
-        );
+        frRay ray = { p, (Vector2) { .x = 1.0f }, FLT_MAX };
+
+        frRaycastHit raycast = frComputeShapeRaycast(s, tx, ray);
         
         return raycast.inside;
     }
@@ -380,11 +378,11 @@ bool frShapeContainsPoint(frShape *s, frTransform tx, Vector2 p) {
 
 /* 도형 `s`의 넓이를 계산한다. */
 static void frComputeArea(frShape *s) {
-    if (s == NULL || s->type == FR_SHAPE_UNKNOWN) {
+    if (s == NULL || s->type == FR_SHAPE_UNKNOWN)
         s->area = 0.0f;
-    } else if (s->type == FR_SHAPE_CIRCLE) {
+    else if (s->type == FR_SHAPE_CIRCLE)
         s->area = PI * (s->circle.radius * s->circle.radius);
-    } else if (s->type == FR_SHAPE_POLYGON) {
+    else if (s->type == FR_SHAPE_POLYGON) {
         if (s->isRect) {
             frVertices *vertices = &(s->polygon.vertices);
 
@@ -392,20 +390,22 @@ static void frComputeArea(frShape *s) {
             float height = vertices->data[1].y - vertices->data[0].y;
 
             s->area = width * height;
-        } else {
-            float twiceAreaSum = 0.0f;
 
-            for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
-                float twiceArea = frVec2CrossProduct(
-                    frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
-                    frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
-                );
-
-                twiceAreaSum += twiceArea;
-            }
-
-            s->area = fabsf(0.5f * twiceAreaSum);
+            return;
         }
+
+        float twiceAreaSum = 0.0f;
+
+        for (int i = 0; i < s->polygon.vertices.count - 1; i++) {
+            float twiceArea = frVec2CrossProduct(
+                frVec2Subtract(s->polygon.vertices.data[i], s->polygon.vertices.data[0]),
+                frVec2Subtract(s->polygon.vertices.data[i + 1], s->polygon.vertices.data[0])
+            );
+
+            twiceAreaSum += twiceArea;
+        }
+
+        s->area = fabsf(0.5f * twiceAreaSum);
     }
 }
 

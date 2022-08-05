@@ -58,7 +58,7 @@ static void frResetBodyMass(frBody *b);
 frBody *frCreateBody(frBodyType type, frBodyFlags flags, Vector2 p) {
     if (type == FR_BODY_UNKNOWN) return NULL;
     
-    frBody *result = calloc(1, sizeof(frBody));
+    frBody *result = calloc(1, sizeof(*result));
     
     result->material = FR_STRUCT_ZERO(frMaterial);
     

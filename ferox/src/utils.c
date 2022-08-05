@@ -31,7 +31,7 @@
 
 /* | `utils` 모듈 상수... | */
 
-const float INVERSE_TWO_PI = (1.0f / TWO_PI);
+static const float INVERSE_TWO_PI = (1.0f / TWO_PI);
 
 /* | `utils` 모듈 함수... | */
 
@@ -44,5 +44,5 @@ float frNormalizeAngle(float angle, float center) {
 
 /* 부동 소수점 값 `f1`이 `f2`와 근접한 값인지 확인한다. */
 bool frNumberApproxEquals(float f1, float f2) {
-    return fabsf(f1 - f2) <= fmaxf(f1, f2) * FLT_EPSILON;
+    return fabsf(f1 - f2) <= fmaxf(1.0f, fmaxf(f1, f2)) * FLT_EPSILON;
 }

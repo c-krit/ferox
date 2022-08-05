@@ -24,7 +24,7 @@
 
 /* | `debug` 모듈 변수... | */
 
-const float ARROW_HEAD_LENGTH = 16.0f;
+static const float ARROW_HEAD_LENGTH = 16.0f;
 
 /* | `debug` 모듈 함수... | */
 

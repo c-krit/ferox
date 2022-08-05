@@ -50,7 +50,7 @@ static void frUpdateWorld(frWorld *world, double dt);
 
 /* 중력 가속도가 `gravity`이고 경계 범위가 `bounds`인 세계를 생성한다. */ 
 frWorld *frCreateWorld(Vector2 gravity, Rectangle bounds) {
-    frWorld *result = calloc(1, sizeof(frWorld));
+    frWorld *result = calloc(1, sizeof(*result));
     
     result->gravity = gravity;
     result->hash = frCreateSpatialHash(bounds, FR_BROADPHASE_CELL_SIZE);
