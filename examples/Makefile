@@ -49,7 +49,9 @@ SOURCE_PATH := src
 INCLUDE_PATH += $(SOURCE_PATH)/external
 
 EXAMPLES := \
-	basic
+	basic   \
+	bricks  \
+	smash
 
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)
