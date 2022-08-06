@@ -51,6 +51,7 @@ INCLUDE_PATH += $(SOURCE_PATH)/external
 EXAMPLES := \
 	basic   \
 	bricks  \
+	cowlvl  \
 	smash
 
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)

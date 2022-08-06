@@ -79,7 +79,7 @@ int main(void) {
 
     InitExample();
 
-#if defined(PLATFORM_WEB)
+#ifdef PLATFORM_WEB
     emscripten_set_main_loop(UpdateExample, 0, 1);
 #else
     SetTargetFPS(TARGET_FPS);
