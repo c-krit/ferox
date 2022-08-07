@@ -52,6 +52,7 @@ EXAMPLES := \
 	basic   \
 	bricks  \
 	cowlvl  \
+	slopes  \
 	smash
 
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)

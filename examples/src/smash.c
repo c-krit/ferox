@@ -56,7 +56,7 @@ const frMaterial MATERIAL_BOX = {
 };
 
 const float BALL_RADIUS = 1.5f;
-const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 200.0f;
 
 static frWorld *world;
 static frBody *ball;
@@ -184,10 +184,7 @@ static void InitExample(void) {
 
 /* 예제 프로그램을 실행한다. */
 static void UpdateExample(void) {
-    const Vector2 screenCenter = { 
-        0.5f * SCREEN_WIDTH, 
-        0.5f * SCREEN_HEIGHT 
-    };
+    const Vector2 screenCenter = { 0.5f * SCREEN_WIDTH, 0.5f * SCREEN_HEIGHT };
 
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
         const Vector2 position = frVec2PixelsToMeters(GetMousePosition());
@@ -248,7 +245,7 @@ static void UpdateExample(void) {
             );
         }
 
-        const Color color = ColorAlpha(GRAY, 0.85f);
+        const Color color = ColorAlpha(GRAY, 0.65f);
 
         frDrawBodyLines(ball, 2.0f, color);
 

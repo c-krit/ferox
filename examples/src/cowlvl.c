@@ -73,7 +73,7 @@ const ObjData userData[OBJ_TYPE_COUNT_] = {
     { .type = OBJ_TYPE_ENEMY  }
 };
 
-const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 200.0f;
 const float FIRE_RATE = 0.1f * TARGET_FPS, PLAYER_SPEED = 0.028f;
 
 const float ENEMY_IMPULSE_MULTIPLIER = 0.0001f;
@@ -196,26 +196,24 @@ static void InitExample(void) {
 
 /* 예제 프로그램을 실행한다. */
 static void UpdateExample(void) {
-    if (enemyCount < MAX_ENEMY_COUNT) {
-        for (int i = 0; i < MAX_ENEMY_COUNT - enemyCount; i++) {
-            Vector2 position = FR_STRUCT_ZERO(Vector2);
-            
-            position.x = GetRandomValue(0.05f * SCREEN_WIDTH, 0.95f * SCREEN_WIDTH);
-            position.y = GetRandomValue(-0.25f * SCREEN_HEIGHT, -0.05f * SCREEN_HEIGHT);
-            
-            frBody *enemy = frCreateBodyFromShape(
-                FR_BODY_DYNAMIC,
-                FR_FLAG_INFINITE_INERTIA,
-                frVec2PixelsToMeters(position),
-                frCreateCircle(MATERIAL_ENEMY, 0.5f * GetRandomValue(2, 5))
-            );
-            
-            frSetBodyUserData(enemy, (void *) &userData[OBJ_TYPE_ENEMY]);
-            
-            frAddToWorld(world, enemy);
+    for (int i = 0; i < MAX_ENEMY_COUNT - enemyCount; i++) {
+        Vector2 position = FR_STRUCT_ZERO(Vector2);
+        
+        position.x = GetRandomValue(0.05f * SCREEN_WIDTH, 0.95f * SCREEN_WIDTH);
+        position.y = GetRandomValue(-0.25f * SCREEN_HEIGHT, -0.05f * SCREEN_HEIGHT);
+        
+        frBody *enemy = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
+            FR_FLAG_INFINITE_INERTIA,
+            frVec2PixelsToMeters(position),
+            frCreateCircle(MATERIAL_ENEMY, 0.5f * GetRandomValue(2, 5))
+        );
+        
+        frSetBodyUserData(enemy, (void *) &userData[OBJ_TYPE_ENEMY]);
+        
+        frAddToWorld(world, enemy);
 
-            enemyCount++;
-        }
+        enemyCount++;
     }
 
     for (int i = 0; i < frGetWorldBodyCount(world); i++) {

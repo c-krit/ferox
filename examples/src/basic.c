@@ -33,7 +33,7 @@
 
 /* | `basic` 모듈 변수 및 상수... | */
 
-const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 200.0f;
 
 static frWorld *world;
 

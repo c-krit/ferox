@@ -29,26 +29,26 @@
 #define SCREEN_WIDTH    800
 #define SCREEN_HEIGHT   600
 
-#define MAX_WALL_COUNT  4
-
 #define MATTEBLACK      ((Color) { 15, 15, 15, 255 })
+
+#define MAX_WALL_COUNT  4
 
 /* | `bricks` 모듈 변수 및 상수... | */
 
 const frMaterial MATERIAL_BRICK = { 
-    .density         = 0.75f, 
+    .density         = 1.0f, 
     .staticFriction  = 0.5f, 
-    .dynamicFriction = 0.15f
+    .dynamicFriction = 0.35f
 };
 
 const frMaterial MATERIAL_WALL = { 
     .density         = 1.25f, 
-    .staticFriction  = 0.5f, 
-    .dynamicFriction = 0.25f
+    .staticFriction  = 0.75f, 
+    .dynamicFriction = 0.5f
 };
 
 const float BRICK_WIDTH = 64.0f, BRICK_HEIGHT = 48.0f;
-const float DELTA_TIME = (1.0f / TARGET_FPS) * 100.0f;
+const float DELTA_TIME = (1.0f / TARGET_FPS) * 200.0f;
 
 const Rectangle SOURCE_REC = { .width = BRICK_WIDTH, .height = BRICK_HEIGHT };
 const Vector2 ORIGIN_POS = { 0.5f * BRICK_WIDTH, 0.5f * BRICK_HEIGHT };
