@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/c-krit/ferox/main/examples/res/images/logo.png" alt="c-krit/ferox"><br>
+<img src="examples/res/images/logo.png" alt="c-krit/ferox"><br>
 
 [![version badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)](https://github.com/c-krit/ferox/releases)
 [![codefactor badge](https://www.codefactor.io/repository/github/c-krit/ferox/badge)](https://www.codefactor.io/repository/github/c-krit/ferox)
@@ -20,7 +20,7 @@
 ## 주요 기능
 
 <div align="center">
-<img src="examples/res/images/readme.gif" width="640" alt="c-krit/ferox: demo">
+<video src="https://user-images.githubusercontent.com/28700668/183297471-733c7235-8493-4639-91c1-f7370acc0d73.mp4"></video>
 </div>
 
 **이 프로젝트는 제가 물리 엔진의 구조를 이해하기 위해 만들었으며, 새로운 기능이 자주 추가되지 않을 수도 있습니다.**

@@ -30,7 +30,37 @@ $ make
 
 ---
 
-TODO: ...
+### `bricks.c`
+
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/bricks.png" width="640">
+</details>
+
+### `cowlvl.c`
+
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/cowlvl.png" width="640">
+</details>
+
+### `slopes.c`
+
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/slopes.png" width="640">
+</details>
+
+### `smash.c`
+
+<details>
+  <summary>Show Example</summary>
+
+  <img src="res/images/smash.png" width="640">
+</details>
 
 ## License
 

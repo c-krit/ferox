@@ -191,7 +191,7 @@ static void UpdateExample(void) {
 
         Vector2 impulse = frVec2ScalarMultiply(
             frVec2Subtract(frVec2PixelsToMeters(screenCenter), position),
-            0.05f
+            0.03f
         );
 
         frSetBodyVelocity(ball, FR_STRUCT_ZERO(Vector2));
