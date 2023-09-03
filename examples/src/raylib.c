@@ -41,8 +41,8 @@
 
 #define WORLD_CELL_SIZE        2.8f
 
-#define LOGO_WIDTH_IN_PIECES   42
-#define LOGO_HEIGHT_IN_PIECES  42
+#define LOGO_WIDTH_IN_PIECES   46
+#define LOGO_HEIGHT_IN_PIECES  46
 
 /* Typedefs ============================================================================= */
 
@@ -58,7 +58,7 @@ static const float DELTA_TIME = 1.0f / TARGET_FPS;
 /* Private Variables ==================================================================== */
 
 static frWorld *world;
-static frBody *ground;
+static frBody *ball;
 
 static Rectangle bounds = { .width = SCREEN_WIDTH, .height = SCREEN_HEIGHT };
 
@@ -103,7 +103,7 @@ int main(void) {
 /* Private Functions ==================================================================== */
 
 static void InitExample(void) {
-    world = frCreateWorld(FR_WORLD_DEFAULT_GRAVITY, WORLD_CELL_SIZE);
+    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), WORLD_CELL_SIZE);
 
     raylibTexture = LoadTexture("../res/images/raylib.png");
 
@@ -115,7 +115,7 @@ static void InitExample(void) {
 
         frShape *pieceShape = frCreateRectangle(
             (frMaterial) {
-                .density = 0.75f,
+                .density = 1.25f,
                 .friction = 0.5f,
                 .restitution = 0.0f
             },
@@ -125,7 +125,7 @@ static void InitExample(void) {
 
         const frVector2 origin = {
             0.5f * (SCREEN_WIDTH - raylibTexture.width),
-            0.35f * (SCREEN_HEIGHT - raylibTexture.height)
+            0.5f * (SCREEN_HEIGHT - raylibTexture.height)
         };
 
         for (int i = 0; i < LOGO_WIDTH_IN_PIECES * LOGO_HEIGHT_IN_PIECES; i++) {
@@ -146,31 +146,33 @@ static void InitExample(void) {
             frAddBodyToWorld(world, pieces[i].body);
         }
 
-        const float groundWidth = 0.5f * SCREEN_WIDTH;
-        const float groundHeight = 0.05f * SCREEN_HEIGHT;
-
-        const float halfGroundHeight = 0.5f * groundHeight;
-
-        ground = frCreateBodyFromShape(
-            FR_BODY_STATIC,
+        ball = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
             frVector2PixelsToUnits(
                 (frVector2) {
-                    .x = 0.5f * SCREEN_WIDTH,
-                    .y = ((origin.y + raylibTexture.height) + halfGroundHeight) + 28.0f
+                    .x = -SCREEN_WIDTH,
+                    .y = 0.5f * SCREEN_HEIGHT
                 }
             ),
-            frCreateRectangle(
+            frCreateCircle(
                 (frMaterial) {
-                    .density = 1.5f,
-                    .friction = 0.75f,
-                    .restitution = 0.0f
-                },
-                frPixelsToUnits(groundWidth),
-                frPixelsToUnits(groundHeight)
+                    .density = 1.85f,
+                    .friction = 0.75f
+                }, 
+                frPixelsToUnits(20.0f)
             )
         );
 
-        frAddBodyToWorld(world, ground);
+        frApplyImpulseToBody(
+            ball,
+            FR_API_STRUCT_ZERO(frVector2), 
+            (frVector2) { 
+                .x = 2048.0f,
+                .y = 0.0f
+            }
+        );
+
+        frAddBodyToWorld(world, ball);
     }
 }
 
@@ -210,7 +212,7 @@ static void UpdateExample(void) {
             );
         }
 
-        frDrawBodyLines(ground, 1.0f, WHITE);
+        frDrawBodyLines(ball, 1.0f, WHITE);
 
         DrawFPS(8, 8);
 
@@ -222,7 +224,7 @@ static void DeinitExample(void) {
     UnloadTexture(raylibTexture);
 
     frReleaseShape(frGetBodyShape(pieces[0].body));
-    frReleaseShape(frGetBodyShape(ground));
+    frReleaseShape(frGetBodyShape(ball));
 
     frReleaseWorld(world);
 }

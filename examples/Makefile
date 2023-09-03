@@ -48,7 +48,8 @@ RESOURCE_PATH := res
 SOURCE_PATH := src
 
 EXAMPLES := \
-	basic
+	basic   \
+	raylib
 
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)
 TARGETS := $(EXAMPLES:%=$(BINARY_PATH)/%)
