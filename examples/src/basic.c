@@ -36,8 +36,8 @@
 
 #define TARGET_FPS       60
 
-#define SCREEN_WIDTH     1280
-#define SCREEN_HEIGHT    800
+#define SCREEN_WIDTH     800
+#define SCREEN_HEIGHT    600
 
 #define WORLD_CELL_SIZE  4.0f
 
@@ -48,6 +48,8 @@ static const float DELTA_TIME = 1.0f / TARGET_FPS;
 /* Private Variables ==================================================================== */
 
 static frWorld *world;
+
+static frBody *box, *ground;
 
 static Rectangle bounds = { .width = SCREEN_WIDTH, .height = SCREEN_HEIGHT };
 
@@ -85,7 +87,49 @@ int main(void) {
 /* Private Functions ==================================================================== */
 
 static void InitExample(void) {
-    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), WORLD_CELL_SIZE);
+    world = frCreateWorld(FR_WORLD_DEFAULT_GRAVITY, WORLD_CELL_SIZE);
+
+    ground = frCreateBodyFromShape(
+        FR_BODY_STATIC,
+        frVector2PixelsToUnits(
+            (frVector2) { 
+                .x = 0.5f * SCREEN_WIDTH,
+                .y = 0.85f * SCREEN_HEIGHT
+            }
+        ),
+        frCreateRectangle(
+            (frMaterial) {
+                .density = 1.25f,
+                .friction = 0.5f
+            },
+            frPixelsToUnits(0.75f * SCREEN_WIDTH),
+            frPixelsToUnits(0.1f * SCREEN_HEIGHT)
+        )
+    );
+
+    frAddBodyToWorld(world, ground);
+
+    box = frCreateBodyFromShape(
+        FR_BODY_DYNAMIC,
+        frVector2PixelsToUnits(
+           (frVector2) { 
+                .x = 0.5f * SCREEN_WIDTH,
+                .y = 0.5f * SCREEN_HEIGHT
+            }
+        ),
+        frCreateRectangle(
+            (frMaterial) {
+                .density = 1.0f,
+                .friction = 0.35f
+            },
+            frPixelsToUnits(45.0f),
+            frPixelsToUnits(45.0f)
+        )
+    );
+
+    frSetBodyAngle(box, DEG2RAD * 25.0f);
+
+    frAddBodyToWorld(world, box);
 }
 
 static void UpdateExample(void) {
@@ -98,6 +142,11 @@ static void UpdateExample(void) {
 
         frDrawGrid(bounds, WORLD_CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
 
+        frDrawBodyLines(ground, 1.0f, GRAY);
+
+        frDrawBodyLines(box, 1.0f, ColorAlpha(RED, 0.85f));
+        // frDrawBodyAABB(box, 1.0f, ColorAlpha(GREEN, 0.25f));
+
         DrawFPS(8, 8);
 
         EndDrawing();
@@ -105,5 +154,8 @@ static void UpdateExample(void) {
 }
 
 static void DeinitExample(void) {
+    frReleaseShape(frGetBodyShape(ground));
+    frReleaseShape(frGetBodyShape(box));
+
     frReleaseWorld(world);
 }

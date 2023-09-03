@@ -44,11 +44,17 @@ extern "C" {
 /* Defines how many pixels represent a unit of length (meter). */
 #define FR_GEOMETRY_PIXELS_PER_UNIT   16.0f
 
+/* TODO: ... */
+#define FR_WORLD_BAUMGARTE_FACTOR     0.2f
+
+/* TODO: ... */
+#define FR_WORLD_BAUMGARTE_SLOP       0.01f
+
 /* Defines the default gravity acceleration vector for a world. */
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
 
 /* Defines the iteration count for the constraint solver. */
-#define FR_WORLD_ITERATION_COUNT      8
+#define FR_WORLD_ITERATION_COUNT      16
 
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     4096
@@ -400,6 +406,9 @@ void frIntegrateForBodyVelocity(frBody *b, float dt);
 
 /* Integrates the velocity of `b` over `dt` to calculate the position of `b`. */
 void frIntegrateForBodyPosition(frBody *b, float dt);
+
+/* Resolves the collision between `b1` and `b2`. */
+void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseDt);
 
 /* (From 'timer.c') ===================================================================== */
 

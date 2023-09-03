@@ -38,6 +38,7 @@ TEST BoxToBox4(void);
 TEST BoxToBox5(void);
 TEST BoxToBox6(void);
 TEST BoxToBox7(void);
+TEST BoxToBox8(void);
 
 /* Public Functions ===================================================================== */
 
@@ -51,6 +52,7 @@ SUITE(BoxToBox) {
     RUN_TEST(BoxToBox5);
     RUN_TEST(BoxToBox6);
     RUN_TEST(BoxToBox7);
+    RUN_TEST(BoxToBox8);
 }
 
 int main(int argc, char **argv) {
@@ -475,12 +477,12 @@ TEST BoxToBox7(void) {
 
     frCollision collision = { .count = 0 };
 
-    frComputeCollision(s1, tx1, s2, tx2, &collision);
+    frComputeCollision(s2, tx2, s1, tx1, &collision);
 
     ASSERT_EQ(collision.count, 2);
 
     ASSERT_IN_RANGE(0.000000f, collision.direction.x, FR_TEST_EPSILON);
-    ASSERT_IN_RANGE(-1.000000f, collision.direction.y, FR_TEST_EPSILON);
+    ASSERT_IN_RANGE(1.000000f, collision.direction.y, FR_TEST_EPSILON);
 
     ASSERT_IN_RANGE(0.586336f, collision.contacts[0].point.x, FR_TEST_EPSILON);
     ASSERT_IN_RANGE(3.604854f, collision.contacts[0].point.y, FR_TEST_EPSILON);
@@ -489,6 +491,69 @@ TEST BoxToBox7(void) {
     ASSERT_IN_RANGE(3.604854f, collision.contacts[1].point.x, FR_TEST_EPSILON);
     ASSERT_IN_RANGE(4.413664f, collision.contacts[1].point.y, FR_TEST_EPSILON);
     ASSERT_IN_RANGE(0.976164f, collision.contacts[1].depth, FR_TEST_EPSILON);
+
+    frReleaseShape(s2), frReleaseShape(s1);
+    frReleaseBody(b2), frReleaseBody(b1);
+
+    PASS();
+}
+
+TEST BoxToBox8(void) {
+    frShape *s1 = frCreateRectangle(
+        FR_API_STRUCT_ZERO(frMaterial),
+        frPixelsToUnits(450.0f),
+        frPixelsToUnits(50.0f)
+    );
+
+    frBody *b1 = frCreateBodyFromShape(
+        FR_BODY_DYNAMIC,
+        frVector2PixelsToUnits(
+            (frVector2) { 
+                .x = 0.0f,
+                .y = 80.0f
+            }
+        ),
+        s1
+    );
+
+    frShape *s2 = frCreateRectangle(
+        FR_API_STRUCT_ZERO(frMaterial),
+        frPixelsToUnits(50.0f),
+        frPixelsToUnits(50.0f)
+    );
+
+    frBody *b2 = frCreateBodyFromShape(
+        FR_BODY_DYNAMIC,
+        frVector2PixelsToUnits(
+            (frVector2) { 
+                .x = 220.0f,
+                .y = 40.0f
+            }
+        ),
+        s2
+    );
+
+    frSetBodyAngle(b2, (M_PI / 180.0f) * 15.0f);
+
+    frTransform tx1 = frGetBodyTransform(b1);
+    frTransform tx2 = frGetBodyTransform(b2);
+
+    frCollision collision = { .count = 0 };
+
+    frComputeCollision(s2, tx2, s1, tx1, &collision);
+
+    ASSERT_EQ(collision.count, 2);
+
+    ASSERT_IN_RANGE(-0.258819f, collision.direction.x, FR_TEST_EPSILON);
+    ASSERT_IN_RANGE(0.965926f, collision.direction.y, FR_TEST_EPSILON);
+
+    ASSERT_IN_RANGE(14.062500f, collision.contacts[0].point.x, FR_TEST_EPSILON);
+    ASSERT_IN_RANGE(3.437500f, collision.contacts[0].point.y, FR_TEST_EPSILON);
+    ASSERT_IN_RANGE(0.737825f, collision.contacts[0].depth, FR_TEST_EPSILON);
+
+    ASSERT_IN_RANGE(11.881179f, collision.contacts[1].point.x, FR_TEST_EPSILON);
+    ASSERT_IN_RANGE(3.437500f, collision.contacts[1].point.y, FR_TEST_EPSILON);
+    ASSERT_IN_RANGE(0.173258f, collision.contacts[1].depth, FR_TEST_EPSILON);
 
     frReleaseShape(s2), frReleaseShape(s1);
     frReleaseBody(b2), frReleaseBody(b1);
