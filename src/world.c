@@ -231,7 +231,27 @@ static void frPreStepQueryCallback(int otherBodyIndex, void *ctx) {
         collision.friction = entry->value.friction;
         collision.restitution = entry->value.restitution;
 
-        /* TODO: ... */
+        for (int i = 0; i < collision.count; i++) {
+            int k = -1;
+
+            for (int j = 0; j < entry->value.count; j++) {
+                const int oldEdgeId = entry->value.contacts[j].edgeId;
+
+                if (collision.contacts[i].edgeId == oldEdgeId) {
+                    k = j;
+
+                    break;
+                }
+            }
+
+            if (k < 0) continue;
+
+            const float oldNormalScalar = entry->value.contacts[k].cache.normalScalar;
+            const float oldTangentScalar = entry->value.contacts[k].cache.tangentScalar;
+
+            collision.contacts[i].cache.normalScalar = oldNormalScalar;
+            collision.contacts[i].cache.tangentScalar = oldTangentScalar;
+        }
     } else {
         collision.friction = frGetShapeFriction(s1) * frGetShapeFriction(s2);
         collision.restitution = fminf(frGetShapeRestitution(s1), frGetShapeRestitution(s2));

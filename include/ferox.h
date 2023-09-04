@@ -107,7 +107,10 @@ typedef struct _frCollision {
         int edgeId;
         frVector2 point;
         float depth;
-        /* TODO: ... */
+        struct {
+            float normalScalar;
+            float tangentScalar;
+        } cache;
     } contacts[2];
     int count;
 } frCollision;
