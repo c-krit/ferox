@@ -321,6 +321,8 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseD
         return;
     }
 
+    const frVector2 ctxTangent = { .x = ctx->direction.y, .y = -ctx->direction.x };
+
     for (int i = 0; i < ctx->count; i++) {
         const frVector2 contactPoint = ctx->contacts[i].point;
 
@@ -343,8 +345,6 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseD
 
         float relVelocityDot = frVector2Dot(relVelocity, ctx->direction);
 
-        if (relVelocityDot > 0.0f) continue;
-
         float relPositionCross1 = frVector2Cross(relPosition1, ctx->direction);
         float relPositionCross2 = frVector2Cross(relPosition2, ctx->direction);
 
@@ -365,7 +365,6 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseD
 
         frVector2 normalImpulse = frVector2ScalarMultiply(ctx->direction, normalScalar);
 
-        // TODO: ...
         frApplyImpulseToBody(b1, relPosition1, frVector2Negate(normalImpulse));
         frApplyImpulseToBody(b2, relPosition2, normalImpulse);
 
@@ -382,18 +381,16 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseD
 
         relVelocityDot = frVector2Dot(relVelocity, ctx->direction);
 
-        frVector2 tangent = { .x = ctx->direction.y, .y = -ctx->direction.x };
-
-        relPositionCross1 = frVector2Cross(relPosition1, tangent);
-        relPositionCross2 = frVector2Cross(relPosition2, tangent);
+        relPositionCross1 = frVector2Cross(relPosition1, ctxTangent);
+        relPositionCross2 = frVector2Cross(relPosition2, ctxTangent);
 
         float tangentMass = (b1->mtn.inverseMass + b2->mtn.inverseMass)
             + b1->mtn.inverseInertia * (relPositionCross1 * relPositionCross1)
             + b2->mtn.inverseInertia * (relPositionCross2 * relPositionCross2);
 
-        float tangentScalar = -frVector2Dot(relVelocity, tangent) / tangentMass;
+        float tangentScalar = -frVector2Dot(relVelocity, ctxTangent) / tangentMass;
 
-        const float maxTangentScalar = ctx->friction * normalScalar;
+        const float maxTangentScalar = fabsf(ctx->friction * normalScalar);
 
         tangentScalar = fminf(fmaxf(tangentScalar, -maxTangentScalar), maxTangentScalar);
 
@@ -402,9 +399,8 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseD
             ctx->contacts[i].cache.tangentScalar = tangentScalar;
         }
 
-        frVector2 tangentImpulse = frVector2ScalarMultiply(tangent, tangentScalar);
+        frVector2 tangentImpulse = frVector2ScalarMultiply(ctxTangent, tangentScalar);
 
-        // TODO: ...
         frApplyImpulseToBody(b1, relPosition1, frVector2Negate(tangentImpulse));
         frApplyImpulseToBody(b2, relPosition2, tangentImpulse);
     }

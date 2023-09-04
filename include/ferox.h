@@ -45,10 +45,10 @@ extern "C" {
 #define FR_GEOMETRY_PIXELS_PER_UNIT   16.0f
 
 /* Defines the 'bias factor' for the Baumgarte stabilization scheme. */
-#define FR_WORLD_BAUMGARTE_FACTOR     0.2f
+#define FR_WORLD_BAUMGARTE_FACTOR     0.25f
 
 /* Defines the 'slop' for the Baumgarte stabilization scheme. */
-#define FR_WORLD_BAUMGARTE_SLOP       0.01f
+#define FR_WORLD_BAUMGARTE_SLOP       0.02f
 
 /* Defines the default gravity acceleration vector for a world. */
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })

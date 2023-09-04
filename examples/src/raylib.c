@@ -39,8 +39,6 @@
 #define SCREEN_WIDTH           1280
 #define SCREEN_HEIGHT          800
 
-#define WORLD_CELL_SIZE        2.8f
-
 #define LOGO_WIDTH_IN_PIECES   46
 #define LOGO_HEIGHT_IN_PIECES  46
 
@@ -53,7 +51,7 @@ typedef struct _Piece {
 
 /* Constants ============================================================================ */
 
-static const float DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 2.8f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ==================================================================== */
 
@@ -103,7 +101,7 @@ int main(void) {
 /* Private Functions ==================================================================== */
 
 static void InitExample(void) {
-    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), WORLD_CELL_SIZE);
+    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), 2.8f);
 
     raylibTexture = LoadTexture("../res/images/raylib.png");
 
@@ -184,7 +182,7 @@ static void UpdateExample(void) {
             
         ClearBackground(FR_DRAW_COLOR_MATTEBLACK);
 
-        frDrawGrid(bounds, WORLD_CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
+        frDrawGrid(bounds, CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
 
         for (int i = 0; i < LOGO_WIDTH_IN_PIECES * LOGO_HEIGHT_IN_PIECES; i++) {
             const frVector2 bodyPosition = frGetBodyPosition(pieces[i].body);

@@ -49,6 +49,7 @@ SOURCE_PATH := src
 
 EXAMPLES := \
 	basic   \
+	bricks  \
 	raylib
 
 SOURCES := $(EXAMPLES:%=$(SOURCE_PATH)/%.c)

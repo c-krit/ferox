@@ -27,19 +27,19 @@
 extern "C" {
 #endif
 
-/* Includes =========================================================================== */
+/* Includes ============================================================================= */
 
 #include "ferox.h"
 #include "raylib.h"
 
-/* Macros ============================================================================= */
+/* Macros =============================================================================== */
 
 #define FR_DRAW_ARROW_HEAD_LENGTH     8.0f
 #define FR_DRAW_CIRCLE_SEGMENT_COUNT  32
 
 #define FR_DRAW_COLOR_MATTEBLACK      CLITERAL(Color) { 16, 16, 16, 255 }
 
-/* Public Function Prototypes ========================================================= */
+/* Public Function Prototypes =========================================================== */
 
 /* 
     Draws an arrow that starts from `v1` to `v2` 
@@ -70,7 +70,7 @@ void frDrawGrid(Rectangle bounds, float cellSize, float thick, Color color);
 
 #ifdef FEROX_RAYLIB_IMPLEMENTATION
 
-/* Public Functions =================================================================== */
+/* Public Functions ===================================================================== */
 
 /* 
     Draws an arrow that starts from `v1` to `v2` 
