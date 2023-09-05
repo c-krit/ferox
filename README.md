@@ -44,8 +44,8 @@ Make sure you have installed [raylib 4.5.0+](https://github.com/raysan5/raylib/r
 
 ### Introduction
 
-- [Chris Hecker. “Behind the Screen: Physics, Parts 1-3.” Game Developer Magazine. 1996–1997.](https://www.chrishecker.com/Rigid_Body_Dynamics)
-- [Erin Catto. “How Do Physics Engines Work?” USC GamePipe Laboratory. January, 2019.](https://github.com/erincatto/box2d-lite/blob/master/docs/HowDoPhysicsEnginesWork.pdf)
+- [Hecker, Chris. “Behind the Screen: Physics, Parts 1-3.” Game Developer Magazine. 1996–1997.](https://www.chrishecker.com/Rigid_Body_Dynamics)
+- [Catto, Erin. “How Do Physics Engines Work?” USC GamePipe Laboratory. January, 2019.](https://github.com/erincatto/box2d-lite/blob/master/docs/HowDoPhysicsEnginesWork.pdf)
 - [Gaul, Randy. “How to Create a Custom Physics Engine.” Envato Tuts+. April–June, 2013.](https://gamedevelopment.tutsplus.com/series/how-to-create-a-custom-physics-engine--gamedev-12715)
 
 ### Collision Detection
@@ -64,16 +64,21 @@ Make sure you have installed [raylib 4.5.0+](https://github.com/raysan5/raylib/r
 
 - [Chou, Ming-Lun. “Game Physics: Resolution – Contact Constraints.” allenchou.net. December 31, 2013.](https://allenchou.net/2013/12/game-physics-resolution-contact-constraints/)
 - [Chou, Ming-Lun. “Game Physics: Stability – Warm Starting.” allenchou.net. January 04, 2014.](http://allenchou.net/2014/01/game-physics-stability-warm-starting/)
-- [Erin Catto. “Fast and Simple Physics Using Sequential Impulses.” San Jose, CA. March, 2006.](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
-- [Erin Catto. “Iterative Dynamics with Temporal Coherence.” Crystal Dynamics, Menlo Park, CA. June, 2005.](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
+- [Catto, Erin. “Fast and Simple Physics Using Sequential Impulses.” San Jose, CA. March, 2006.](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
+- [Catto, Erin. “Iterative Dynamics with Temporal Coherence.” Crystal Dynamics, Menlo Park, CA. June, 2005.](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
 - [Strunk, Oliver. “Stop my Constraints from Blowing Up!” Game Developers Conference 2013. March, 2013.](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/box2d/Strunk_Oliver_Stop_My_Constraints_From_Blowing_Up.pdf)
 - [Tonge, Richard. “Iterative Rigid Body Solvers.” Game Developers Conference 2013. March, 2013.](https://archive.org/details/GDC2013Tonge)
 
 ### Numerical Methods
 
-- [Erin Catto. “Numerical Methods.” San Jose, CA. March, 2015.](https://box2d.org/files/ErinCatto_NumericalMethods_GDC2015.pdf)
-- [Glenn Fiedler. “Integration Basics.” Gaffer on Games. June 01, 2004.](https://gafferongames.com/post/integration_basics/)
+- [Catto, Erin. “Numerical Methods.” San Jose, CA. March, 2015.](https://box2d.org/files/ErinCatto_NumericalMethods_GDC2015.pdf)
+- [Fiedler, Glenn. “Integration Basics.” Gaffer on Games. June 01, 2004.](https://gafferongames.com/post/integration_basics/)
 - [Witkin, Andrew, and David Baraff. n.d. “An Introduction to Physically Based Modeling: Differential Equation Basics.” ACM SIGGRAPH 1995. August, 1995.](http://www.cs.cmu.edu/~baraff/sigcourse/index.html)
+
+### Raycast Queries
+
+- [Rees, Gareth. “How do you detect where two line segments intersect?” stackoverflow.com. February, 2009.](https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282)
+- [Scratchapixel. “A Minimal Ray-Tracer: Rendering Simple Shapes (Sphere, Cube, Disk, Plane, etc.).” scratchapixel.com. November, 2022.](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html)
 
 ## License
 

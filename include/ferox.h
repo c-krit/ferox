@@ -115,6 +115,22 @@ typedef struct _frCollision {
     int count;
 } frCollision;
 
+/* A structure that represents a ray. */
+typedef struct _frRay {
+    frVector2 origin;
+    frVector2 direction;
+    float maxDistance;
+    bool closest;
+} frRay;
+
+/* A struct that represents the information about a raycast hit. */
+typedef struct _frRaycastHit {
+    frVector2 point;
+    frVector2 normal;
+    float distance;
+    bool inside;
+} frRaycastHit;
+
 /* (From 'geometry.c') ================================================================== */
 
 /* An enumeration that represents the type of a collision shape. */
@@ -216,6 +232,9 @@ bool frComputeCollision(
     const frShape *s2, frTransform tx2,
     frCollision *collision
 );
+
+/* Casts a `ray` against `b`. */
+bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit);
 
 /* (From 'geometry.c') ================================================================== */
 

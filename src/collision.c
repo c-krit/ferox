@@ -75,6 +75,20 @@ static bool frComputeCollisionPolys(
     frCollision *collision
 );
 
+/* Computes the intersection of a circle and a line. */
+static bool frComputeIntersectionCircleLine(
+    frVector2 center, float radius,
+    frVector2 origin, frVector2 direction,
+    float *lambda
+);
+
+/* Computes the intersection of two lines. */
+static bool frComputeIntersectionLines(
+    frVector2 origin1, frVector2 direction1,
+    frVector2 origin2, frVector2 direction2,
+    float *lambda
+);
+
 /* Returns the edge of `s` that is most perpendicular to `v`. */
 static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v);
 
@@ -85,7 +99,7 @@ static int frGetSeparatingAxisIndex(
     float *depth
 );
 
-/* Finds the vertex farthest along `v`, then returns its index. */
+/* Returns the index of the vertex farthest along `v`. */
 static int frGetSupportPointIndex(
     const frVertices *vertices, 
     frTransform tx, frVector2 v
@@ -115,6 +129,92 @@ bool frComputeCollision(
     else if (t1 == FR_SHAPE_POLYGON && t2 == FR_SHAPE_POLYGON)
         return frComputeCollisionPolys(s1, tx1, s2, tx2, collision);
     else return false;
+}
+
+/* Casts a `ray` against `b`. */
+bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
+    if (b == NULL) return false;
+
+    ray.direction = frVector2Normalize(ray.direction);
+
+    const frShape *s = frGetBodyShape(b);
+    frTransform tx = frGetBodyTransform(b);
+
+    frShapeType type = frGetShapeType(s);
+
+    float lambda = FLT_MAX;
+
+    if (type == FR_SHAPE_CIRCLE) {
+        bool intersects = frComputeIntersectionCircleLine(
+            tx.position, frGetCircleRadius(s),
+            ray.origin, ray.direction,
+            &lambda
+        );
+
+        bool result = (lambda >= 0.0f) && (lambda <= ray.maxDistance);
+
+        if (raycastHit != NULL) {
+            raycastHit->point = frVector2Add(
+                ray.origin, 
+                frVector2ScalarMultiply(ray.direction, lambda)
+            );
+
+            raycastHit->normal = frVector2LeftNormal(
+                frVector2Subtract(ray.origin, raycastHit->point)
+            );
+
+            raycastHit->distance = lambda;
+            raycastHit->inside = (lambda < 0.0f);
+        }
+
+        return result;
+    } else if (type == FR_SHAPE_POLYGON) {
+        const frVertices *vertices = frGetPolygonVertices(s);
+
+        int intersectionCount = 0;
+
+        float minLambda = FLT_MAX;
+
+        for (int j = vertices->count - 1, i = 0; i < vertices->count; j = i, i++) {
+            frVector2 v1 = frVector2Transform(vertices->data[i], tx);
+            frVector2 v2 = frVector2Transform(vertices->data[j], tx);
+
+            frVector2 edgeVector = frVector2Subtract(v1, v2);
+            
+            bool intersects = frComputeIntersectionLines(
+                ray.origin, ray.direction, 
+                v2, edgeVector, 
+                &lambda
+            );
+            
+            if (intersects && lambda <= ray.maxDistance) {
+                if (minLambda > lambda) {
+                    minLambda = lambda;
+
+                    if (raycastHit != NULL) {
+                        raycastHit->point = frVector2Add(
+                            ray.origin, 
+                            frVector2ScalarMultiply(
+                                ray.direction, 
+                                minLambda
+                            )
+                        );
+
+                        raycastHit->normal = frVector2LeftNormal(edgeVector);
+                    }
+                }
+                
+                intersectionCount++;
+            }
+        }
+
+        if (raycastHit != NULL) 
+            raycastHit->inside = (intersectionCount & 1);
+        
+        return (!(raycastHit->inside) && (intersectionCount > 0));
+    } else {
+        return false;
+    }
 }
 
 /* Private Functions ==================================================================== */
@@ -453,6 +553,73 @@ static bool frComputeCollisionPolys(
     return true;
 }
 
+/* Computes the intersection of a circle and a line. */
+static bool frComputeIntersectionCircleLine(
+    frVector2 center, float radius,
+    frVector2 origin, frVector2 direction,
+    float *lambda
+) {
+    const frVector2 originToCenter = frVector2Subtract(center, origin);
+    
+    const float dot = frVector2Dot(originToCenter, direction);
+    
+    const float heightSqr = frVector2MagnitudeSqr(originToCenter) - (dot * dot);
+    const float baseSqr = (radius * radius) - heightSqr;
+    
+    if (lambda != NULL) *lambda = dot - sqrtf(baseSqr);
+
+    return (dot >= 0.0f && baseSqr >= 0.0f);
+}
+
+/* Computes the intersection of two lines. */
+static bool frComputeIntersectionLines(
+    frVector2 origin1, frVector2 direction1,
+    frVector2 origin2, frVector2 direction2,
+    float *lambda
+) {
+    float rXs = frVector2Cross(direction1, direction2);
+
+    frVector2 qp = frVector2Subtract(origin2, origin1);
+
+    float qpXs = frVector2Cross(qp, direction2);
+    float qpXr = frVector2Cross(qp, direction1);
+
+    if (rXs != 0.0f) {
+        float inverseRxS = 1.0f / rXs;
+
+        float t = qpXs * inverseRxS, u = qpXr * inverseRxS;
+
+        if ((t >= 0.0f && t <= 1.0f) && (u >= 0.0f && u <= 1.0f)) {
+            if (lambda != NULL) *lambda = t;
+
+            return true;
+        }
+
+        return false;
+    } else {
+        if (qpXr != 0.0f) return 0;
+
+        float rDr = frVector2Dot(direction1, direction1);
+        float sDr = frVector2Dot(direction2, direction1);
+
+        float inverseRdR = 1.0f / rDr;
+
+        float qpDr = frVector2Dot(qp, direction1);
+
+        float k, t0 = qpDr * inverseRdR, t1 = t0 + sDr * inverseRdR;
+
+        if (sDr < 0.0f) k = t0, t0 = t1, t1 = k;
+
+        if ((t0 < 0.0f && t1 == 0.0f) || (t0 == 1.0f && t1 > 1.0f)) {
+            if (lambda != NULL) *lambda = (t0 == 1.0f);
+
+            return 1;
+        }
+
+        return (t1 >= 0.0f && t0 <= 1.0f);
+    }
+}
+
 /* Returns the edge of `s` that is most perpendicular to `v`. */
 static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
     const frVertices *vertices = frGetPolygonVertices(s);
@@ -526,7 +693,7 @@ static int frGetSeparatingAxisIndex(
     return maxIndex;
 }
 
-/* Finds the vertex farthest along `v`, then returns its index. */
+/* Returns the index of the vertex farthest along `v`. */
 static int frGetSupportPointIndex(
     const frVertices *vertices, 
     frTransform tx, frVector2 v
