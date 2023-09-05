@@ -88,6 +88,18 @@ typedef struct _frAABB {
     float x, y, width, height; 
 } frAABB;
 
+/* 
+    A structure that represents a collision shape, 
+    which can be attached to a rigid body.
+*/
+typedef struct _frShape frShape;
+
+/* A structure that represents a rigid body. */
+typedef struct _frBody frBody;
+
+/* A structure that represents a simulation container. */
+typedef struct _frWorld frWorld;
+
 /* (From 'broad-phase.c') =============================================================== */
 
 /* A structure that represents a spatial hash. */
@@ -122,6 +134,15 @@ typedef struct _frRay {
     float maxDistance;
 } frRay;
 
+/* A struct that represents the information about a raycast hit. */
+typedef struct _frRaycastHit {
+    frBody *body;
+    frVector2 point;
+    frVector2 normal;
+    float distance;
+    bool inside;
+} frRaycastHit;
+
 /* (From 'geometry.c') ================================================================== */
 
 /* An enumeration that represents the type of a collision shape. */
@@ -143,12 +164,6 @@ typedef struct _frVertices {
     frVector2 data[FR_GEOMETRY_MAX_VERTEX_COUNT];
     int count;
 } frVertices;
-
-/* 
-    A structure that represents a collision shape, 
-    which can be attached to a rigid body.
-*/
-typedef struct _frShape frShape;
 
 /* (From 'rigid-body.c') ================================================================ */
 
@@ -180,27 +195,20 @@ typedef struct _frTransform {
     float angle;
 } frTransform;
 
-/* A structure that represents a rigid body. */
-typedef struct _frBody frBody;
-
 /* A structure that represents a pair of two rigid bodies. */
 typedef struct _frBodyPair {
     frBody *first, *second;
 } frBodyPair;
 
-/* A struct that represents the information about a raycast hit. */
-typedef struct _frRaycastHit {
-    frBody *body;
-    frVector2 point;
-    frVector2 normal;
-    float distance;
-    bool inside;
-} frRaycastHit;
-
 /* (From 'world.c') ===================================================================== */
 
-/* A structure that represents a simulation container. */
-typedef struct _frWorld frWorld;
+/* A callback function type for a collision event. */
+typedef bool (*frCollisionEventFunc)(frBodyPair key, const frCollision *value);
+
+/* A structure that represents the collision event callback functions. */
+typedef struct _frCollisionHandler {
+    frCollisionEventFunc preStep, postStep;
+} frCollisionHandler;
 
 /* A callback function type for `frComputeRaycastForWorld()`. */
 typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit);
@@ -468,6 +476,9 @@ int frGetBodyCountForWorld(const frWorld *w);
 
 /* Returns the gravity acceleration vector of `w`. */
 frVector2 frGetWorldGravity(const frWorld *w);
+
+/* Sets the collision event `handler` of `w`. */
+void frSetWorldCollisionHandler(frWorld *w, frCollisionHandler handler);
 
 /* Sets the `gravity` acceleration vector of `w`. */
 void frSetWorldGravity(frWorld *w, frVector2 gravity);

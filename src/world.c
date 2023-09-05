@@ -41,6 +41,7 @@ struct _frWorld {
     frBody **bodies;
     frSpatialHash *hash;
     frContactCacheEntry *cache;
+    frCollisionHandler handler;
     float accumulator, timestamp;
 };
 
@@ -160,6 +161,11 @@ frVector2 frGetWorldGravity(const frWorld *w) {
     return (w != NULL) ? w->gravity : FR_API_STRUCT_ZERO(frVector2);
 }
 
+/* Sets the collision event `handler` of `w`. */
+void frSetWorldCollisionHandler(frWorld *w, frCollisionHandler handler) {
+    if (w != NULL) w->handler = handler;
+}
+
 /* Sets the `gravity` acceleration vector of `w`. */
 void frSetWorldGravity(frWorld *w, frVector2 gravity) {
     if (w != NULL) w->gravity = gravity;
@@ -170,6 +176,10 @@ void frStepWorld(frWorld *w, float dt) {
     if (w == NULL || dt <= 0.0f) return;
 
     frPreStepWorld(w);
+
+    for (int i = 0; i < arrlen(w->cache); i++)
+        if (w->handler.preStep != NULL) 
+            w->handler.preStep(w->cache[i].key, &w->cache[i].value);
 
     for (int i = 0; i < arrlen(w->bodies); i++) {
         frApplyGravityToBody(w->bodies[i], w->gravity);
@@ -190,6 +200,10 @@ void frStepWorld(frWorld *w, float dt) {
 
     for (int i = 0; i < arrlen(w->bodies); i++)
         frIntegrateForBodyPosition(w->bodies[i], dt);
+
+    for (int i = 0; i < arrlen(w->cache); i++)
+        if (w->handler.postStep != NULL) 
+            w->handler.postStep(w->cache[i].key, &w->cache[i].value);
 
     frPostStepWorld(w);
 }
