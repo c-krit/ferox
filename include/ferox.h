@@ -120,16 +120,7 @@ typedef struct _frRay {
     frVector2 origin;
     frVector2 direction;
     float maxDistance;
-    bool closest;
 } frRay;
-
-/* A struct that represents the information about a raycast hit. */
-typedef struct _frRaycastHit {
-    frVector2 point;
-    frVector2 normal;
-    float distance;
-    bool inside;
-} frRaycastHit;
 
 /* (From 'geometry.c') ================================================================== */
 
@@ -196,6 +187,15 @@ typedef struct _frBody frBody;
 typedef struct _frBodyPair {
     frBody *first, *second;
 } frBodyPair;
+
+/* A struct that represents the information about a raycast hit. */
+typedef struct _frRaycastHit {
+    frBody *body;
+    frVector2 point;
+    frVector2 normal;
+    float distance;
+    bool inside;
+} frRaycastHit;
 
 /* (From 'world.c') ===================================================================== */
 

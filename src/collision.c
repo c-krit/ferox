@@ -154,6 +154,8 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
         bool result = (lambda >= 0.0f) && (lambda <= ray.maxDistance);
 
         if (raycastHit != NULL) {
+            raycastHit->body = (frBody *) b;
+
             raycastHit->point = frVector2Add(
                 ray.origin, 
                 frVector2ScalarMultiply(ray.direction, lambda)
@@ -208,8 +210,10 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
             }
         }
 
-        if (raycastHit != NULL) 
+        if (raycastHit != NULL) {
+            raycastHit->body = (frBody *) b;
             raycastHit->inside = (intersectionCount & 1);
+        }
         
         return (!(raycastHit->inside) && (intersectionCount > 0));
     } else {
