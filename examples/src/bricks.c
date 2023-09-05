@@ -77,7 +77,7 @@ int main(void) {
 #ifdef PLATFORM_WEB
     emscripten_set_main_loop(UpdateExample, 0, 1);
 #else
-    // SetTargetFPS(TARGET_FPS);
+    SetTargetFPS(TARGET_FPS);
 
     while (!WindowShouldClose()) 
         UpdateExample();
@@ -224,7 +224,7 @@ static void UpdateExample(void) {
                 frVector2PixelsToUnits(
                     (frVector2) {
                         .x = mousePosition.x,
-                        .y = mousePosition.y + (1.05f * BRICK_HEIGHT)
+                        .y = mousePosition.y + (1.1f * BRICK_HEIGHT)
                     }
                 ),
                 frCreateRectangle(
@@ -271,29 +271,9 @@ static void UpdateExample(void) {
                     .y = 0.5f * BRICK_HEIGHT 
                 },
                 RAD2DEG * frGetBodyAngle(body),
-                ColorAlpha(WHITE, 1.0f)
+                ColorAlpha(WHITE, (body == cursor) ? 0.5f : 1.0f)
             );
         }
-
-        DrawTexturePro(
-            brickTarget.texture,
-            (Rectangle) {
-                .width = BRICK_WIDTH, 
-                .height = BRICK_HEIGHT 
-            },
-            (Rectangle) {
-                .x = mousePosition.x, 
-                .y = mousePosition.y,
-                .width = BRICK_WIDTH,
-                .height = BRICK_HEIGHT
-            },
-            (Vector2) {
-                .x = 0.5f * BRICK_WIDTH, 
-                .y = 0.5f * BRICK_HEIGHT 
-            },
-            0.0f,
-            ColorAlpha(WHITE, 0.5f)
-        );
 
         DrawFPS(8, 8);
 

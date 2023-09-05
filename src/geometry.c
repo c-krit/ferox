@@ -183,8 +183,8 @@ frAABB frGetShapeAABB(const frShape *s, frTransform tx) {
             
             result.width = result.height = 2.0f * s->circle.radius;
         } else if (s->type == FR_SHAPE_POLYGON) {
-            frVector2 minVertex = {  FLT_MAX,  FLT_MAX };
-            frVector2 maxVertex = { -FLT_MAX, -FLT_MAX };
+            frVector2 minVertex = { .x =  FLT_MAX, .y =  FLT_MAX };
+            frVector2 maxVertex = { .x = -FLT_MAX, .y = -FLT_MAX };
             
             for (int i = 0; i < s->polygon.vertices.count; i++) {
                 const frVector2 v = frVector2Transform(s->polygon.vertices.data[i], tx);

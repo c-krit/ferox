@@ -23,14 +23,16 @@ Documentation &mdash;
 - Narrow-phase collision detection with SAT (Separating Axis Theorem)
 - Numerical integration with semi-implicit Euler method
 - Projected Gauss-Seidel iterative constraint solver
+- ~~Support for basic collision event callbacks~~
+- WebAssembly examples powered by [raylib](https://github.com/raysan5/raylib)
 
 // TODO: ...
 
 ## Prerequisites
 
 - GCC version 6.4.0+
-- GNU Make version 4.1+
 - Git version 2.14.0+
+- GNU Make version 4.1+
 
 ### Optional
 

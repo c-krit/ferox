@@ -94,7 +94,7 @@ typedef struct _frAABB {
 typedef struct _frSpatialHash frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
-typedef void (*frHashQueryFunc)(int index, void *ctx);
+typedef bool (*frHashQueryFunc)(int index, void *ctx);
 
 /* (From 'collision.c') ================================================================= */
 
@@ -201,6 +201,9 @@ typedef struct _frBodyPair {
 
 /* A structure that represents a simulation container. */
 typedef struct _frWorld frWorld;
+
+/* A callback function type for `frComputeRaycastForWorld()`. */
+typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit);
 
 /* Public Function Prototypes =========================================================== */
 
@@ -477,6 +480,12 @@ void frStepWorld(frWorld *w, float dt);
     which will always run independent of the framerate.
 */
 void frUpdateWorld(frWorld *w, float dt);
+
+/* 
+    Casts a `ray` against all objects in `w`, 
+    then calls `func` for each object that collides with `ray`. 
+*/
+void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func);
 
 /* Inline Functions ===================================================================== */
 

@@ -29,12 +29,6 @@
 
 /* Typedefs ============================================================================= */
 
-/* A structure that represents the context data for `frPreStepQueryCallback()`. */
-typedef struct _frPreStepQueryContext {
-    frWorld *world;
-    int bodyIndex;
-} frPreStepQueryContext;
-
 /* A structure that represents the key-value pair of the contact cache. */
 typedef struct _frContactCacheEntry {
     frBodyPair key;
@@ -50,13 +44,19 @@ struct _frWorld {
     float accumulator, timestamp;
 };
 
+/* A structure that represents the context data for `frPreStepHashQueryCallback()`. */
+typedef struct _frPreStepHashQueryCtx {
+    frWorld *world;
+    int bodyIndex;
+} frPreStepHashQueryCtx;
+
 /* Private Function Prototypes ========================================================== */
 
 /* 
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static void frPreStepQueryCallback(int otherIndex, void *ctx);
+static bool frPreStepHashQueryCallback(int otherIndex, void *ctx);
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w);
@@ -197,16 +197,39 @@ void frUpdateWorld(frWorld *w, float dt) {
         frStepWorld(w, dt);
 }
 
+/* 
+    Casts a `ray` against all objects in `w`, 
+    then calls `func` for each object that collides with `ray`. 
+*/
+void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
+    if (w == NULL || func == NULL) return;
+
+    frClearSpatialHash(w->hash);
+
+    for (int i = 0; i < arrlen(w->bodies); i++)
+        frInsertToSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
+
+    frVector2 minVertex = ray.origin, maxVertex = frVector2Add(
+        ray.origin, 
+        frVector2ScalarMultiply(
+            frVector2Normalize(ray.direction), 
+            ray.maxDistance
+        )
+    );
+
+    /* TODO: ... */
+}
+
 /* Private Functions ==================================================================== */
 
 /* 
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static void frPreStepQueryCallback(int otherBodyIndex, void *ctx) {
-    frPreStepQueryContext *queryCtx = ctx;
+static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
+    frPreStepHashQueryCtx *queryCtx = ctx;
     
-    if (otherBodyIndex <= queryCtx->bodyIndex) return;
+    if (otherBodyIndex <= queryCtx->bodyIndex) return false;
 
     frBody *b1 = queryCtx->world->bodies[queryCtx->bodyIndex];
     frBody *b2 = queryCtx->world->bodies[otherBodyIndex];
@@ -222,7 +245,7 @@ static void frPreStepQueryCallback(int otherBodyIndex, void *ctx) {
         // NOTE: `hmdel()` returns `0` if `key` is not in `queryCtx->world->cache`!
         hmdel(queryCtx->world->cache, key);
 
-        return;
+        return false;
     }
 
     frContactCacheEntry *entry = hmgetp_null(queryCtx->world->cache, key);
@@ -263,10 +286,11 @@ static void frPreStepQueryCallback(int otherBodyIndex, void *ctx) {
     hmputs(
         queryCtx->world->cache, 
         ((frContactCacheEntry) { 
-            .key = key, 
-            .value = collision 
+            .key = key, .value = collision 
         })
     );
+
+    return true;
 }
 
 /* Finds all pairs of bodies in `w` that are colliding. */
@@ -278,8 +302,8 @@ static void frPreStepWorld(frWorld *w) {
         frQuerySpatialHash(
             w->hash, 
             frGetBodyAABB(w->bodies[i]), 
-            frPreStepQueryCallback, 
-            &(frPreStepQueryContext) {
+            frPreStepHashQueryCallback, 
+            &(frPreStepHashQueryCtx) {
                 .world = w, .bodyIndex = i
             }
         );
