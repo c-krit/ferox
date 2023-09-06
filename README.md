@@ -40,7 +40,71 @@ Make sure you have installed [raylib 4.5.0+](https://github.com/raysan5/raylib/r
 
 ## Building
 
-// TODO: ...
+<details>
+<summary>Compiling for GNU/Linux</summary>
+
+### Ubuntu
+
+```console
+$ sudo apt install build-essential git
+$ git clone https://github.com/c-krit/ferox && cd ferox
+$ make
+```
+
+</details>
+
+<details>
+<summary>Compiling for the Web (WebAssembly)</summary>
+
+<br />
+
+Compiling for the Web requires installation of the [Emscripten SDK](https://emscripten.org/).
+
+### Ubuntu
+
+```console
+$ sudo apt install build-essential git
+$ git clone https://github.com/emscripten-core/emsdk && cd emsdk
+$ ./emsdk install latest
+$ ./emsdk activate latest
+$ source ./emsdk_env.sh
+```
+
+After setting up the environment variables for Emscripten SDK, do:
+
+```console
+$ git clone https://github.com/c-krit/ferox && cd ferox
+$ make CC=emcc AR=emar
+```
+
+</details>
+
+<details>
+<summary>Cross-compiling from GNU/Linux to Windows (WSL2)</summary>
+
+### Ubuntu
+
+```console
+$ sudo apt install build-essential git mingw-w64
+$ git clone https://github.com/c-krit/ferox && cd ferox
+$ make -f Makefile.win
+```
+
+You may need to recompile raylib for Windows before building this library.
+
+```console
+$ git clone https://github.com/raysan5/raylib && cd raylib/src
+$ make -j`nproc` CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar OS=Windows_NT
+```
+
+After recompiling raylib for Windows, you should be able to build the examples:
+
+```console
+$ cd examples
+$ make -f Makefile.win RAYLIB_PATH=../../raylib
+```
+
+</details>
 
 ## References
 

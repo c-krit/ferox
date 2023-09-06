@@ -44,8 +44,8 @@ OBJECTS = \
 
 TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a
 
-CC = gcc
-AR = ar
+CC = x86_64-w64-mingw32-gcc
+AR = x86_64-w64-mingw32-ar
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 LDLIBS = -lm
 

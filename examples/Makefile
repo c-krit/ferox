@@ -21,6 +21,7 @@
 #
 
 .PHONY: all clean
+.SUFFIXES: .c .out
 
 _COLOR_BEGIN != tput setaf 10
 _COLOR_END != tput sgr0
@@ -39,7 +40,7 @@ TARGETS := \
 	${SOURCE_PATH}/basic.out   \
 	${SOURCE_PATH}/bricks.out  \
 	${SOURCE_PATH}/raycast.out \
-	${SOURCE_PATH}/raylib.out  \
+	${SOURCE_PATH}/raylib.out
 
 CC = gcc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} -O2 -std=gnu99
@@ -64,4 +65,5 @@ post-build:
 
 clean:
 	@echo "${PROJECT_PREFIX} Cleaning up."
+	@rm -f ${BINARY_PATH}/*.exe
 	@rm -f ${BINARY_PATH}/*.out
