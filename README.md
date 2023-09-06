@@ -32,7 +32,7 @@ Documentation &mdash;
 
 - GCC version 6.4.0+
 - Git version 2.14.0+
-- GNU Make version 4.1+
+- GNU Make version 4.1+ (or BSD Make 20181221+)
 
 ### Optional
 

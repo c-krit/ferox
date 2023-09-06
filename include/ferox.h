@@ -619,7 +619,7 @@ FR_API_INLINE int frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector
     const float lhs = (v2.y - v1.y) * (v3.x - v1.x);
     const float rhs = (v3.y - v1.y) * (v2.x - v1.x);
 
-    // Compares the slopes of two line equations.
+    // NOTE: Compares the slopes of two line equations.
     return (lhs > rhs) - (lhs < rhs);
 }
 
