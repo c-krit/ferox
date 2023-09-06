@@ -34,8 +34,9 @@
 *.lib
 
 # 빌드 결과물
+*.data
+*.exe
+*.js
+*.html
 *.out
-**/bin/
-**/build/
-**/**/Debug/
-**/**/Release/
+*.wasm

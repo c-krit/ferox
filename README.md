@@ -54,7 +54,7 @@ $ make
 </details>
 
 <details>
-<summary>Compiling for the Web (WebAssembly)</summary>
+<summary>Compiling for the Web (LLVM-to-WebAssembly)</summary>
 
 <br />
 
@@ -74,7 +74,22 @@ After setting up the environment variables for Emscripten SDK, do:
 
 ```console
 $ git clone https://github.com/c-krit/ferox && cd ferox
-$ make CC=emcc AR=emar
+$ make -f Makefile.emcc
+```
+
+In order to build the examples, you must compile raylib to WebAssembly first.
+
+```console
+$ git clone https://github.com/raysan5/raylib && cd raylib/src
+$ make -j`nproc` PLATFORM=PLATFORM_WEB -B
+```
+
+After recompiling raylib for the Web, you should be able to build the examples:
+
+```console
+$ cd examples
+$ make -f Makefile.emcc RAYLIB_PATH=../../raylib
+$ emrun --no_browser ./bin/basic.html
 ```
 
 </details>

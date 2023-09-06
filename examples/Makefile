@@ -31,12 +31,11 @@ PROJECT_FULL_NAME = c-krit/ferox
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
-BINARY_PATH = bin
 INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
-TARGETS := \
+TARGETS = \
 	${SOURCE_PATH}/basic.out   \
 	${SOURCE_PATH}/bricks.out  \
 	${SOURCE_PATH}/raycast.out \
@@ -44,26 +43,24 @@ TARGETS := \
 
 CC = gcc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} -O2 -std=gnu99
-LDFLAGS := -L${LIBRARY_PATH}
-LDLIBS := -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
+LDFLAGS = -L${LIBRARY_PATH}
+LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 
 all: pre-build build post-build
 
 pre-build:
 	@echo "${PROJECT_PREFIX} Using: '${CC}' to build all examples."
-	@mkdir -p ${BINARY_PATH}
 
 build: ${TARGETS}
 
 .c.out:
 	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
 	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
-	@mv $@ ${BINARY_PATH}
 
 post-build:
 	@echo "${PROJECT_PREFIX} Build complete."
 
 clean:
 	@echo "${PROJECT_PREFIX} Cleaning up."
-	@rm -f ${BINARY_PATH}/*.exe
-	@rm -f ${BINARY_PATH}/*.out
+	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
+		${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm

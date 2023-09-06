@@ -21,7 +21,6 @@
 #
 
 .PHONY: all clean
-.SUFFIXES: .c .exe
 
 _COLOR_BEGIN != tput setaf 10
 _COLOR_END != tput sgr0
@@ -31,40 +30,47 @@ PROJECT_FULL_NAME = c-krit/ferox
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
-# TODO: Edit this value to match your raylib installation path
-RAYLIB_PATH ?= ../../raylib
-
 INCLUDE_PATH = include
-LIBRARY_PATH = ../lib
+LIBRARY_PATH = lib
 SOURCE_PATH = src
 
-TARGETS = \
-	${SOURCE_PATH}/basic.exe   \
-	${SOURCE_PATH}/bricks.exe  \
-	${SOURCE_PATH}/raycast.exe \
-	${SOURCE_PATH}/raylib.exe
+OBJECTS = \
+	${SOURCE_PATH}/broad-phase.o  \
+	${SOURCE_PATH}/collision.o    \
+	${SOURCE_PATH}/geometry.o     \
+	${SOURCE_PATH}/rigid-body.o   \
+	${SOURCE_PATH}/timer.o        \
+	${SOURCE_PATH}/world.o
 
-CC = x86_64-w64-mingw32-gcc
-CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
-	-I${RAYLIB_PATH}/src -O2 -std=gnu99
-LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_PATH}/src
-LDLIBS = -lferox -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
+TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a
+
+CC = emcc
+AR = emar
+CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
+LDLIBS = -lm
+
+CFLAGS += -Wno-unused-command-line-argument
 
 all: pre-build build post-build
 
 pre-build:
-	@echo "${PROJECT_PREFIX} Using: '${CC}' to build all examples."
+	@echo "${PROJECT_PREFIX} Using: '${CC}' and '${AR}' to build this project."
 
 build: ${TARGETS}
 
-.c.exe:
+.c.o:
 	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
-	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
+	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
+
+${TARGETS}: ${OBJECTS}
+	@mkdir -p ${LIBRARY_PATH}
+	@echo "${PROJECT_PREFIX} Linking: ${TARGETS}"
+	@${AR} rcs ${TARGETS} ${OBJECTS}
 
 post-build:
 	@echo "${PROJECT_PREFIX} Build complete."
 
 clean:
 	@echo "${PROJECT_PREFIX} Cleaning up."
-	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
-		${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm
+	@rm -f ${LIBRARY_PATH}/*.a
+	@rm -f ${SOURCE_PATH}/*.o
