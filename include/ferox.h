@@ -120,8 +120,8 @@ typedef struct _frCollision {
         frVector2 point;
         float depth;
         struct {
-            float normalScalar;
-            float tangentScalar;
+            float normalMass, normalScalar;
+            float tangentMass, tangentScalar;
         } cache;
     } contacts[2];
     int count;
@@ -430,6 +430,9 @@ void frApplyGravityToBody(frBody *b, frVector2 g);
 
 /* Applies an `impulse` at a `point` on `b`. */
 void frApplyImpulseToBody(frBody *b, frVector2 point, frVector2 impulse);
+
+/* Applies accumulated impulses to `b1` and `b2`. */
+void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx);
 
 /* 
     Calculates the acceleration of `b` from the accumulated forces,
