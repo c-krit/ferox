@@ -41,6 +41,48 @@ Make sure you have installed [raylib 4.5.0+](https://github.com/raysan5/raylib/r
 ## Building
 
 <details>
+<summary>Compiling for Windows</summary>
+
+### [MSYS2](https://www.msys2.org/)
+
+Download the latest release of MSYS2 from [here](https://www.msys2.org/) and follow the instructions on the homepage.
+
+```console
+# MSYS2, UCRT 64-bit
+
+$ pacman -Syu && pacman -S mingw-w64-ucrt-x86_64-gcc
+$ git clone https://github.com/c-krit/ferox && cd ferox
+$ make
+```
+
+Then you can install raylib by downloading `mingw-w64-x86_64-raylib` package:
+
+```console
+$ pacman -S mingw-w64-x86_64-raylib
+$ cd examples
+```
+
+You will also need to configure the `RAYLIB_INCLUDE_PATH` and `RAYLIB_LIBRARY_PATH` variables in `Makefile.win`:
+
+```
+$ vim Makefile.win
+```
+
+```
+# TODO: Edit these values to match your raylib installation path!
+RAYLIB_INCLUDE_PATH ?= /mingw64/include 
+RAYLIB_LIBRARY_PATH ?= /mingw64/lib
+```
+
+Finally, in order to compile the examples, do:
+
+```
+$ make -f Makefile.win
+```
+
+</details>
+
+<details>
 <summary>Compiling for GNU/Linux</summary>
 
 ### Ubuntu
@@ -77,14 +119,14 @@ $ git clone https://github.com/c-krit/ferox && cd ferox
 $ make -f Makefile.emcc
 ```
 
-In order to build the examples, you must compile raylib to WebAssembly first.
+You may need to recompile raylib for the Web before compiling the examples:
 
 ```console
 $ git clone https://github.com/raysan5/raylib && cd raylib/src
 $ make -j`nproc` PLATFORM=PLATFORM_WEB -B
 ```
 
-After recompiling raylib for the Web, you should be able to build the examples:
+Finally, in order to compile the examples, do:
 
 ```console
 $ cd examples
@@ -105,14 +147,14 @@ $ git clone https://github.com/c-krit/ferox && cd ferox
 $ make -f Makefile.win
 ```
 
-You may need to recompile raylib for Windows before building this library.
+You may need to recompile raylib for Windows before compiling the examples:
 
 ```console
 $ git clone https://github.com/raysan5/raylib && cd raylib/src
 $ make -j`nproc` CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar OS=Windows_NT
 ```
 
-After recompiling raylib for Windows, you should be able to build the examples:
+Lastly, in order to compile the examples, do:
 
 ```console
 $ cd examples

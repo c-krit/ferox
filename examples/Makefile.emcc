@@ -31,8 +31,9 @@ PROJECT_FULL_NAME = c-krit/ferox
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
-# TODO: Edit this value to match your raylib installation path
-RAYLIB_PATH ?= ../../raylib
+# TODO: Edit these values to match your raylib installation path!
+RAYLIB_INCLUDE_PATH ?= ../../raylib/src
+RAYLIB_LIBRARY_PATH ?= ../../raylib/src
 
 INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
@@ -47,11 +48,11 @@ TARGETS = \
 
 CC = emcc
 CFLAGS = -D_DEFAULT_SOURCE -DPLATFORM_WEB -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
-	-I${RAYLIB_PATH}/src -O2 -std=gnu99 -Wno-limited-postlink-optimizations
-LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_PATH}/src
+	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99 -Wno-limited-postlink-optimizations
+LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
 LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 WEBFLAGS = -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3 \
-	--preload-file $(RESOURCE_PATH) --shell-file $(RESOURCE_PATH)/html/shell.html
+	--preload-file ${RESOURCE_PATH} --shell-file ${RESOURCE_PATH}/html/shell.html
 
 all: pre-build build post-build
 

@@ -22,13 +22,10 @@
 
 .PHONY: all clean
 
-_COLOR_BEGIN != tput setaf 10
-_COLOR_END != tput sgr0
-
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox
 
-PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+PROJECT_PREFIX = ${PROJECT_FULL_NAME}:
 
 INCLUDE_PATH = include
 LIBRARY_PATH = lib
