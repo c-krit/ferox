@@ -21,12 +21,6 @@
 #
 
 .PHONY: all clean
-.SUFFIXES: .c .exe
-
-PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox
-
-PROJECT_PREFIX = ${PROJECT_FULL_NAME}:
 
 # TODO: Edit these values to match your raylib installation path!
 RAYLIB_INCLUDE_PATH ?= ../../raylib/src
@@ -48,21 +42,9 @@ CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
 LDLIBS = -lferox -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
 
-all: pre-build build post-build
-
-pre-build:
-	@echo "${PROJECT_PREFIX} Using: '${CC}' to build all examples."
-
-build: ${TARGETS}
-
-.c.exe:
-	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
-	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
-
-post-build:
-	@echo "${PROJECT_PREFIX} Build complete."
+all:
+	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
+	LDLIBS="${LDLIBS}"
 
 clean:
-	@echo "${PROJECT_PREFIX} Cleaning up."
-	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
-		${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm
+	@${MAKE} $@

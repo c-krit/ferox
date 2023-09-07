@@ -21,10 +21,10 @@
 #
 
 .PHONY: all clean
-.SUFFIXES: .c .out
+.SUFFIXES: .c .exe .html .out
 
-_COLOR_BEGIN != tput setaf 10
-_COLOR_END != tput sgr0
+_COLOR_BEGIN ?= \033[1;32m
+_COLOR_END ?= \033[m
 
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox
@@ -35,16 +35,16 @@ INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
-TARGETS = \
+TARGETS ?= \
 	${SOURCE_PATH}/basic.out   \
 	${SOURCE_PATH}/bricks.out  \
 	${SOURCE_PATH}/raycast.out \
 	${SOURCE_PATH}/raylib.out
 
-CC = gcc
-CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} -O2 -std=gnu99
-LDFLAGS = -L${LIBRARY_PATH}
-LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
+CC ?= gcc
+CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} -O2 -std=gnu99
+LDFLAGS ?= -L${LIBRARY_PATH}
+LDLIBS ?= -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 
 all: pre-build build post-build
 
@@ -53,7 +53,11 @@ pre-build:
 
 build: ${TARGETS}
 
-.c.out:
+.c.exe .c.out:
+	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
+	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
+
+.c.html:
 	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
 	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
 
@@ -63,4 +67,4 @@ post-build:
 clean:
 	@echo "${PROJECT_PREFIX} Cleaning up."
 	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
-		${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm
+	${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm

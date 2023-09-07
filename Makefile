@@ -22,13 +22,13 @@
 
 .PHONY: all clean
 
-_COLOR_BEGIN != tput setaf 10
-_COLOR_END != tput sgr0
+_COLOR_BEGIN ?= \033[1;32m
+_COLOR_END ?= \033[m
 
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox
 
-PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+PROJECT_PREFIX ?= ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
 INCLUDE_PATH = include
 LIBRARY_PATH = lib
@@ -44,31 +44,31 @@ OBJECTS = \
 
 TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a
 
-CC = gcc
-AR = ar
-CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
-LDLIBS = -lm
+CC ?= gcc
+AR ?= ar
+CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
+LDLIBS ?= -lm
 
 all: pre-build build post-build
 
 pre-build:
-	@echo "${PROJECT_PREFIX} Using: '${CC}' and '${AR}' to build this project."
+	@printf "${PROJECT_PREFIX} Using: '${CC}' and '${AR}' to build this project.\n"
 
 build: ${TARGETS}
 
 .c.o:
-	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
+	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
 ${TARGETS}: ${OBJECTS}
 	@mkdir -p ${LIBRARY_PATH}
-	@echo "${PROJECT_PREFIX} Linking: ${TARGETS}"
+	@printf "${PROJECT_PREFIX} Linking: ${TARGETS}\n"
 	@${AR} rcs ${TARGETS} ${OBJECTS}
 
 post-build:
-	@echo "${PROJECT_PREFIX} Build complete."
+	@printf "${PROJECT_PREFIX} Build complete.\n"
 
 clean:
-	@echo "${PROJECT_PREFIX} Cleaning up."
+	@printf "${PROJECT_PREFIX} Cleaning up.\n"
 	@rm -f ${LIBRARY_PATH}/*.a
 	@rm -f ${SOURCE_PATH}/*.o

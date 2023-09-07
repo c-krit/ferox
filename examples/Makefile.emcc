@@ -21,15 +21,6 @@
 #
 
 .PHONY: all clean
-.SUFFIXES: .c .html
-
-_COLOR_BEGIN != tput setaf 10
-_COLOR_END != tput sgr0
-
-PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox
-
-PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
 # TODO: Edit these values to match your raylib installation path!
 RAYLIB_INCLUDE_PATH ?= ../../raylib/src
@@ -54,21 +45,9 @@ LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 WEBFLAGS = -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3 \
 	--preload-file ${RESOURCE_PATH} --shell-file ${RESOURCE_PATH}/html/shell.html
 
-all: pre-build build post-build
-
-pre-build:
-	@echo "${PROJECT_PREFIX} Using: '${CC}' to build all examples."
-
-build: ${TARGETS}
-
-.c.html:
-	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
-	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
-
-post-build:
-	@echo "${PROJECT_PREFIX} Build complete."
+all:
+	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
+	LDLIBS="${LDLIBS}" WEBFLAGS="${WEBFLAGS}"
 
 clean:
-	@echo "${PROJECT_PREFIX} Cleaning up."
-	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
-		${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm
+	@${MAKE} $@
