@@ -42,7 +42,7 @@ struct _frWorld {
     frSpatialHash *hash;
     frContactCacheEntry *cache;
     frCollisionHandler handler;
-    float accumulator, timestamp;
+    double accumulator, timestamp;
 };
 
 /* A structure that represents the context data for `frPreStepHashQueryCallback()`. */
@@ -327,7 +327,7 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
             collision.contacts[i].cache.tangentScalar = accTangentScalar;
         }
     } else {
-        collision.friction = frGetShapeFriction(s1) * frGetShapeFriction(s2);
+        collision.friction = 0.5f * (frGetShapeFriction(s1) + frGetShapeFriction(s2));
         collision.restitution = fminf(frGetShapeRestitution(s1), frGetShapeRestitution(s2));
 
         if (collision.friction <= 0.0f) collision.friction = 0.0f;

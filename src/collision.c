@@ -32,15 +32,16 @@
 typedef struct _frEdge {
     frVector2 data[2];
     int indexes[2];
+    int count;
 } frEdge;
 
 /* Private Function Prototypes ========================================================== */
 
 /* 
     Clips `e` so that the dot product of each vertex in `e` 
-    and `v` is greater than or equal to `dot`. 
+    and `v` is greater than or equal to `dot`.
 */
-static void frClipEdge(frEdge *e, frVector2 v, float dot);
+static bool frClipEdge(frEdge *e, frVector2 v, float dot);
 
 /* 
     Checks whether `s1` and `s2` are colliding,
@@ -227,24 +228,39 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
     Clips `e` so that the dot product of each vertex in `e` 
     and `v` is greater than or equal to `dot`. 
 */
-static void frClipEdge(frEdge *e, frVector2 v, float dot) {
+static bool frClipEdge(frEdge *e, frVector2 v, float dot) {
+    e->count = 0;
+
     float dot1 = frVector2Dot(e->data[0], v) - dot;
     float dot2 = frVector2Dot(e->data[1], v) - dot;
 
-    bool inside1 = (dot1 >= 0.0f), inside2 = (dot2 >= 0.0f);
+    if (dot1 >= 0.0f && dot2 >= 0.0f) {
+        e->count = 2;
 
-    if (inside1 && inside2) return;
+        return true;
+    } else {
+        frVector2 edgeVector = frVector2Subtract(e->data[1], e->data[0]);
+    
+        frVector2 midpoint = frVector2Add(
+            e->data[0], 
+            frVector2ScalarMultiply(
+                edgeVector, 
+                (dot1 / (dot1 - dot2))
+            )
+        );
 
-    frVector2 edgeVector = frVector2Subtract(e->data[1], e->data[0]);
-    
-    frVector2 midpoint = frVector2Add(
-        e->data[0], frVector2ScalarMultiply(edgeVector, (dot1 / (dot1 - dot2)))
-    );
-    
-    if (inside1 && !inside2)
-        e->data[1] = midpoint;
-    else if (!inside1 && inside2)
-        e->data[0] = e->data[1], e->data[1] = midpoint;
+        if (dot1 > 0.0f && dot2 < 0.0f) {
+            e->data[1] = midpoint, e->count = 2;
+
+            return true;
+        } else if (dot1 < 0.0f && dot2 > 0.0f) {
+            e->data[0] = e->data[1], e->data[1] = midpoint, e->count = 2;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 /* 
@@ -486,8 +502,6 @@ static bool frComputeCollisionPolys(
         if (frVector2Dot(deltaPosition, direction) < 0.0f)
             direction = frVector2Negate(direction);
 
-        collision->direction = direction;
-
         frEdge edge1 = frGetContactEdge(s1, tx1, direction);
         frEdge edge2 = frGetContactEdge(s2, tx2, frVector2Negate(direction));
 
@@ -517,8 +531,8 @@ static bool frComputeCollisionPolys(
         const float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
         const float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
 
-        frClipEdge(&incEdge, refEdgeVector, refDot1);
-        frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2);
+        if (!frClipEdge(&incEdge, refEdgeVector, refDot1)) return false;
+        if (!frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2)) return false;
 
         frVector2 refEdgeNormal = frVector2RightNormal(refEdgeVector);
 
@@ -527,6 +541,8 @@ static bool frComputeCollisionPolys(
         const float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal) - maxDepth;
         const float depth2 = frVector2Dot(incEdge.data[1], refEdgeNormal) - maxDepth;
 
+        collision->direction = direction;
+
         collision->contacts[0].edgeId = (!incEdgeFlipped) 
             ? FR_GEOMETRY_MAX_VERTEX_COUNT + incEdge.indexes[0]
             : incEdge.indexes[0];
@@ -534,13 +550,19 @@ static bool frComputeCollisionPolys(
         collision->contacts[1].edgeId = collision->contacts[0].edgeId;
 
         if (depth1 < 0.0f) {
-            collision->contacts[0].point = collision->contacts[1].point = incEdge.data[1];
-            collision->contacts[0].depth = collision->contacts[1].depth = depth2;
+            collision->contacts[0].point = incEdge.data[1];
+            collision->contacts[0].depth = depth2;
+
+            collision->contacts[1].point = collision->contacts[0].point;
+            collision->contacts[1].depth = collision->contacts[0].depth;
 
             collision->count = 1;
         } else if (depth2 < 0.0f) {
-            collision->contacts[0].point = collision->contacts[1].point = incEdge.data[0];
-            collision->contacts[0].depth = collision->contacts[1].depth = depth1;
+            collision->contacts[0].point = incEdge.data[0];
+            collision->contacts[0].depth = depth1;
+
+            collision->contacts[1].point = collision->contacts[0].point;
+            collision->contacts[1].depth = collision->contacts[0].depth;
 
             collision->count = 1;
         } else {
@@ -649,7 +671,8 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
                 frVector2Transform(vertices->data[prevIndex], tx),
                 frVector2Transform(vertices->data[supportIndex], tx)
             },
-            .indexes = { prevIndex, supportIndex }
+            .indexes = { prevIndex, supportIndex },
+            .count = 2
         };
     } else {
         return (frEdge) {
@@ -657,7 +680,8 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
                 frVector2Transform(vertices->data[supportIndex], tx),
                 frVector2Transform(vertices->data[nextIndex], tx)
             },
-            .indexes = { supportIndex, nextIndex }
+            .indexes = { supportIndex, nextIndex },
+            .count = 2
         };
     }
 }

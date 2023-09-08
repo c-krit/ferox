@@ -85,7 +85,10 @@ int main(void) {
 /* Private Functions ==================================================================== */
 
 static void InitExample(void) {
-    world = frCreateWorld(FR_WORLD_DEFAULT_GRAVITY, CELL_SIZE);
+    world = frCreateWorld(
+        frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY, 4.0f), 
+        CELL_SIZE
+    );
 
     ground = frCreateBodyFromShape(
         FR_BODY_STATIC,
