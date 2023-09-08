@@ -112,7 +112,7 @@ static void InitExample(void) {
         frVector2PixelsToUnits(
            (frVector2) { 
                 .x = 0.5f * SCREEN_WIDTH,
-                .y = 0.5f * SCREEN_HEIGHT
+                .y = 0.35f * SCREEN_HEIGHT
             }
         ),
         frCreateRectangle(
@@ -125,7 +125,7 @@ static void InitExample(void) {
         )
     );
 
-    frSetBodyAngle(box, DEG2RAD * 25.0f);
+    // frSetBodyAngle(box, DEG2RAD * 25.0f);
 
     frAddBodyToWorld(world, box);
 }

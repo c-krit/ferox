@@ -101,7 +101,7 @@ int main(void) {
 /* Private Functions ==================================================================== */
 
 static void InitExample(void) {
-    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), 2.8f);
+    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), CELL_SIZE);
 
     raylibTexture = LoadTexture("../res/images/raylib.png");
 

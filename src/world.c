@@ -75,7 +75,10 @@ static bool frRaycastHashQueryCallback(int bodyIndex, void *ctx);
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w);
 
-/* Clears the spatial hash for `w`. */
+/* 
+    Clears the accumulated forces on each body in `w`, 
+    then clears the spatial hash of `w`. 
+*/
 static void frPostStepWorld(frWorld *w);
 
 /* Public Functions ===================================================================== */
@@ -280,6 +283,8 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
     frBody *b1 = queryCtx->world->bodies[queryCtx->bodyIndex];
     frBody *b2 = queryCtx->world->bodies[otherBodyIndex];
 
+    if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f) return false;
+
     const frBodyPair key = { .first = b1, .second = b2 };
 
     frShape *s1 = frGetBodyShape(b1), *s2 = frGetBodyShape(b2);
@@ -375,7 +380,10 @@ static void frPreStepWorld(frWorld *w) {
         );
 }
 
-/* Clears the spatial hash for `w`. */
+/* 
+    Clears the accumulated forces on each body in `w`, 
+    then clears the spatial hash of `w`. 
+*/
 static void frPostStepWorld(frWorld *w) {
     for (int i = 0; i < arrlen(w->bodies); i++)
         frClearBodyForces(w->bodies[i]);
