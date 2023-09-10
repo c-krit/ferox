@@ -96,6 +96,34 @@ $ make
 </details>
 
 <details>
+<summary>Compiling for Raspberry Pi</summary>
+
+### Raspberry Pi OS (Raspbian)
+
+```console
+$ sudo apt install build-essential git
+$ git clone https://github.com/c-krit/ferox && cd ferox
+$ make
+```
+
+You may need to recompile raylib for Raspberry Pi before compiling the examples:
+
+```console
+$ sudo apt install libdrm-dev libegl1-mesa-dev libgles2-mesa-dev libgbm-dev
+$ git clone https://github.com/raysan5/raylib && cd raylib/src
+$ make -j`nproc` PLATFORM=PLATFORM_DRM
+```
+
+Finally, in order to compile the examples, do:
+
+```console
+$ cd examples
+$ make -f Makefile.drm
+```
+
+</details>
+
+<details>
 <summary>Compiling for the Web (LLVM-to-WebAssembly)</summary>
 
 <br />

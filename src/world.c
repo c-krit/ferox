@@ -180,9 +180,9 @@ void frStepWorld(frWorld *w, float dt) {
 
     frPreStepWorld(w);
 
-    for (int i = 0; i < arrlen(w->cache); i++)
+    for (int j = 0; j < arrlen(w->cache); j++)
         if (w->handler.preStep != NULL) 
-            w->handler.preStep(w->cache[i].key, &w->cache[i].value);
+            w->handler.preStep(w->cache[j].key, &w->cache[j].value);
 
     for (int i = 0; i < arrlen(w->bodies); i++) {
         frApplyGravityToBody(w->bodies[i], w->gravity);
@@ -190,11 +190,11 @@ void frStepWorld(frWorld *w, float dt) {
         frIntegrateForBodyVelocity(w->bodies[i], dt);
     }
 
-    for (int i = 0; i < hmlen(w->cache); i++)
+    for (int j = 0; j < hmlen(w->cache); j++)
         frApplyAccumulatedImpulses(
-            w->cache[i].key.first,
-            w->cache[i].key.second,
-            &w->cache[i].value
+            w->cache[j].key.first,
+            w->cache[j].key.second,
+            &w->cache[j].value
         );
 
     const float inverseDt = 1.0f / dt;
@@ -211,9 +211,9 @@ void frStepWorld(frWorld *w, float dt) {
     for (int i = 0; i < arrlen(w->bodies); i++)
         frIntegrateForBodyPosition(w->bodies[i], dt);
 
-    for (int i = 0; i < arrlen(w->cache); i++)
+    for (int j = 0; j < arrlen(w->cache); j++)
         if (w->handler.postStep != NULL) 
-            w->handler.postStep(w->cache[i].key, &w->cache[i].value);
+            w->handler.postStep(w->cache[j].key, &w->cache[j].value);
 
     frPostStepWorld(w);
 }
