@@ -30,6 +30,9 @@ CC = x86_64-w64-mingw32-gcc
 AR = x86_64-w64-mingw32-ar
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 
+# CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
+	-Wno-unused-variable
+
 all:
 	@${MAKE} CC=${CC} AR=${AR} CFLAGS="${CFLAGS}"
 

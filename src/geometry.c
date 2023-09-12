@@ -296,10 +296,10 @@ void frSetRectangleDimensions(frShape *s, float width, float height) {
     // NOTE: https://en.cppreference.com/w/c/language/compound_literal
     frSetPolygonVertices(s, &(const frVertices) {
         .data = {
-            { -halfWidth, -halfHeight },
-            { -halfWidth,  halfHeight },
-            {  halfWidth,  halfHeight },
-            {  halfWidth, -halfHeight }
+            { .x = -halfWidth, .y = -halfHeight },
+            { .x = -halfWidth, .y =  halfHeight },
+            { .x =  halfWidth, .y =  halfHeight },
+            { .x =  halfWidth, .y = -halfHeight }
         },
         .count = 4
     });

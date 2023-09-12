@@ -30,7 +30,8 @@ CC = emcc
 AR = emar
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 
-CFLAGS += -Wno-unused-command-line-argument
+# CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable \
+	-Wno-unused-command-line-argument -Wno-unused-value -Wno-unused-variable
 
 all:
 	@${MAKE} CC=${CC} AR=${AR} CFLAGS="${CFLAGS}"

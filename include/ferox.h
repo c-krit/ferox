@@ -54,7 +54,7 @@ extern "C" {
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
 
 /* Defines the iteration count for the constraint solver. */
-#define FR_WORLD_ITERATION_COUNT      12
+#define FR_WORLD_ITERATION_COUNT      10
 
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     4096
@@ -116,7 +116,7 @@ typedef struct _frCollision {
     float restitution;
     frVector2 direction;
     struct {
-        int edgeId;
+        int id;
         frVector2 point;
         float depth;
         struct {

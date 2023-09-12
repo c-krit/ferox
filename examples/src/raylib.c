@@ -39,8 +39,8 @@
 #define SCREEN_WIDTH           1280
 #define SCREEN_HEIGHT          800
 
-#define LOGO_WIDTH_IN_PIECES   46
-#define LOGO_HEIGHT_IN_PIECES  46
+#define LOGO_WIDTH_IN_PIECES   40
+#define LOGO_HEIGHT_IN_PIECES  40
 
 /* Typedefs ============================================================================= */
 
@@ -103,7 +103,7 @@ int main(void) {
 static void InitExample(void) {
     world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), CELL_SIZE);
 
-    raylibTexture = LoadTexture("../res/images/raylib.png");
+    raylibTexture = LoadTexture("../res/images/raylib-40.png");
 
     if (IsTextureReady(raylibTexture)) {
         pieceWidth = raylibTexture.width / LOGO_WIDTH_IN_PIECES;

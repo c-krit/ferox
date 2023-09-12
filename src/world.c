@@ -309,22 +309,25 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
             int k = -1;
 
             for (int j = 0; j < entry->value.count; j++) {
-                const int edgeId = entry->value.contacts[j].edgeId;
+                const int id = entry->value.contacts[j].id;
 
-                if (collision.contacts[i].edgeId == edgeId) {
+                if (collision.contacts[i].id == id) {
                     k = j;
 
                     break;
                 }
             }
 
-            if (k < 0) continue;
+            if (k >= 0) {
+                const float accNormalScalar = entry->value.contacts[k].cache.normalScalar;
+                const float accTangentScalar = entry->value.contacts[k].cache.tangentScalar;
 
-            const float accNormalScalar = entry->value.contacts[k].cache.normalScalar;
-            const float accTangentScalar = entry->value.contacts[k].cache.tangentScalar;
-
-            collision.contacts[i].cache.normalScalar = accNormalScalar;
-            collision.contacts[i].cache.tangentScalar = accTangentScalar;
+                collision.contacts[i].cache.normalScalar = accNormalScalar;
+                collision.contacts[i].cache.tangentScalar = accTangentScalar;
+            } else {
+                collision.contacts[i].cache.normalScalar = 0.0f;
+                collision.contacts[i].cache.tangentScalar = 0.0f;
+            }
         }
     } else {
         collision.friction = 0.5f * (frGetShapeFriction(s1) + frGetShapeFriction(s2));

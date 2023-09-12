@@ -287,7 +287,7 @@ static bool frComputeCollisionCircles(
             ? frVector2ScalarMultiply(direction, 1.0f / magnitude)
             : (frVector2) { .x = 1.0f };
 
-        collision->contacts[0].edgeId = 0;
+        collision->contacts[0].id = 0;
 
         collision->contacts[0].point = frVector2Transform(
             frVector2ScalarMultiply(collision->direction, frGetCircleRadius(s1)), tx1
@@ -374,7 +374,7 @@ static bool frComputeCollisionCirclePoly(
             if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                 collision->direction = frVector2Negate(collision->direction);
 
-            collision->contacts[0].edgeId = 0;
+            collision->contacts[0].id = 0;
 
             collision->contacts[0].point = frVector2Add(
                 circleTx.position,
@@ -428,7 +428,7 @@ static bool frComputeCollisionCirclePoly(
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                     collision->direction = frVector2Negate(collision->direction);
 
-                collision->contacts[0].edgeId = 0;
+                collision->contacts[0].id = 0;
 
                 collision->contacts[0].point = frVector2Transform(
                     frVector2ScalarMultiply(collision->direction, radius), circleTx
@@ -453,7 +453,7 @@ static bool frComputeCollisionCirclePoly(
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                     collision->direction = frVector2Negate(collision->direction);
 
-                collision->contacts[0].edgeId = 0;
+                collision->contacts[0].id = 0;
 
                 collision->contacts[0].point = frVector2Add(
                     circleTx.position,
@@ -543,11 +543,13 @@ static bool frComputeCollisionPolys(
 
         collision->direction = direction;
 
-        collision->contacts[0].edgeId = (!incEdgeFlipped) 
+        collision->contacts[0].id = (!incEdgeFlipped) 
             ? FR_GEOMETRY_MAX_VERTEX_COUNT + incEdge.indexes[0]
             : incEdge.indexes[0];
 
-        collision->contacts[1].edgeId = collision->contacts[0].edgeId;
+        collision->contacts[1].id = (!incEdgeFlipped) 
+            ? FR_GEOMETRY_MAX_VERTEX_COUNT + incEdge.indexes[1]
+            : incEdge.indexes[1];
 
         if (depth1 < 0.0f) {
             collision->contacts[0].point = incEdge.data[1];
