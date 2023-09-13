@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/static/readme-logo.png" alt="c-krit/ferox"><br>
+<img src="docs/static/images/readme-logo.png" alt="c-krit/ferox"><br>
 
 [![Version Badge](https://img.shields.io/github/v/release/c-krit/ferox?include_prereleases)](https://github.com/c-krit/ferox/releases)
 [![Codefactor Badge](https://www.codefactor.io/repository/github/c-krit/ferox/badge)](https://www.codefactor.io/repository/github/c-krit/ferox)
@@ -81,6 +81,48 @@ Finally, in order to compile the examples, do:
 ```
 $ make -f Makefile.mgw
 ```
+
+### Visual Studio 2019
+
+Download the latest release of this library from [here](https://github.com/c-krit/ferox/releases) and extract the `.zip` file to your working directory. Then, open the [Developer Powershell for VS 2019](https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell).
+
+```console
+**********************************************************************
+** Visual Studio 2019 Developer PowerShell v16.11.30
+** Copyright (c) 2021 Microsoft Corporation
+**********************************************************************
+PS C:\Users\jdeokkim\source\repos> ls ferox
+
+
+    디렉터리: C:\Users\jdeokkim\source\repos\ferox
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----      2023-09-13   오후 9:15                .github
+d-----      2023-09-13   오후 9:15                docs
+d-----      2023-09-13   오후 9:15                examples
+d-----      2023-09-13   오후 9:15                include
+d-----      2023-09-13   오후 9:15                src
+-a----      2023-09-13   오후 9:15           2599 .clang-format
+-a----      2023-09-13   오후 9:15           1323 .gitignore
+-a----      2023-09-13   오후 9:15            629 CREDITS.md
+-a----      2023-09-13   오후 9:15           1099 LICENSE
+-a----      2023-09-13   오후 9:15           2388 Makefile
+-a----      2023-09-13   오후 9:15           1497 Makefile.emcc
+-a----      2023-09-13   오후 9:15           1499 Makefile.mgw
+-a----      2023-09-13   오후 9:15           2442 NMakefile
+-a----      2023-09-13   오후 9:15          12944 README.md
+```
+
+In order to build this library, do:
+
+```console
+PS C:\Users\jdeokkim\source\repos> cd ferox
+PS C:\Users\jdeokkim\source\repos\ferox> nmake -f NMakefile
+```
+
+TODO: ...
 
 </details>
 
