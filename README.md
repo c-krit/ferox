@@ -45,7 +45,7 @@ Make sure you have installed [raylib 4.5.0+](https://github.com/raysan5/raylib/r
 <details>
 <summary>Compiling for Windows</summary>
 
-### [MSYS2](https://www.msys2.org/)
+### [MSYS2 (MinGW-w64)](https://www.msys2.org/)
 
 Download the latest release of MSYS2 from [here](https://www.msys2.org/) and follow the instructions on the homepage.
 
@@ -64,10 +64,10 @@ $ pacman -S mingw-w64-x86_64-raylib
 $ cd examples
 ```
 
-You will also need to configure the `RAYLIB_INCLUDE_PATH` and `RAYLIB_LIBRARY_PATH` variables in `Makefile.win`:
+You will also need to configure the `RAYLIB_INCLUDE_PATH` and `RAYLIB_LIBRARY_PATH` variables in `Makefile.mgw`:
 
 ```
-$ vim Makefile.win
+$ vim Makefile.mgw
 ```
 
 ```
@@ -79,7 +79,7 @@ RAYLIB_LIBRARY_PATH ?= /mingw64/lib
 Finally, in order to compile the examples, do:
 
 ```
-$ make -f Makefile.win
+$ make -f Makefile.mgw
 ```
 
 </details>
@@ -174,7 +174,7 @@ $ emrun --no_browser ./bin/basic.html
 ```console
 $ sudo apt install build-essential git mingw-w64
 $ git clone https://github.com/c-krit/ferox && cd ferox
-$ make -f Makefile.win
+$ make -f Makefile.mgw
 ```
 
 You may need to recompile raylib for Windows before compiling the examples:
@@ -188,7 +188,7 @@ Lastly, in order to compile the examples, do:
 
 ```console
 $ cd examples
-$ make -f Makefile.win RAYLIB_PATH=../../raylib
+$ make -f Makefile.mgw RAYLIB_PATH=../../raylib
 ```
 
 </details>
