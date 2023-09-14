@@ -195,12 +195,12 @@ typedef struct _frTransform {
     float angle;
 } frTransform;
 
+/* (From 'world.c') ===================================================================== */
+
 /* A structure that represents a pair of two rigid bodies. */
 typedef struct _frBodyPair {
     frBody *first, *second;
 } frBodyPair;
-
-/* (From 'world.c') ===================================================================== */
 
 /* A callback function type for a collision event. */
 typedef bool (*frCollisionEventFunc)(frBodyPair key, const frCollision *value);
