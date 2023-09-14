@@ -82,6 +82,8 @@ Finally, in order to compile the examples, do:
 $ make -f Makefile.mgw
 ```
 
+<br />
+
 ### Visual Studio 2019
 
 Download the latest release of this library from [here](https://github.com/c-krit/ferox/releases) and extract the `.zip` file to your working directory. Then, open the [Developer Powershell for VS 2019](https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell).
@@ -122,7 +124,38 @@ PS C:\Users\jdeokkim\source\repos> cd ferox
 PS C:\Users\jdeokkim\source\repos\ferox> nmake -f NMakefile
 ```
 
-TODO: ...
+<br />
+
+### [w64devkit](https://github.com/skeeto/w64devkit)
+
+Download the latest release of w64devkit from [here](https://github.com/skeeto/w64devkit/releases), extract the `.zip` file to your working directory, and run `w64devkit.exe`.
+
+```console
+$ mkdir ~/workspace && cd ~/workspace
+$ wget https://github.com/c-krit/ferox/archive/refs/heads/main.zip && unzip main.zip
+$ mv ferox-main ferox && cd ferox
+```
+
+In order to build this library, do:
+
+```console
+$ make -f Makefile.mgw
+```
+
+You may need to compile raylib for Windows before compiling the examples:
+
+```console
+$ cd .. && wget https://github.com/raysan5/raylib/archive/refs/tags/4.5.0.zip
+$ unzip 4.5.0.zip && mv raylib-4.5.0 raylib
+$ cd raylib/src && make -j`nproc`
+```
+
+Finally, in order to compile the examples, do:
+
+```console
+$ cd ~/workspace/ferox/examples
+$ make -f Makefile.mgw RAYLIB_PATH=../../raylib
+```
 
 </details>
 

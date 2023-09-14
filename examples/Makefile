@@ -49,22 +49,22 @@ LDLIBS ?= -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 all: pre-build build post-build
 
 pre-build:
-	@echo "${PROJECT_PREFIX} Using: '${CC}' to build all examples."
+	@printf "${PROJECT_PREFIX} Using: '${CC}' to build all examples.\n"
 
 build: ${TARGETS}
 
 .c.exe .c.out:
-	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
+	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
 .c.html:
-	@echo "${PROJECT_PREFIX} Compiling: $@ (from $<)"
+	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
 
 post-build:
-	@echo "${PROJECT_PREFIX} Build complete."
+	@printf "${PROJECT_PREFIX} Build complete.\n"
 
 clean:
-	@echo "${PROJECT_PREFIX} Cleaning up."
+	@printf "${PROJECT_PREFIX} Cleaning up.\n"
 	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
 	${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm
