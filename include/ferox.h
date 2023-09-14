@@ -226,6 +226,9 @@ void frReleaseSpatialHash(frSpatialHash *sh);
 /* Erases all elements from `sh`. */
 void frClearSpatialHash(frSpatialHash *sh);
 
+/* Returns the cell size of `sh`. */
+float frGetSpatialHashCellSize(const frSpatialHash *sh);
+
 /* Inserts a `key`-`value` pair into `sh`. */
 void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value);
 
