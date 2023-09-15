@@ -42,9 +42,10 @@ TARGETS ?= \
 	${SOURCE_PATH}/raylib.out
 
 CC ?= gcc
-CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} -O2 -std=gnu99
-LDFLAGS ?= -L${LIBRARY_PATH}
-LDLIBS ?= -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
+CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
+	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
+LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
+LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 
 all: pre-build build post-build
 

@@ -105,7 +105,7 @@ static void InitExample(void) {
 
     raylibTexture = LoadTexture("../res/images/raylib-40.png");
 
-    if (IsTextureReady(raylibTexture)) {
+    if (raylibTexture.id > 0) {
         pieceWidth = raylibTexture.width / LOGO_WIDTH_IN_PIECES;
         pieceHeight = raylibTexture.height / LOGO_HEIGHT_IN_PIECES;
 

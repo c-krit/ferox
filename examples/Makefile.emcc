@@ -39,11 +39,13 @@ TARGETS = \
 
 CC = emcc
 CFLAGS = -D_DEFAULT_SOURCE -DPLATFORM_WEB -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
-	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99 -Wno-limited-postlink-optimizations
+	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
 LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 WEBFLAGS = -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3 \
 	--preload-file ${RESOURCE_PATH} --shell-file ${RESOURCE_PATH}/html/shell.html
+
+CFLAGS += -Wno-limited-postlink-optimizations
 
 all:
 	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \

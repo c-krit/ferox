@@ -57,7 +57,7 @@ $ git clone https://github.com/c-krit/ferox && cd ferox
 $ make
 ```
 
-Then you can install raylib by downloading `mingw-w64-x86_64-raylib` package:
+Then you can install raylib by downloading the `mingw-w64-x86_64-raylib` package:
 
 ```console
 $ pacman -S mingw-w64-x86_64-raylib
@@ -168,6 +168,32 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 $ sudo apt install build-essential git
 $ git clone https://github.com/c-krit/ferox && cd ferox
 $ make
+```
+
+</details>
+
+<details>
+<summary>Compiling for *BSD (FreeBSD)</summary>
+
+### FreeBSD
+
+```console
+$ sudo pkg install git
+$ git clone https://github.com/c-krit/ferox && cd ferox
+$ make
+```
+
+Then you can install raylib by downloading the `raylib` package:
+
+```
+$ sudo pkg install raylib
+```
+
+Finally, in order to compile the examples, do:
+
+```console
+$ cd examples
+$ make RAYLIB_INCLUDE_PATH=/usr/local/include RAYLIB_LIBRARY_PATH=/usr/local/lib
 ```
 
 </details>
