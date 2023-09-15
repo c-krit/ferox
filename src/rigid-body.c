@@ -246,7 +246,7 @@ void frSetBodyUserData(frBody *b, void *ctx) {
 
 /* Checks if the given `point` lies inside `b`. */
 bool frBodyContainsPoint(const frBody *b, frVector2 point) {
-    if (b == NULL) return;
+    if (b == NULL) return false;
 
     const frShape *s = frGetBodyShape(b);
     frTransform tx = frGetBodyTransform(b);
