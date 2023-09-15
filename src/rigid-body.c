@@ -22,6 +22,8 @@
 
 /* Includes ============================================================================= */
 
+#include <float.h>
+
 #include "ferox.h"
 
 /* Typedefs ============================================================================= */
@@ -240,6 +242,39 @@ void frSetBodyAngularVelocity(frBody *b, float angularVelocity) {
 /* Sets the user data of `b` to `ctx`. */
 void frSetBodyUserData(frBody *b, void *ctx) {
     if (b != NULL) b->ctx = ctx;
+}
+
+/* Checks if the given `point` lies inside `b`. */
+bool frBodyContainsPoint(const frBody *b, frVector2 point) {
+    if (b == NULL) return;
+
+    const frShape *s = frGetBodyShape(b);
+    frTransform tx = frGetBodyTransform(b);
+
+    frShapeType type = frGetShapeType(s);
+
+    if (type == FR_SHAPE_CIRCLE) {
+        float deltaX = point.x - tx.position.x;
+        float deltaY = point.y - tx.position.y;
+        
+        float radius = frGetCircleRadius(s);
+        
+        return (deltaX * deltaX) + (deltaY * deltaY) <= radius * radius;
+    } else if (type == FR_SHAPE_POLYGON) {
+        const frRay ray = { 
+            .origin = point, 
+            .direction = { .x = 1.0f, .y = 0.0f },
+            .maxDistance = FLT_MAX
+        };
+
+        frRaycastHit raycastHit = { .distance = 0.0f };
+
+        bool result = frComputeRaycast(b, ray, &raycastHit);
+        
+        return raycastHit.inside;
+    } else {
+        return false;
+    }
 }
 
 /* Clears accumulated forces on `b`. */

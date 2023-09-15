@@ -422,6 +422,9 @@ void frSetBodyAngularVelocity(frBody *b, float angularVelocity);
 /* Sets the user data of `b` to `ctx`. */
 void frSetBodyUserData(frBody *b, void *ctx);
 
+/* Checks if the given `point` lies inside `b`. */
+bool frBodyContainsPoint(const frBody *b, frVector2 point);
+
 /* Clears accumulated forces on `b`. */
 void frClearBodyForces(frBody *b);
 
