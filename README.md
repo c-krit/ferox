@@ -64,10 +64,10 @@ $ pacman -S mingw-w64-x86_64-raylib
 $ cd examples
 ```
 
-You will also need to configure the `RAYLIB_INCLUDE_PATH` and `RAYLIB_LIBRARY_PATH` variables in `Makefile.mgw`:
+You will also need to configure the `RAYLIB_INCLUDE_PATH` and `RAYLIB_LIBRARY_PATH` variables in `Makefile.mingw`:
 
 ```
-$ vim Makefile.mgw
+$ vim Makefile.mingw
 ```
 
 ```
@@ -79,7 +79,7 @@ RAYLIB_LIBRARY_PATH ?= /mingw64/lib
 Finally, in order to compile the examples, do:
 
 ```
-$ make -f Makefile.mgw
+$ make -f Makefile.mingw
 ```
 
 <br />
@@ -112,7 +112,7 @@ d-----      2023-09-13   오후 9:15                src
 -a----      2023-09-13   오후 9:15           1099 LICENSE
 -a----      2023-09-13   오후 9:15           2388 Makefile
 -a----      2023-09-13   오후 9:15           1497 Makefile.emcc
--a----      2023-09-13   오후 9:15           1499 Makefile.mgw
+-a----      2023-09-13   오후 9:15           1499 Makefile.mingw
 -a----      2023-09-13   오후 9:15           2442 NMakefile
 -a----      2023-09-13   오후 9:15          12944 README.md
 ```
@@ -139,7 +139,7 @@ $ mv ferox-main ferox && cd ferox
 In order to build this library, do:
 
 ```console
-$ make -f Makefile.mgw
+$ make -f Makefile.mingw
 ```
 
 You may need to compile raylib for Windows before compiling the examples:
@@ -154,7 +154,7 @@ Finally, in order to compile the examples, do:
 
 ```console
 $ cd ~/workspace/ferox/examples
-$ make -f Makefile.mgw RAYLIB_PATH=../../raylib
+$ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 ```
 
 </details>
@@ -249,7 +249,7 @@ $ emrun --no_browser ./bin/basic.html
 ```console
 $ sudo apt install build-essential git mingw-w64
 $ git clone https://github.com/c-krit/ferox && cd ferox
-$ make -f Makefile.mgw
+$ make -f Makefile.mingw
 ```
 
 You may need to recompile raylib for Windows before compiling the examples:
@@ -263,7 +263,7 @@ Lastly, in order to compile the examples, do:
 
 ```console
 $ cd examples
-$ make -f Makefile.mgw RAYLIB_PATH=../../raylib
+$ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 ```
 
 </details>
