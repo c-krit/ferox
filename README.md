@@ -84,15 +84,18 @@ $ make -f Makefile.mingw
 
 <br />
 
-### Visual Studio 2019
+### Visual Studio 2022
 
-Download the latest release of this library from [here](https://github.com/c-krit/ferox/releases) and extract the `.zip` file to your working directory. Then, open the [Developer Powershell for VS 2019](https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell).
+Download the latest release of this library from [here](https://github.com/c-krit/ferox/releases) and extract the `.zip` file to your working directory. Then, start [Windows PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/windows-powershell/starting-windows-powershell?view=powershell-7.3) and type the following command to start the [Developer PowerShell](https://learn.microsoft.com/en-us/visualstudio/ide/reference/command-prompt-powershell?view=vs-2022):
 
 ```console
+PS C:\Users\jdeokkim> & 'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1' -Arch amd64
+
 **********************************************************************
-** Visual Studio 2019 Developer PowerShell v16.11.30
-** Copyright (c) 2021 Microsoft Corporation
+** Visual Studio 2022 Developer PowerShell v17.7.4
+** Copyright (c) 2022 Microsoft Corporation
 **********************************************************************
+
 PS C:\Users\jdeokkim\source\repos> ls ferox
 
 
