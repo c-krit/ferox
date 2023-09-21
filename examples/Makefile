@@ -23,8 +23,8 @@
 .PHONY: all clean
 .SUFFIXES: .c .exe .html .out
 
-_COLOR_BEGIN ?= \033[1;36m
-_COLOR_END ?= \033[m
+_COLOR_BEGIN = \033[1;36m
+_COLOR_END = \033[m
 
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox

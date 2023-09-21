@@ -22,55 +22,63 @@
 
 # https://releases.llvm.org/6.0.0/tools/clang/docs/ClangFormatStyleOptions.html
 
-# LLVM 스타일을 기반으로 한 C++ 코딩 스타일.
+---
+
 BasedOnStyle: LLVM
-Language: Cpp
-
-# 공백 설정
-SpaceAfterCStyleCast: true
-SpaceAfterTemplateKeyword: false
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements
-SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
-SpacesInCStyleCastParentheses: false
-SpacesInContainerLiterals: false
-SpacesInParentheses: false
-SpacesInSquareBrackets: false
-
-# 들여쓰기 설정
-IndentCaseLabels: true
-IndentWidth: 4
-IndentWrappedFunctionNames: false
-TabWidth: 4
-UseTab: false
-
-# 코드 정렬 설정
-AlignAfterOpenBracket: Align
-# AlignConsecutiveAssignments: false
-# AlignConsecutiveDeclarations: false
+AlignAfterOpenBracket: DontAlign
 AlignEscapedNewlines: Left
-AlignTrailingComments: true
-AlwaysBreakAfterReturnType: None
-AlwaysBreakBeforeMultilineStrings: false
-AlwaysBreakTemplateDeclarations: false
-# BinPackArguments: false
-# BinPackParameters: false
-# BreakBeforeBraces: Attach
-BreakBeforeInheritanceComma: false
-SortIncludes: true
-SortUsingDeclarations: true
-
-# 포인터 변수 스타일 설정
-DerivePointerAlignment: false
-PointerAlignment: Right
-
-# 나머지 스타일 설정
-AllowShortBlocksOnASingleLine: false
-AllowShortCaseLabelsOnASingleLine: false
+AlignOperands: 'true'
+AlignTrailingComments: 'true'
+AllowAllConstructorInitializersOnNextLine: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-ColumnLimit: 0
-MaxEmptyLinesToKeep: 1
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: 'true'
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: 'false'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakAfterJavaFieldAnnotations: 'true'
+BreakBeforeTernaryOperators: 'true'
+BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: BeforeColon
+BreakStringLiterals: 'true'
+ColumnLimit: '0'
+ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
+ContinuationIndentWidth: '4'
+Cpp11BracedListStyle: 'false'
+DerivePointerAlignment: 'false'
+FixNamespaceComments: 'false'
+IndentCaseLabels: 'true'
+IndentPPDirectives: BeforeHash
+IndentWidth: '4'
+KeepEmptyLinesAtTheStartOfBlocks: 'false'
+Language: Cpp
+MaxEmptyLinesToKeep: '1'
+NamespaceIndentation: All
+PointerAlignment: Right
+ReflowComments: 'false'
+SortIncludes: 'false'
+SortUsingDeclarations: 'false'
+SpaceAfterCStyleCast: 'true'
+SpaceAfterLogicalNot: 'false'
+SpaceAfterTemplateKeyword: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeCpp11BracedList: 'true'
+SpaceBeforeCtorInitializerColon: 'false'
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: 'true'
+SpaceInEmptyParentheses: 'false'
+SpacesBeforeTrailingComments: '2'
+SpacesInAngles: 'false'
+SpacesInCStyleCastParentheses: 'true'
+SpacesInContainerLiterals: 'false'
+SpacesInParentheses: 'false'
+SpacesInSquareBrackets: 'false'
+Standard: Cpp11
+TabWidth: '4'
+UseTab: Never
+
+...

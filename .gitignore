@@ -20,8 +20,10 @@
 # SOFTWARE.
 #
 
-# 백업 파일과 설정 파일
+# 백업 파일
 *.bak
+
+# 설정 파일
 *.manifest
 **/.vs/
 **/.vscode/
