@@ -44,7 +44,7 @@ OBJECTS = \
 
 TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a
 
-CC ?= gcc
+CC = cc
 AR = ar
 CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 
@@ -63,7 +63,7 @@ build: ${TARGETS}
 
 .c.o:
 	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
-	${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
+	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
 ${TARGETS}: ${OBJECTS}
 	@mkdir -p ${LIBRARY_PATH}

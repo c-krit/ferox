@@ -41,7 +41,7 @@ TARGETS ?= \
 	${SOURCE_PATH}/raycast.out \
 	${SOURCE_PATH}/raylib.out
 
-CC ?= gcc
+CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
