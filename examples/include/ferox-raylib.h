@@ -104,22 +104,22 @@ void frDrawArrow(frVector2 v1, frVector2 v2, float thick, Color color) {
     );
 
     DrawLineEx(
-        (Vector2) { v1.x, v1.y }, 
-        (Vector2) { v2.x, v2.y },
+        (Vector2) { .x = v1.x, .y = v1.y }, 
+        (Vector2) { .x = v2.x, .y = v2.y },
         thick, 
         color
     );
 
     DrawLineEx(
-        (Vector2) { v2.x, v2.y },
-        (Vector2) { leftHead.x, leftHead.y },
+        (Vector2) { .x = v2.x, .y = v2.y },
+        (Vector2) { .x = leftHead.x, .y = leftHead.y },
         thick,
         color
     );
 
     DrawLineEx(
-        (Vector2) { v2.x, v2.y }, 
-        (Vector2) { rightHead.x, rightHead.y },
+        (Vector2) { .x = v2.x, .y = v2.y }, 
+        (Vector2) { .x = rightHead.x, .y = rightHead.y },
         thick, 
         color
     );
@@ -136,10 +136,10 @@ void frDrawBodyAABB(const frBody *b, float thick, Color color) {
     
     DrawRectangleLinesEx(
         (Rectangle) { 
-            frUnitsToPixels(aabb.x), 
-            frUnitsToPixels(aabb.y),
-            frUnitsToPixels(aabb.width),
-            frUnitsToPixels(aabb.height)
+            .x = frUnitsToPixels(aabb.x), 
+            .y = frUnitsToPixels(aabb.y),
+            .width = frUnitsToPixels(aabb.width),
+            .height = frUnitsToPixels(aabb.height)
         }, 
         thick, 
         color
@@ -147,7 +147,7 @@ void frDrawBodyAABB(const frBody *b, float thick, Color color) {
 
     frVector2 position = frVector2UnitsToPixels(frGetBodyPosition(b));
     
-    DrawCircleV((Vector2) { position.x, position.y }, 2.0f, color);
+    DrawCircleV((Vector2) { .x = position.x, .y = position.y }, 2.0f, color);
 }
 
 /* Draws the outline of `b` with the given `thick`ness and `color`. */
@@ -161,7 +161,7 @@ void frDrawBodyLines(const frBody *b, float thick, Color color) {
 
     if (frGetShapeType(s) == FR_SHAPE_CIRCLE) {
         DrawRing(
-            (Vector2) { position.x, position.y },
+            (Vector2) { .x = position.x, .y = position.y },
             frUnitsToPixels(frGetCircleRadius(s)) - thick,
             frUnitsToPixels(frGetCircleRadius(s)),
             0.0f,
@@ -180,15 +180,15 @@ void frDrawBodyLines(const frBody *b, float thick, Color color) {
             v2 = frVector2UnitsToPixels(v2);
 
             DrawLineEx(
-                (Vector2) { v1.x, v1.y }, 
-                (Vector2) { v2.x, v2.y },
+                (Vector2) { .x = v1.x, .y = v1.y }, 
+                (Vector2) { .x = v2.x, .y = v2.y },
                 thick, 
                 color
             );
         }
     }
 
-    DrawCircleV((Vector2) { position.x, position.y }, 2.0f, color);
+    DrawCircleV((Vector2) { .x = position.x, .y = position.y }, 2.0f, color);
 }
 
 /* 
@@ -206,12 +206,12 @@ void frDrawGrid(Rectangle bounds, float cellSize, float thick, Color color) {
     for (int i = 0; i <= vLineCount; i++) {
         DrawLineEx(
             (Vector2) { 
-                bounds.x + frUnitsToPixels(cellSize * i), 
-                bounds.y 
+                .x = bounds.x + frUnitsToPixels(cellSize * i), 
+                .y = bounds.y 
             },
             (Vector2) { 
-                bounds.x + frUnitsToPixels(cellSize * i), 
-                bounds.y + bounds.height 
+                .x = bounds.x + frUnitsToPixels(cellSize * i), 
+                .y = bounds.y + bounds.height 
             },
             thick,
             color
@@ -221,12 +221,12 @@ void frDrawGrid(Rectangle bounds, float cellSize, float thick, Color color) {
     for (int i = 0; i <= hLineCount; i++)
         DrawLineEx(
             (Vector2) { 
-                bounds.x, 
-                bounds.y + frUnitsToPixels(cellSize * i) 
+                .x = bounds.x, 
+                .y = bounds.y + frUnitsToPixels(cellSize * i) 
             },
             (Vector2) { 
-                bounds.x + bounds.width, 
-                bounds.y + frUnitsToPixels(cellSize * i) 
+                .x = bounds.x + bounds.width, 
+                .y = bounds.y + frUnitsToPixels(cellSize * i) 
             },
             thick,
             color
