@@ -48,10 +48,7 @@ CC = cc
 AR = ar
 CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 
-# CFLAGS += -Wall -Wpedantic
-CFLAGS += -Wno-unused-command-line-argument  \
-	-Wno-unused-but-set-variable             \
-	-Wno-unused-value                        \
+CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
 	-Wno-unused-variable
 
 all: pre-build build post-build

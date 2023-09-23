@@ -166,11 +166,18 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 <details>
 <summary>Compiling for GNU/Linux</summary>
 
-### Ubuntu
+### Debian / Ubuntu
 
 ```console
 $ sudo apt install build-essential git
 $ git clone https://github.com/c-krit/ferox && cd ferox
+$ make
+```
+
+In order to compile the examples, do:
+
+```console
+$ cd examples
 $ make
 ```
 
@@ -237,7 +244,7 @@ $ make -f Makefile.drm
 
 Compiling for the Web requires installation of the [Emscripten SDK](https://emscripten.org/).
 
-### Ubuntu
+### Debian / Ubuntu
 
 ```console
 $ sudo apt install build-essential git
@@ -274,7 +281,7 @@ $ emrun --no_browser ./bin/basic.html
 <details>
 <summary>Cross-compiling from GNU/Linux to Windows (WSL2)</summary>
 
-### Ubuntu
+### Debian / Ubuntu
 
 ```console
 $ sudo apt install build-essential git mingw-w64
