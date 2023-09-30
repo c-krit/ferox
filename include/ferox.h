@@ -203,7 +203,7 @@ typedef struct _frBodyPair {
 } frBodyPair;
 
 /* A callback function type for a collision event. */
-typedef bool (*frCollisionEventFunc)(frBodyPair key, const frCollision *value);
+typedef void (*frCollisionEventFunc)(frBodyPair key, frCollision *value);
 
 /* A structure that represents the collision event callback functions. */
 typedef struct _frCollisionHandler {

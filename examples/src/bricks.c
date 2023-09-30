@@ -46,6 +46,11 @@
 static const frMaterial MATERIAL_BRICK = { .density = 1.25f, .friction = 0.75f };
 static const frMaterial MATERIAL_WALL = { .density = 1.5f, .friction = 0.85f };
 
+static const Rectangle SCREEN_BOUNDS = { 
+    .width = SCREEN_WIDTH, 
+    .height = SCREEN_HEIGHT 
+};
+
 static const float BRICK_WIDTH = 60.0f, BRICK_HEIGHT = 48.0f;
 static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
@@ -54,8 +59,6 @@ static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 static frWorld *world;
 
 static frBody *cursor, *walls[MAX_WALL_COUNT];
-
-static Rectangle bounds = { .width = SCREEN_WIDTH, .height = SCREEN_HEIGHT };
 
 static RenderTexture2D brickTarget;
 
@@ -245,7 +248,7 @@ static void UpdateExample(void) {
             
         ClearBackground(FR_DRAW_COLOR_MATTEBLACK);
 
-        frDrawGrid(bounds, CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
+        frDrawGrid(SCREEN_BOUNDS, CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
 
         const int bodyCount = frGetBodyCountForWorld(world);
 

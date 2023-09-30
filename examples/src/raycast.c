@@ -45,13 +45,16 @@
 
 static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
+static const Rectangle SCREEN_BOUNDS = { 
+    .width = SCREEN_WIDTH, 
+    .height = SCREEN_HEIGHT 
+};
+
 /* Private Variables ==================================================================== */
 
 static frWorld *world;
 
 static frBody *player;
-
-static Rectangle bounds = { .width = SCREEN_WIDTH, .height = SCREEN_HEIGHT };
 
 /* Private Function Prototypes ========================================================== */
 
@@ -60,7 +63,8 @@ static void UpdateExample(void);
 static void DeinitExample(void);
 
 static void DrawCursor(void);
-static void RaycastQueryCallback(frRaycastHit raycastHit);
+
+static void OnRaycastQuery(frRaycastHit raycastHit);
 
 /* Public Functions ===================================================================== */
 
@@ -200,7 +204,7 @@ static void UpdateExample(void) {
             
         ClearBackground(FR_DRAW_COLOR_MATTEBLACK);
 
-        frDrawGrid(bounds, CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
+        frDrawGrid(SCREEN_BOUNDS, CELL_SIZE, 0.25f, ColorAlpha(DARKGRAY, 0.75f));
 
         const int bodyCount = frGetBodyCountForWorld(world);
 
@@ -210,7 +214,7 @@ static void UpdateExample(void) {
             frDrawBodyLines(object, 2.0f, ColorAlpha(LIGHTGRAY, 0.95f));
         }
 
-        frComputeRaycastForWorld(world, ray, RaycastQueryCallback);
+        frComputeRaycastForWorld(world, ray, OnRaycastQuery);
 
         frDrawBodyLines(player, 2.0f, ColorAlpha(GREEN, 0.85f));
 
@@ -263,7 +267,7 @@ static void DrawCursor(void) {
     );
 }
 
-static void RaycastQueryCallback(frRaycastHit raycastHit) {
+static void OnRaycastQuery(frRaycastHit raycastHit) {
     frDrawBodyAABB(raycastHit.body, 1.0f, YELLOW);
 
     Vector2 center = {
