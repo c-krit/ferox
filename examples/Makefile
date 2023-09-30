@@ -31,6 +31,10 @@ PROJECT_FULL_NAME = c-krit/ferox
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
+# TODO: Edit these values to match your raylib installation path!
+RAYLIB_INCLUDE_PATH ?= .
+RAYLIB_LIBRARY_PATH ?= .
+
 INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src

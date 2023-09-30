@@ -23,8 +23,8 @@
 .PHONY: all clean
 
 # TODO: Edit these values to match your raylib installation path!
-RAYLIB_INCLUDE_PATH ?=
-RAYLIB_LIBRARY_PATH ?=
+RAYLIB_INCLUDE_PATH ?= .
+RAYLIB_LIBRARY_PATH ?= .
 
 INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
