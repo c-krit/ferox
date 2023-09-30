@@ -39,6 +39,8 @@
 #define SCREEN_WIDTH     1280
 #define SCREEN_HEIGHT    800
 
+#define MAX_ENEMY_COUNT  256
+
 /* Typedefs ============================================================================= */
 
 typedef enum _EntityType {
@@ -51,6 +53,7 @@ typedef enum _EntityType {
 typedef struct _EntityData {
     EntityType type;
     float attackSpeed;
+    float movementSpeed;
     float counter;
 } EntityData;
 
@@ -90,11 +93,11 @@ static EntityData entityData[ENTITY_COUNT_] = {
     },
     {
         .type = ENTITY_BULLET,
-        .attackSpeed = 64.0f
+        .movementSpeed = 64.0f
     },
     {
         .type = ENTITY_ENEMY,
-        .attackSpeed = 0.0f
+        .movementSpeed = 4.0f
     }
 };
 
@@ -103,6 +106,8 @@ static frVertices bulletVertices, playerVertices;
 static frWorld *world;
 
 static frBody *player;
+
+static int enemyCount;
 
 /* Private Function Prototypes ========================================================== */
 
@@ -200,14 +205,36 @@ static void InitExample(void) {
 }
 
 static void UpdateExample(void) {
+    for (int i = 0; i < MAX_ENEMY_COUNT - enemyCount; i++) {
+        frVector2 position = { .x = 0.5f * SCREEN_WIDTH, .y = 0.5f * SCREEN_HEIGHT };
+        
+        while (position.x >= 0.35f * SCREEN_WIDTH && position.x <= 0.65f * SCREEN_WIDTH)
+            position.x = GetRandomValue(-2.5f * SCREEN_WIDTH, 2.5f * SCREEN_WIDTH);
+
+        while (position.y >= 0.35f * SCREEN_HEIGHT && position.y <= 0.65f * SCREEN_HEIGHT)
+            position.y = GetRandomValue(-2.5f * SCREEN_HEIGHT, 2.5f * SCREEN_HEIGHT);
+        
+        frBody *enemy = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
+            frVector2PixelsToUnits(position),
+            frCreateCircle(MATERIAL_ENEMY, 0.5f * GetRandomValue(2, 4))
+        );
+        
+        frSetBodyUserData(enemy, (void *) &entityData[ENTITY_ENEMY]);
+        
+        frAddBodyToWorld(world, enemy);
+
+        enemyCount++;
+    }
+
     const int bodyCount = frGetBodyCountForWorld(world);
 
     for (int i = 0; i < bodyCount; i++) {
         frBody *body = frGetBodyFromWorld(world, i);
 
-        const EntityData *entityData = frGetBodyUserData(body);
+        const EntityData *bodyData = frGetBodyUserData(body);
 
-        if (entityData == NULL || entityData->type != ENTITY_BULLET) continue;
+        if (bodyData == NULL || bodyData->type != ENTITY_BULLET) continue;
 
         frAABB aabb = frGetBodyAABB(body);
 
@@ -258,17 +285,34 @@ static void UpdateExample(void) {
         for (int i = 0; i < bodyCount; i++) {
             frBody *body = frGetBodyFromWorld(world, i);
 
-            const EntityData *entityData = frGetBodyUserData(body);
+            const EntityData *bodyData = frGetBodyUserData(body);
 
-            if (entityData == NULL) continue;
+            if (bodyData == NULL) continue;
 
-            switch (entityData->type) {
+            const frVector2 deltaPosition = frVector2Normalize(
+                frVector2Subtract(
+                    frGetBodyPosition(player), 
+                    frGetBodyPosition(body)
+                )
+            );
+
+            switch (bodyData->type) {
                 case ENTITY_BULLET:
                     frDrawBodyLines(body, 2.0f, ColorAlpha(YELLOW, 0.85f));
 
                     break;
 
                 case ENTITY_ENEMY:
+                    frSetBodyVelocity(
+                        body, 
+                        frVector2ScalarMultiply(
+                            deltaPosition, 
+                            bodyData->movementSpeed
+                        )
+                    );
+                    
+                    frDrawBodyLines(body, 2.0f, ColorAlpha(RED, 0.65f));
+
                     break;
 
                 case ENTITY_PLAYER:
@@ -368,7 +412,7 @@ static void UpdateBullets(void) {
             bullet,
             frVector2ScalarMultiply(
                 frVector2Normalize(direction), 
-                entityData[ENTITY_BULLET].attackSpeed
+                entityData[ENTITY_BULLET].movementSpeed
             )
         );
         
@@ -381,5 +425,19 @@ static void UpdateBullets(void) {
 }
 
 static void OnPreStep(frBodyPair key, frCollision *value) {
-    // TODO: ...
+    const EntityData *bodyData1 = frGetBodyUserData(key.first);
+    const EntityData *bodyData2 = frGetBodyUserData(key.second);
+
+    if ((bodyData1->type == ENTITY_BULLET && bodyData2->type == ENTITY_ENEMY)
+       || (bodyData1->type == ENTITY_ENEMY && bodyData2->type == ENTITY_BULLET)) {
+        frBody *bullet = NULL, *enemy = NULL;
+
+        if (bodyData1->type == ENTITY_BULLET) bullet = key.first, enemy = key.second;
+        else bullet = key.second, enemy = key.first;
+
+        value->count = 0;
+        
+        frRemoveBodyFromWorld(world, bullet);
+        frRemoveBodyFromWorld(world, enemy);
+    }
 }

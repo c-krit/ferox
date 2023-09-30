@@ -180,7 +180,7 @@ void frStepWorld(frWorld *w, float dt) {
 
     frPreStepWorld(w);
 
-    for (int j = 0; j < arrlen(w->cache); j++)
+    for (int j = 0; j < hmlen(w->cache); j++)
         if (w->handler.preStep != NULL) 
             w->handler.preStep(w->cache[j].key, &w->cache[j].value);
 
@@ -211,7 +211,7 @@ void frStepWorld(frWorld *w, float dt) {
     for (int i = 0; i < arrlen(w->bodies); i++)
         frIntegrateForBodyPosition(w->bodies[i], dt);
 
-    for (int j = 0; j < arrlen(w->cache); j++)
+    for (int j = 0; j < hmlen(w->cache); j++)
         if (w->handler.postStep != NULL) 
             w->handler.postStep(w->cache[j].key, &w->cache[j].value);
 
