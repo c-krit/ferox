@@ -434,10 +434,10 @@ static void OnPreStep(frBodyPair key, frCollision *value) {
 
         if (bodyData1->type == ENTITY_BULLET) bullet = key.first, enemy = key.second;
         else bullet = key.second, enemy = key.first;
-
-        value->count = 0;
         
         frRemoveBodyFromWorld(world, bullet);
         frRemoveBodyFromWorld(world, enemy);
+
+        value->count = 0, enemyCount--;
     }
 }

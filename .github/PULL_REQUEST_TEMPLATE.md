@@ -7,18 +7,12 @@
 
 ## What does this pull request do?
 
-*TODO: ...*
+<!-- ... -->
 
 ## Why do we need this pull request?
 
-### Environment
-
-*TODO: ...*
-
-### Description
-
-*TODO: ...*
+<!-- ... -->
 
 ## How did you test your pull request?
 
-*TODO: ...*
+<!-- ... -->

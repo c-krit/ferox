@@ -9,7 +9,7 @@
 
 A lightweight 2D physics engine written in C, for educational purposes.
 
-Documentation &mdash;
+[Documentation](/wiki) &mdash;
 [Examples](./examples/src) &mdash;
 [Prerequisites](#prerequisites)
 
