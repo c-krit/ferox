@@ -38,6 +38,8 @@ extern "C" {
 
 /* User-Defined Macros ===================================================== */
 
+// clang-format off
+
 /* Defines the maximum number of vertices for a convex polygon. */
 #define FR_GEOMETRY_MAX_VERTEX_COUNT  8
 
@@ -58,6 +60,8 @@ extern "C" {
 
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     4096
+
+// clang-format on
 
 /* Macros ================================================================== */
 
