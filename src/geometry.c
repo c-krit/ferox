@@ -30,11 +30,11 @@
 
 /* A union that represents the internal data of a collision shape. */
 typedef union _frShapeData {
-    struct { 
-        float radius; 
+    struct {
+        float radius;
     } circle;
-    struct { 
-        frVertices vertices, normals; 
+    struct {
+        frVertices vertices, normals;
     } polygon;
 } frShapeData;
 
@@ -85,15 +85,13 @@ frShape *frCreateRectangle(frMaterial material, float width, float height) {
     const float halfWidth = 0.5f * width, halfHeight = 0.5f * height;
 
     // NOTE: https://en.cppreference.com/w/c/language/compound_literal
-    frSetPolygonVertices(result, &(const frVertices) {
-        .data = {
-            { .x = -halfWidth, .y = -halfHeight },
-            { .x = -halfWidth, .y =  halfHeight },
-            { .x = halfWidth,  .y =  halfHeight },
-            { .x = halfWidth,  .y = -halfHeight }
-        },
-        .count = 4
-    });
+    frSetPolygonVertices(result,
+                         &(const frVertices) {
+                             .data = { { .x = -halfWidth, .y = -halfHeight },
+                                       { .x = -halfWidth, .y = halfHeight },
+                                       { .x = halfWidth, .y = halfHeight },
+                                       { .x = halfWidth, .y = -halfHeight } },
+                             .count = 4 });
 
     return result;
 }
@@ -169,9 +167,10 @@ float frGetShapeInertia(const frShape *s) {
         for (int j = vertexCount - 1, i = 0; i < vertexCount; j = i, i++) {
             frVector2 v1 = s->data.polygon.vertices.data[j];
             frVector2 v2 = s->data.polygon.vertices.data[i];
-            
-            const float cross = frVector2Cross(v1, v2), dotSum = (frVector2Dot(v1, v1) 
-                + frVector2Dot(v1, v2) + frVector2Dot(v2, v2));
+
+            const float cross = frVector2Cross(v1, v2),
+                        dotSum = (frVector2Dot(v1, v1) + frVector2Dot(v1, v2)
+                                  + frVector2Dot(v2, v2));
 
             numerator += (cross * dotSum), denominator += cross;
         }
@@ -190,25 +189,26 @@ frAABB frGetShapeAABB(const frShape *s, frTransform tx) {
         if (s->type == FR_SHAPE_CIRCLE) {
             result.x = tx.position.x - s->data.circle.radius;
             result.y = tx.position.y - s->data.circle.radius;
-            
+
             result.width = result.height = 2.0f * s->data.circle.radius;
         } else if (s->type == FR_SHAPE_POLYGON) {
-            frVector2 minVertex = { .x =  FLT_MAX, .y =  FLT_MAX };
+            frVector2 minVertex = { .x = FLT_MAX, .y = FLT_MAX };
             frVector2 maxVertex = { .x = -FLT_MAX, .y = -FLT_MAX };
-            
+
             for (int i = 0; i < s->data.polygon.vertices.count; i++) {
-                frVector2 v = frVector2Transform(s->data.polygon.vertices.data[i], tx);
-                
+                frVector2 v =
+                    frVector2Transform(s->data.polygon.vertices.data[i], tx);
+
                 if (minVertex.x > v.x) minVertex.x = v.x;
                 if (minVertex.y > v.y) minVertex.y = v.y;
-                    
+
                 if (maxVertex.x < v.x) maxVertex.x = v.x;
                 if (maxVertex.y < v.y) maxVertex.y = v.y;
             }
-            
+
             const float deltaX = maxVertex.x - minVertex.x;
             const float deltaY = maxVertex.y - minVertex.y;
-            
+
             result.x = minVertex.x;
             result.y = minVertex.y;
 
@@ -222,7 +222,8 @@ frAABB frGetShapeAABB(const frShape *s, frTransform tx) {
 
 /* Returns the radius of `s`, assuming `s` is a 'circle' collision shape. */
 float frGetCircleRadius(const frShape *s) {
-    return (frGetShapeType(s) == FR_SHAPE_CIRCLE) ? s->data.circle.radius : 0.0f;
+    return (frGetShapeType(s) == FR_SHAPE_CIRCLE) ? s->data.circle.radius
+                                                  : 0.0f;
 }
 
 /* 
@@ -230,8 +231,8 @@ float frGetCircleRadius(const frShape *s) {
     assuming `s` is a 'polygon' collision shape. 
 */
 frVector2 frGetPolygonVertex(const frShape *s, int index) {
-    if (frGetShapeType(s) != FR_SHAPE_POLYGON
-        || index < 0 || index >= s->data.polygon.vertices.count) 
+    if (frGetShapeType(s) != FR_SHAPE_POLYGON || index < 0
+        || index >= s->data.polygon.vertices.count)
         return FR_API_STRUCT_ZERO(frVector2);
 
     return s->data.polygon.vertices.data[index];
@@ -239,9 +240,8 @@ frVector2 frGetPolygonVertex(const frShape *s, int index) {
 
 /* Returns the vertices of `s`, assuming `s` is a 'polygon' collision shape. */
 const frVertices *frGetPolygonVertices(const frShape *s) {
-    return (frGetShapeType(s) == FR_SHAPE_POLYGON) 
-        ? &(s->data.polygon.vertices)
-        : NULL;
+    return (frGetShapeType(s) == FR_SHAPE_POLYGON) ? &(s->data.polygon.vertices)
+                                                   : NULL;
 }
 
 /* 
@@ -249,8 +249,8 @@ const frVertices *frGetPolygonVertices(const frShape *s) {
     assuming `s` is a 'polygon' collision shape. 
 */
 frVector2 frGetPolygonNormal(const frShape *s, int index) {
-    if (frGetShapeType(s) != FR_SHAPE_POLYGON
-        || index < 0 || index >= s->data.polygon.normals.count) 
+    if (frGetShapeType(s) != FR_SHAPE_POLYGON || index < 0
+        || index >= s->data.polygon.normals.count)
         return FR_API_STRUCT_ZERO(frVector2);
 
     return s->data.polygon.normals.data[index];
@@ -258,9 +258,8 @@ frVector2 frGetPolygonNormal(const frShape *s, int index) {
 
 /* Returns the normals of `s`, assuming `s` is a 'polygon' collision shape. */
 const frVertices *frGetPolygonNormals(const frShape *s) {
-    return (frGetShapeType(s) == FR_SHAPE_POLYGON) 
-        ? &(s->data.polygon.normals)
-        : NULL;
+    return (frGetShapeType(s) == FR_SHAPE_POLYGON) ? &(s->data.polygon.normals)
+                                                   : NULL;
 }
 
 /* Sets the type of `s` to `type`. */
@@ -290,8 +289,8 @@ void frSetShapeRestitution(frShape *s, float restitution) {
 
 /* Sets the `radius` of `s`, assuming `s` is a 'circle' collision shape. */
 void frSetCircleRadius(frShape *s, float radius) {
-    if (s == NULL || s->type != FR_SHAPE_CIRCLE) return; 
-    
+    if (s == NULL || s->type != FR_SHAPE_CIRCLE) return;
+
     s->data.circle.radius = radius;
 
     s->area = M_PI * (radius * radius);
@@ -307,15 +306,13 @@ void frSetRectangleDimensions(frShape *s, float width, float height) {
     const float halfWidth = 0.5f * width, halfHeight = 0.5f * height;
 
     // NOTE: https://en.cppreference.com/w/c/language/compound_literal
-    frSetPolygonVertices(s, &(const frVertices) {
-        .data = {
-            { .x = -halfWidth, .y = -halfHeight },
-            { .x = -halfWidth, .y =  halfHeight },
-            { .x =  halfWidth, .y =  halfHeight },
-            { .x =  halfWidth, .y = -halfHeight }
-        },
-        .count = 4
-    });
+    frSetPolygonVertices(s,
+                         &(const frVertices) {
+                             .data = { { .x = -halfWidth, .y = -halfHeight },
+                                       { .x = -halfWidth, .y = halfHeight },
+                                       { .x = halfWidth, .y = halfHeight },
+                                       { .x = halfWidth, .y = -halfHeight } },
+                             .count = 4 });
 }
 
 /* Sets the `vertices` of `s`, assuming `s` is a 'polygon' collision shape. */
@@ -333,13 +330,11 @@ void frSetPolygonVertices(frShape *s, const frVertices *vertices) {
         for (int i = 0; i < newVertices.count; i++)
             s->data.polygon.vertices.data[i] = newVertices.data[i];
 
-        for (int j = newVertices.count - 1, i = 0; i < newVertices.count; j = i, i++)
+        for (int j = newVertices.count - 1, i = 0; i < newVertices.count;
+             j = i, i++)
             s->data.polygon.normals.data[i] = frVector2LeftNormal(
-                frVector2Subtract(
-                    s->data.polygon.vertices.data[i], 
-                    s->data.polygon.vertices.data[j]
-                )
-            );
+                frVector2Subtract(s->data.polygon.vertices.data[i],
+                                  s->data.polygon.vertices.data[j]));
     }
 
     float twiceAreaSum = 0.0f;
@@ -351,15 +346,10 @@ void frSetPolygonVertices(frShape *s, const frVertices *vertices) {
         */
 
         const float twiceArea = frVector2Cross(
-            frVector2Subtract(
-                s->data.polygon.vertices.data[i], 
-                s->data.polygon.vertices.data[0]
-            ),
-            frVector2Subtract(
-                s->data.polygon.vertices.data[i + 1], 
-                s->data.polygon.vertices.data[0]
-            )
-        );
+            frVector2Subtract(s->data.polygon.vertices.data[i],
+                              s->data.polygon.vertices.data[0]),
+            frVector2Subtract(s->data.polygon.vertices.data[i + 1],
+                              s->data.polygon.vertices.data[0]));
 
         twiceAreaSum += twiceArea;
     }
@@ -385,8 +375,7 @@ static void frJarvisMarch(const frVertices *input, frVertices *output) {
     int lowestIndex = 0;
 
     for (int i = 1; i < input->count; i++)
-        if (input->data[lowestIndex].x > input->data[i].x)
-            lowestIndex = i;
+        if (input->data[lowestIndex].x > input->data[i].x) lowestIndex = i;
 
     output->count = 0, output->data[output->count++] = input->data[lowestIndex];
 
@@ -404,19 +393,18 @@ static void frJarvisMarch(const frVertices *input, frVertices *output) {
         for (int i = 0; i < input->count; i++) {
             if (i == currentIndex || i == nextIndex) continue;
 
-            const int direction = frVector2CounterClockwise(
-                input->data[currentIndex], input->data[i], input->data[nextIndex]
-            );
+            const int direction =
+                frVector2CounterClockwise(input->data[currentIndex],
+                                          input->data[i],
+                                          input->data[nextIndex]);
 
             if (direction < 0) continue;
 
-            const float toCandidate = frVector2DistanceSqr(
-                input->data[currentIndex], input->data[i]
-            );
+            const float toCandidate =
+                frVector2DistanceSqr(input->data[currentIndex], input->data[i]);
 
-            const float toNext = frVector2DistanceSqr(
-                input->data[currentIndex], input->data[nextIndex]
-            );
+            const float toNext = frVector2DistanceSqr(input->data[currentIndex],
+                                                      input->data[nextIndex]);
 
             if (direction != 0 || (direction == 0 && (toCandidate > toNext)))
                 nextIndex = i;
@@ -425,7 +413,7 @@ static void frJarvisMarch(const frVertices *input, frVertices *output) {
         if (nextIndex == lowestIndex) break;
 
         currentIndex = nextIndex;
-        
+
         output->data[output->count++] = input->data[nextIndex];
     }
 }

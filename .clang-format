@@ -25,7 +25,7 @@
 ---
 
 BasedOnStyle: LLVM
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: Left
 AlignOperands: 'true'

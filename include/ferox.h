@@ -83,13 +83,13 @@ extern "C" {
 /* Typedefs ================================================================ */
 
 /* A structure that represents a two-dimensional vector. */
-typedef struct _frVector2 { 
-    float x, y; 
+typedef struct _frVector2 {
+    float x, y;
 } frVector2;
 
 /* A structure that represents an axis-aligned bounding box. */
-typedef struct _frAABB { 
-    float x, y, width, height; 
+typedef struct _frAABB {
+    float x, y, width, height;
 } frAABB;
 
 /* 
@@ -198,7 +198,9 @@ typedef uint_fast8_t frBodyFlags;
 */
 typedef struct _frTransform {
     frVector2 position;
-    struct { float _sin, _cos; } rotation;
+    struct {
+        float _sin, _cos;
+    } rotation;
     float angle;
 } frTransform;
 
@@ -240,7 +242,10 @@ float frGetSpatialHashCellSize(const frSpatialHash *sh);
 void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value);
 
 /* Query `sh` for any objects that overlap the given `aabb`. */
-void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, void *ctx);
+void frQuerySpatialHash(frSpatialHash *sh,
+                        frAABB aabb,
+                        frHashQueryFunc func,
+                        void *ctx);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -248,11 +253,11 @@ void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, vo
     Checks whether `s1` and `s2` are colliding,
     then stores the collision information to `collision`.
 */
-bool frComputeCollision(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-);
+bool frComputeCollision(const frShape *s1,
+                        frTransform tx1,
+                        const frShape *s2,
+                        frTransform tx2,
+                        frCollision *collision);
 
 /* Casts a `ray` against `b`. */
 bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit);
@@ -464,7 +469,10 @@ void frIntegrateForBodyVelocity(frBody *b, float dt);
 void frIntegrateForBodyPosition(frBody *b, float dt);
 
 /* Resolves the collision between `b1` and `b2`. */
-void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseDt);
+void frResolveCollision(frBody *b1,
+                        frBody *b2,
+                        frCollision *ctx,
+                        float inverseDt);
 
 /* (From 'timer.c') ======================================================== */
 
@@ -577,8 +585,9 @@ FR_API_INLINE float frVector2Distance(frVector2 v1, frVector2 v2) {
 /* Converts `v` to a unit vector. */
 FR_API_INLINE frVector2 frVector2Normalize(frVector2 v) {
     const float magnitude = frVector2Magnitude(v);
-    
-    return (magnitude > 0.0f) ? frVector2ScalarMultiply(v, 1.0f / magnitude) : v;
+
+    return (magnitude > 0.0f) ? frVector2ScalarMultiply(v, 1.0f / magnitude)
+                              : v;
 }
 
 /* Returns the left normal vector of `v`. */
@@ -595,19 +604,14 @@ FR_API_INLINE frVector2 frVector2RightNormal(frVector2 v) {
 FR_API_INLINE frVector2 frVector2Rotate(frVector2 v, float angle) {
     const float _sin = sinf(angle);
     const float _cos = cosf(angle);
-    
-    return (frVector2) { 
-        v.x * _cos - v.y * _sin, 
-        v.x * _sin + v.y * _cos
-    };
+
+    return (frVector2) { v.x * _cos - v.y * _sin, v.x * _sin + v.y * _cos };
 }
 
 /* Rotates `v` through `tx` about the origin of a coordinate plane. */
 FR_API_INLINE frVector2 frVector2RotateTx(frVector2 v, frTransform tx) {
-    return (frVector2) { 
-        v.x * tx.rotation._cos - v.y * tx.rotation._sin, 
-        v.x * tx.rotation._sin + v.y * tx.rotation._cos
-    };
+    return (frVector2) { v.x * tx.rotation._cos - v.y * tx.rotation._sin,
+                         v.x * tx.rotation._sin + v.y * tx.rotation._cos };
 }
 
 /* Transforms `v` through `tx` about the origin of a coordinate plane. */
@@ -628,7 +632,8 @@ FR_API_INLINE float frVector2Angle(frVector2 v1, frVector2 v2) {
     a clockwise angle, a positive integer value if `v1, `v2` and `v3` form
     a counter-clockwise angle and zero if `v1, `v2` and `v3` are collinear.
 */
-FR_API_INLINE int frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector2 v3) {
+FR_API_INLINE int
+frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector2 v3) {
     /*
        `v1`
         *
@@ -649,33 +654,33 @@ FR_API_INLINE int frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector
 /* Converts each component of `v` (in pixels) to units. */
 FR_API_INLINE frVector2 frVector2PixelsToUnits(frVector2 v) {
     return (FR_GEOMETRY_PIXELS_PER_UNIT > 0.0f)
-        ? frVector2ScalarMultiply(v, 1.0f / FR_GEOMETRY_PIXELS_PER_UNIT)
-        : FR_API_STRUCT_ZERO(frVector2);
+               ? frVector2ScalarMultiply(v, 1.0f / FR_GEOMETRY_PIXELS_PER_UNIT)
+               : FR_API_STRUCT_ZERO(frVector2);
 }
 
 /* Converts each component of `v` (in units) to pixels. */
 FR_API_INLINE frVector2 frVector2UnitsToPixels(frVector2 v) {
     return (FR_GEOMETRY_PIXELS_PER_UNIT > 0.0f)
-        ? frVector2ScalarMultiply(v, FR_GEOMETRY_PIXELS_PER_UNIT)
-        : FR_API_STRUCT_ZERO(frVector2);
+               ? frVector2ScalarMultiply(v, FR_GEOMETRY_PIXELS_PER_UNIT)
+               : FR_API_STRUCT_ZERO(frVector2);
 }
 
 /* Converts `k` (in pixels) to units. */
 FR_API_INLINE float frPixelsToUnits(float k) {
     return (FR_GEOMETRY_PIXELS_PER_UNIT > 0.0f)
-        ? (k / FR_GEOMETRY_PIXELS_PER_UNIT)
-        : 0.0f;
+               ? (k / FR_GEOMETRY_PIXELS_PER_UNIT)
+               : 0.0f;
 }
 
 /* Converts `k` (in units) to pixels. */
 FR_API_INLINE float frUnitsToPixels(float k) {
     return (FR_GEOMETRY_PIXELS_PER_UNIT > 0.0f)
-        ? (k * FR_GEOMETRY_PIXELS_PER_UNIT)
-        : 0.0f;
+               ? (k * FR_GEOMETRY_PIXELS_PER_UNIT)
+               : 0.0f;
 }
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // `FEROX_H`
+#endif  // `FEROX_H`

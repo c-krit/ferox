@@ -45,6 +45,6 @@ double frGetCurrentTime(void) {
 
         stm_setup();
     }
-    
+
     return stm_sec(stm_now());
 }

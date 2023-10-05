@@ -30,16 +30,16 @@
 /* Typedefs ================================================================ */
 
 /* A structure that represents the key of a spatial hash entry. */
-typedef struct _frSpatialHashKey { 
-    int x, y; 
+typedef struct _frSpatialHashKey {
+    int x, y;
 } frSpatialHashKey;
 
 /* A structure that represents the value of a spatial hash entry. */
 typedef int *frSpatialHashValue;
 
 /* A structure that represents the key-value pair of a spatial hash.*/
-typedef struct _frSpatialHashEntry { 
-    frSpatialHashKey key; 
+typedef struct _frSpatialHashEntry {
+    frSpatialHashKey key;
     frSpatialHashValue value;
 } frSpatialHashEntry;
 
@@ -130,7 +130,10 @@ void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value) {
 }
 
 /* Query `sh` for any objects that are likely to overlap the given `aabb`. */
-void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, void *ctx) {
+void frQuerySpatialHash(frSpatialHash *sh,
+                        frAABB aabb,
+                        frHashQueryFunc func,
+                        void *ctx) {
     if (sh == NULL) return;
 
     const float inverseCellSize = sh->inverseCellSize;
@@ -154,22 +157,25 @@ void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, vo
             for (int i = 0; i < arrlen(entry->value); i++)
                 arrput(sh->queryResult, entry->value[i]);
         }
-    
+
     const size_t oldLength = arrlen(sh->queryResult);
 
     if (oldLength > 1) {
         // NOTE: Sort the array first, then remove duplicates!
-        qsort(sh->queryResult, oldLength, sizeof *(sh->queryResult), frQSortCompare);
+        qsort(sh->queryResult,
+              oldLength,
+              sizeof *(sh->queryResult),
+              frQSortCompare);
 
         size_t newLength = 0;
-        
+
         for (int i = 0; i < oldLength; i++)
             if (sh->queryResult[i] != sh->queryResult[i + 1])
                 sh->queryResult[newLength++] = sh->queryResult[i];
-        
+
         if (sh->queryResult[newLength - 1] != sh->queryResult[oldLength - 1])
             sh->queryResult[newLength++] = sh->queryResult[oldLength - 1];
-        
+
         arrsetlen(sh->queryResult, newLength);
     }
 
@@ -177,7 +183,7 @@ void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, vo
         NOTE: For each object in the query result, the callback `func`tion
         will be called with the user data pointer `ctx`.
     */
-    for (int i = 0; i < arrlen(sh->queryResult); i++) 
+    for (int i = 0; i < arrlen(sh->queryResult); i++)
         func(sh->queryResult[i], ctx);
 }
 
@@ -191,6 +197,6 @@ void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, vo
 static int frQSortCompare(const void *a, const void *b) {
     const int x = *(const int *) a;
     const int y = *(const int *) b;
-    
+
     return (x > y) - (x < y);
 }

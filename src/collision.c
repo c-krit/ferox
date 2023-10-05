@@ -48,47 +48,47 @@ static bool frClipEdge(frEdge *e, frVector2 v, float dot);
     assuming `s1` and `s2` are 'circle' collision shapes,
     then stores the collision information to `collision`.
 */
-static bool frComputeCollisionCircles(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-);
+static bool frComputeCollisionCircles(const frShape *s1,
+                                      frTransform tx1,
+                                      const frShape *s2,
+                                      frTransform tx2,
+                                      frCollision *collision);
 
 /* 
     Checks whether `s1` and `s2` are colliding,
     assuming `s1` is a 'circle' collision shape and `s2` is a 'polygon' 
     collision shape, then stores the collision information to `collision`.
 */
-static bool frComputeCollisionCirclePoly(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-);
+static bool frComputeCollisionCirclePoly(const frShape *s1,
+                                         frTransform tx1,
+                                         const frShape *s2,
+                                         frTransform tx2,
+                                         frCollision *collision);
 
 /* 
     Checks whether `s1` and `s2` are colliding,
     assuming `s1` and `s2` are 'polygon' collision shapes,
     then stores the collision information to `collision`.
 */
-static bool frComputeCollisionPolys(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-);
+static bool frComputeCollisionPolys(const frShape *s1,
+                                    frTransform tx1,
+                                    const frShape *s2,
+                                    frTransform tx2,
+                                    frCollision *collision);
 
 /* Computes the intersection of a circle and a line. */
-static bool frComputeIntersectionCircleLine(
-    frVector2 center, float radius,
-    frVector2 origin, frVector2 direction,
-    float *lambda
-);
+static bool frComputeIntersectionCircleLine(frVector2 center,
+                                            float radius,
+                                            frVector2 origin,
+                                            frVector2 direction,
+                                            float *lambda);
 
 /* Computes the intersection of two lines. */
-static bool frComputeIntersectionLines(
-    frVector2 origin1, frVector2 direction1,
-    frVector2 origin2, frVector2 direction2,
-    float *lambda
-);
+static bool frComputeIntersectionLines(frVector2 origin1,
+                                       frVector2 direction1,
+                                       frVector2 origin2,
+                                       frVector2 direction2,
+                                       float *lambda);
 
 /* Returns the edge of `s` that is most perpendicular to `v`. */
 static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v);
@@ -97,17 +97,15 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v);
     Finds the axis of minimum penetration from `s1` to `s2`,
     then returns its index.
 */
-static int frGetSeparatingAxisIndex(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    float *depth
-);
+static int frGetSeparatingAxisIndex(const frShape *s1,
+                                    frTransform tx1,
+                                    const frShape *s2,
+                                    frTransform tx2,
+                                    float *depth);
 
 /* Returns the index of the vertex farthest along `v`. */
-static int frGetSupportPointIndex(
-    const frVertices *vertices, 
-    frTransform tx, frVector2 v
-);
+static int
+frGetSupportPointIndex(const frVertices *vertices, frTransform tx, frVector2 v);
 
 /* Public Functions ======================================================== */
 
@@ -115,11 +113,11 @@ static int frGetSupportPointIndex(
     Checks whether `s1` and `s2` are colliding,
     then stores the collision information to `collision`.
 */
-bool frComputeCollision(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-) {
+bool frComputeCollision(const frShape *s1,
+                        frTransform tx1,
+                        const frShape *s2,
+                        frTransform tx2,
+                        frCollision *collision) {
     if (s1 == NULL || s2 == NULL) return false;
 
     frShapeType t1 = frGetShapeType(s1);
@@ -127,12 +125,13 @@ bool frComputeCollision(
 
     if (t1 == FR_SHAPE_CIRCLE && t2 == FR_SHAPE_CIRCLE)
         return frComputeCollisionCircles(s1, tx1, s2, tx2, collision);
-    else if ((t1 == FR_SHAPE_CIRCLE && t2 == FR_SHAPE_POLYGON) 
-        || (t1 == FR_SHAPE_POLYGON && t2 == FR_SHAPE_CIRCLE))
+    else if ((t1 == FR_SHAPE_CIRCLE && t2 == FR_SHAPE_POLYGON)
+             || (t1 == FR_SHAPE_POLYGON && t2 == FR_SHAPE_CIRCLE))
         return frComputeCollisionCirclePoly(s1, tx1, s2, tx2, collision);
     else if (t1 == FR_SHAPE_POLYGON && t2 == FR_SHAPE_POLYGON)
         return frComputeCollisionPolys(s1, tx1, s2, tx2, collision);
-    else return false;
+    else
+        return false;
 }
 
 /* Casts a `ray` against `b`. */
@@ -149,11 +148,11 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
     float lambda = FLT_MAX;
 
     if (type == FR_SHAPE_CIRCLE) {
-        bool intersects = frComputeIntersectionCircleLine(
-            tx.position, frGetCircleRadius(s),
-            ray.origin, ray.direction,
-            &lambda
-        );
+        bool intersects = frComputeIntersectionCircleLine(tx.position,
+                                                          frGetCircleRadius(s),
+                                                          ray.origin,
+                                                          ray.direction,
+                                                          &lambda);
 
         bool result = (lambda >= 0.0f) && (lambda <= ray.maxDistance);
 
@@ -161,13 +160,10 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
             raycastHit->body = (frBody *) b;
 
             raycastHit->point = frVector2Add(
-                ray.origin, 
-                frVector2ScalarMultiply(ray.direction, lambda)
-            );
+                ray.origin, frVector2ScalarMultiply(ray.direction, lambda));
 
             raycastHit->normal = frVector2LeftNormal(
-                frVector2Subtract(ray.origin, raycastHit->point)
-            );
+                frVector2Subtract(ray.origin, raycastHit->point));
 
             raycastHit->distance = lambda;
             raycastHit->inside = (lambda < 0.0f);
@@ -181,35 +177,32 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
 
         float minLambda = FLT_MAX;
 
-        for (int j = vertices->count - 1, i = 0; i < vertices->count; j = i, i++) {
+        for (int j = vertices->count - 1, i = 0; i < vertices->count;
+             j = i, i++) {
             frVector2 v1 = frVector2Transform(vertices->data[i], tx);
             frVector2 v2 = frVector2Transform(vertices->data[j], tx);
 
             frVector2 edgeVector = frVector2Subtract(v1, v2);
-            
-            bool intersects = frComputeIntersectionLines(
-                ray.origin, ray.direction, 
-                v2, edgeVector, 
-                &lambda
-            );
-            
+
+            bool intersects = frComputeIntersectionLines(ray.origin,
+                                                         ray.direction,
+                                                         v2,
+                                                         edgeVector,
+                                                         &lambda);
+
             if (intersects && lambda <= ray.maxDistance) {
                 if (minLambda > lambda) {
                     minLambda = lambda;
 
                     if (raycastHit != NULL) {
                         raycastHit->point = frVector2Add(
-                            ray.origin, 
-                            frVector2ScalarMultiply(
-                                ray.direction, 
-                                minLambda
-                            )
-                        );
+                            ray.origin,
+                            frVector2ScalarMultiply(ray.direction, minLambda));
 
                         raycastHit->normal = frVector2LeftNormal(edgeVector);
                     }
                 }
-                
+
                 intersectionCount++;
             }
         }
@@ -218,7 +211,7 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
             raycastHit->body = (frBody *) b;
             raycastHit->inside = (intersectionCount & 1);
         }
-        
+
         return (!(raycastHit->inside) && (intersectionCount > 0));
     } else {
         return false;
@@ -243,14 +236,10 @@ static bool frClipEdge(frEdge *e, frVector2 v, float dot) {
         return true;
     } else {
         frVector2 edgeVector = frVector2Subtract(e->data[1], e->data[0]);
-    
+
         frVector2 midpoint = frVector2Add(
-            e->data[0], 
-            frVector2ScalarMultiply(
-                edgeVector, 
-                (dot1 / (dot1 - dot2))
-            )
-        );
+            e->data[0],
+            frVector2ScalarMultiply(edgeVector, (dot1 / (dot1 - dot2))));
 
         if (dot1 > 0.0f && dot2 < 0.0f) {
             e->data[1] = midpoint, e->count = 2;
@@ -271,11 +260,11 @@ static bool frClipEdge(frEdge *e, frVector2 v, float dot) {
     assuming `s1` and `s2` are 'circle' collision shapes,
     then stores the collision information to `collision`.
 */
-static bool frComputeCollisionCircles(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-) {
+static bool frComputeCollisionCircles(const frShape *s1,
+                                      frTransform tx1,
+                                      const frShape *s2,
+                                      frTransform tx2,
+                                      frCollision *collision) {
     frVector2 direction = frVector2Subtract(tx2.position, tx1.position);
 
     float radiusSum = frGetCircleRadius(s1) + frGetCircleRadius(s2);
@@ -287,18 +276,20 @@ static bool frComputeCollisionCircles(
         float magnitude = sqrtf(magnitudeSqr);
 
         collision->direction = (magnitude > 0.0f)
-            ? frVector2ScalarMultiply(direction, 1.0f / magnitude)
-            : (frVector2) { .x = 1.0f };
+                                   ? frVector2ScalarMultiply(direction,
+                                                             1.0f / magnitude)
+                                   : (frVector2) { .x = 1.0f };
 
         collision->contacts[0].id = 0;
 
-        collision->contacts[0].point = frVector2Transform(
-            frVector2ScalarMultiply(collision->direction, frGetCircleRadius(s1)), tx1
-        );
+        collision->contacts[0].point =
+            frVector2Transform(frVector2ScalarMultiply(collision->direction,
+                                                       frGetCircleRadius(s1)),
+                               tx1);
 
         collision->contacts[0].depth = (magnitude > 0.0f)
-            ? radiusSum - magnitude
-            : frGetCircleRadius(s1);
+                                           ? radiusSum - magnitude
+                                           : frGetCircleRadius(s1);
 
         collision->contacts[1] = collision->contacts[0];
 
@@ -313,11 +304,11 @@ static bool frComputeCollisionCircles(
     assuming `s1` is a 'circle' collision shape and `s2` is a 'polygon' 
     collision shape, then stores the collision information to `collision`.
 */
-static bool frComputeCollisionCirclePoly(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-) {
+static bool frComputeCollisionCirclePoly(const frShape *s1,
+                                         frTransform tx1,
+                                         const frShape *s2,
+                                         frTransform tx2,
+                                         frCollision *collision) {
     frShape *circle, *poly;
     frTransform circleTx, polyTx;
 
@@ -331,15 +322,14 @@ static bool frComputeCollisionCirclePoly(
 
     const frVertices *vertices = frGetPolygonVertices(poly);
     const frVertices *normals = frGetPolygonNormals(poly);
-    
+
     /*
         NOTE: `txCenter` refers to the center of the 'circle' collision shape
         transformed to the local space of the 'polygon' collision shape.
     */
-    frVector2 txCenter = frVector2Rotate(
-        frVector2Subtract(circleTx.position, polyTx.position), 
-        -polyTx.angle
-    );
+    frVector2 txCenter = frVector2Rotate(frVector2Subtract(circleTx.position,
+                                                           polyTx.position),
+                                         -polyTx.angle);
 
     float radius = frGetCircleRadius(circle), maxDot = -FLT_MAX;
 
@@ -350,13 +340,12 @@ static bool frComputeCollisionCirclePoly(
         closest to the center of the 'circle' collision shape.
     */
     for (int i = 0; i < vertices->count; i++) {
-        float dot = frVector2Dot(
-            normals->data[i], 
-            frVector2Subtract(txCenter, vertices->data[i])
-        );
+        float dot = frVector2Dot(normals->data[i],
+                                 frVector2Subtract(txCenter,
+                                                   vertices->data[i]));
 
         if (dot > radius) return false;
-        
+
         if (maxDot < dot) maxDot = dot, maxIndex = i;
     }
 
@@ -369,10 +358,10 @@ static bool frComputeCollisionCirclePoly(
     if (maxDot < 0.0f) {
         if (collision != NULL) {
             collision->direction = frVector2Negate(
-                frVector2RotateTx(normals->data[maxIndex], polyTx)
-            );
+                frVector2RotateTx(normals->data[maxIndex], polyTx));
 
-            frVector2 deltaPosition = frVector2Subtract(tx2.position, tx1.position);
+            frVector2 deltaPosition = frVector2Subtract(tx2.position,
+                                                        tx1.position);
 
             if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                 collision->direction = frVector2Negate(collision->direction);
@@ -381,8 +370,7 @@ static bool frComputeCollisionCirclePoly(
 
             collision->contacts[0].point = frVector2Add(
                 circleTx.position,
-                frVector2ScalarMultiply(collision->direction, radius)
-            );
+                frVector2ScalarMultiply(collision->direction, radius));
 
             collision->contacts[0].depth = radius - maxDot;
 
@@ -391,10 +379,9 @@ static bool frComputeCollisionCirclePoly(
             collision->count = 1;
         }
     } else {
-        frVector2 v1 = (maxIndex > 0)
-            ? vertices->data[maxIndex - 1]
-            : vertices->data[vertices->count - 1];
-        
+        frVector2 v1 = (maxIndex > 0) ? vertices->data[maxIndex - 1]
+                                      : vertices->data[vertices->count - 1];
+
         frVector2 v2 = vertices->data[maxIndex];
 
         frVector2 edgeVector = frVector2Subtract(v2, v1);
@@ -419,27 +406,28 @@ static bool frComputeCollisionCirclePoly(
             if (collision != NULL) {
                 float magnitude = sqrtf(magnitudeSqr);
 
-                collision->direction = (magnitude > 0.0f)
-                    ? frVector2ScalarMultiply(
-                        frVector2RotateTx(frVector2Negate(direction), polyTx), 
-                        1.0f / magnitude
-                    )
-                    : FR_API_STRUCT_ZERO(frVector2);
+                collision->direction =
+                    (magnitude > 0.0f) ? frVector2ScalarMultiply(
+                        frVector2RotateTx(frVector2Negate(direction), polyTx),
+                        1.0f / magnitude)
+                                       : FR_API_STRUCT_ZERO(frVector2);
 
-                frVector2 deltaPosition = frVector2Subtract(tx2.position, tx1.position);
+                frVector2 deltaPosition = frVector2Subtract(tx2.position,
+                                                            tx1.position);
 
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
-                    collision->direction = frVector2Negate(collision->direction);
+                    collision->direction = frVector2Negate(
+                        collision->direction);
 
                 collision->contacts[0].id = 0;
 
                 collision->contacts[0].point = frVector2Transform(
-                    frVector2ScalarMultiply(collision->direction, radius), circleTx
-                );
+                    frVector2ScalarMultiply(collision->direction, radius),
+                    circleTx);
 
                 collision->contacts[0].depth = (magnitude > 0.0f)
-                    ? radius - magnitude
-                    : radius;
+                                                   ? radius - magnitude
+                                                   : radius;
 
                 collision->contacts[1] = collision->contacts[0];
 
@@ -448,20 +436,20 @@ static bool frComputeCollisionCirclePoly(
         } else {
             if (collision != NULL) {
                 collision->direction = frVector2Negate(
-                    frVector2RotateTx(normals->data[maxIndex], polyTx)
-                );
+                    frVector2RotateTx(normals->data[maxIndex], polyTx));
 
-                frVector2 deltaPosition = frVector2Subtract(tx2.position, tx1.position);
+                frVector2 deltaPosition = frVector2Subtract(tx2.position,
+                                                            tx1.position);
 
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
-                    collision->direction = frVector2Negate(collision->direction);
+                    collision->direction = frVector2Negate(
+                        collision->direction);
 
                 collision->contacts[0].id = 0;
 
                 collision->contacts[0].point = frVector2Add(
                     circleTx.position,
-                    frVector2ScalarMultiply(collision->direction, radius)
-                );
+                    frVector2ScalarMultiply(collision->direction, radius));
 
                 collision->contacts[0].depth = radius - maxDot;
 
@@ -480,25 +468,26 @@ static bool frComputeCollisionCirclePoly(
     assuming `s1` and `s2` are 'polygon' collision shapes,
     then stores the collision information to `collision`.
 */
-static bool frComputeCollisionPolys(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    frCollision *collision
-) {
+static bool frComputeCollisionPolys(const frShape *s1,
+                                    frTransform tx1,
+                                    const frShape *s2,
+                                    frTransform tx2,
+                                    frCollision *collision) {
     float maxDepth1 = FLT_MAX, maxDepth2 = FLT_MAX;
 
     int index1 = frGetSeparatingAxisIndex(s1, tx1, s2, tx2, &maxDepth1);
 
     if (maxDepth1 >= 0.0f) return false;
-    
+
     int index2 = frGetSeparatingAxisIndex(s2, tx2, s1, tx1, &maxDepth2);
 
     if (maxDepth2 >= 0.0f) return false;
 
     if (collision != NULL) {
-        frVector2 direction = (maxDepth1 > maxDepth2)
-            ? frVector2RotateTx(frGetPolygonNormal(s1, index1), tx1)
-            : frVector2RotateTx(frGetPolygonNormal(s2, index2), tx2);
+        frVector2 direction =
+            (maxDepth1 > maxDepth2)
+                ? frVector2RotateTx(frGetPolygonNormal(s1, index1), tx1)
+                : frVector2RotateTx(frGetPolygonNormal(s2, index2), tx2);
 
         frVector2 deltaPosition = frVector2Subtract(tx2.position, tx1.position);
 
@@ -523,36 +512,40 @@ static bool frComputeCollisionPolys(
         if (fabsf(edgeDot1) > fabsf(edgeDot2)) {
             refEdge = edge2, incEdge = edge1;
             refTx = tx2, incTx = tx1;
-            
+
             incEdgeFlipped = true;
         }
 
         frVector2 refEdgeVector = frVector2Normalize(
-            frVector2Subtract(refEdge.data[1], refEdge.data[0])
-        );
+            frVector2Subtract(refEdge.data[1], refEdge.data[0]));
 
         const float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
         const float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
 
         if (!frClipEdge(&incEdge, refEdgeVector, refDot1)) return false;
-        if (!frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2)) return false;
+        if (!frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2))
+            return false;
 
         frVector2 refEdgeNormal = frVector2RightNormal(refEdgeVector);
 
         const float maxDepth = frVector2Dot(refEdge.data[0], refEdgeNormal);
 
-        const float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal) - maxDepth;
-        const float depth2 = frVector2Dot(incEdge.data[1], refEdgeNormal) - maxDepth;
+        const float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal)
+                             - maxDepth;
+        const float depth2 = frVector2Dot(incEdge.data[1], refEdgeNormal)
+                             - maxDepth;
 
         collision->direction = direction;
 
-        collision->contacts[0].id = (!incEdgeFlipped) 
-            ? FR_GEOMETRY_MAX_VERTEX_COUNT + incEdge.indexes[0]
-            : incEdge.indexes[0];
+        collision->contacts[0].id = (!incEdgeFlipped)
+                                        ? FR_GEOMETRY_MAX_VERTEX_COUNT
+                                              + incEdge.indexes[0]
+                                        : incEdge.indexes[0];
 
-        collision->contacts[1].id = (!incEdgeFlipped) 
-            ? FR_GEOMETRY_MAX_VERTEX_COUNT + incEdge.indexes[1]
-            : incEdge.indexes[1];
+        collision->contacts[1].id = (!incEdgeFlipped)
+                                        ? FR_GEOMETRY_MAX_VERTEX_COUNT
+                                              + incEdge.indexes[1]
+                                        : incEdge.indexes[1];
 
         if (depth1 < 0.0f) {
             collision->contacts[0].point = incEdge.data[1];
@@ -585,29 +578,29 @@ static bool frComputeCollisionPolys(
 }
 
 /* Computes the intersection of a circle and a line. */
-static bool frComputeIntersectionCircleLine(
-    frVector2 center, float radius,
-    frVector2 origin, frVector2 direction,
-    float *lambda
-) {
+static bool frComputeIntersectionCircleLine(frVector2 center,
+                                            float radius,
+                                            frVector2 origin,
+                                            frVector2 direction,
+                                            float *lambda) {
     const frVector2 originToCenter = frVector2Subtract(center, origin);
-    
+
     const float dot = frVector2Dot(originToCenter, direction);
-    
+
     const float heightSqr = frVector2MagnitudeSqr(originToCenter) - (dot * dot);
     const float baseSqr = (radius * radius) - heightSqr;
-    
+
     if (lambda != NULL) *lambda = dot - sqrtf(baseSqr);
 
     return (dot >= 0.0f && baseSqr >= 0.0f);
 }
 
 /* Computes the intersection of two lines. */
-static bool frComputeIntersectionLines(
-    frVector2 origin1, frVector2 direction1,
-    frVector2 origin2, frVector2 direction2,
-    float *lambda
-) {
+static bool frComputeIntersectionLines(frVector2 origin1,
+                                       frVector2 direction1,
+                                       frVector2 origin2,
+                                       frVector2 direction2,
+                                       float *lambda) {
     float rXs = frVector2Cross(direction1, direction2);
 
     frVector2 qp = frVector2Subtract(origin2, origin1);
@@ -657,34 +650,32 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
 
     int supportIndex = frGetSupportPointIndex(vertices, tx, v);
 
-    int prevIndex = (supportIndex == 0) ? vertices->count - 1 : supportIndex - 1;
-    int nextIndex = (supportIndex == vertices->count - 1) ? 0 : supportIndex + 1;
+    int prevIndex = (supportIndex == 0) ? vertices->count - 1
+                                        : supportIndex - 1;
+    int nextIndex = (supportIndex == vertices->count - 1) ? 0
+                                                          : supportIndex + 1;
 
     frVector2 prevEdgeVector = frVector2Normalize(
-        frVector2Subtract(vertices->data[supportIndex], vertices->data[prevIndex])
-    );
+        frVector2Subtract(vertices->data[supportIndex],
+                          vertices->data[prevIndex]));
 
     frVector2 nextEdgeVector = frVector2Normalize(
-        frVector2Subtract(vertices->data[supportIndex], vertices->data[nextIndex])
-    );
+        frVector2Subtract(vertices->data[supportIndex],
+                          vertices->data[nextIndex]));
 
     v = frVector2Rotate(v, -tx.angle);
 
     if (frVector2Dot(prevEdgeVector, v) < frVector2Dot(nextEdgeVector, v)) {
-        return (frEdge) { 
-            .data = {
-                frVector2Transform(vertices->data[prevIndex], tx),
-                frVector2Transform(vertices->data[supportIndex], tx)
-            },
+        return (frEdge) {
+            .data = { frVector2Transform(vertices->data[prevIndex], tx),
+                      frVector2Transform(vertices->data[supportIndex], tx) },
             .indexes = { prevIndex, supportIndex },
             .count = 2
         };
     } else {
         return (frEdge) {
-            .data = {
-                frVector2Transform(vertices->data[supportIndex], tx),
-                frVector2Transform(vertices->data[nextIndex], tx)
-            },
+            .data = { frVector2Transform(vertices->data[supportIndex], tx),
+                      frVector2Transform(vertices->data[nextIndex], tx) },
             .indexes = { supportIndex, nextIndex },
             .count = 2
         };
@@ -692,11 +683,11 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
 }
 
 /* Finds the axis of minimum penetration, then returns its index. */
-static int frGetSeparatingAxisIndex(
-    const frShape *s1, frTransform tx1, 
-    const frShape *s2, frTransform tx2,
-    float *depth
-) {
+static int frGetSeparatingAxisIndex(const frShape *s1,
+                                    frTransform tx1,
+                                    const frShape *s2,
+                                    frTransform tx2,
+                                    float *depth) {
     const frVertices *vertices1 = frGetPolygonVertices(s1);
     const frVertices *vertices2 = frGetPolygonVertices(s2);
 
@@ -710,13 +701,17 @@ static int frGetSeparatingAxisIndex(
         frVector2 vertex = frVector2Transform(vertices1->data[i], tx1);
         frVector2 normal = frVector2RotateTx(normals1->data[i], tx1);
 
-        int supportIndex = frGetSupportPointIndex(vertices2, tx2, frVector2Negate(normal));
+        int supportIndex = frGetSupportPointIndex(vertices2,
+                                                  tx2,
+                                                  frVector2Negate(normal));
 
         if (supportIndex < 0) return supportIndex;
 
-        frVector2 supportPoint = frVector2Transform(vertices2->data[supportIndex], tx2);
+        frVector2 supportPoint =
+            frVector2Transform(vertices2->data[supportIndex], tx2);
 
-        float depth = frVector2Dot(normal, frVector2Subtract(supportPoint, vertex));
+        float depth = frVector2Dot(normal,
+                                   frVector2Subtract(supportPoint, vertex));
 
         if (maxDepth < depth) maxDepth = depth, maxIndex = i;
     }
@@ -727,19 +722,18 @@ static int frGetSeparatingAxisIndex(
 }
 
 /* Returns the index of the vertex farthest along `v`. */
-static int frGetSupportPointIndex(
-    const frVertices *vertices, 
-    frTransform tx, frVector2 v
-) {
+static int frGetSupportPointIndex(const frVertices *vertices,
+                                  frTransform tx,
+                                  frVector2 v) {
     float maxDot = -FLT_MAX;
-    
+
     int maxIndex = -1;
 
     v = frVector2Rotate(v, -tx.angle);
 
     for (int i = 0; i < vertices->count; i++) {
         float dot = frVector2Dot(vertices->data[i], v);
-        
+
         if (maxDot < dot) maxDot = dot, maxIndex = i;
     }
 
