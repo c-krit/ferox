@@ -1,32 +1,32 @@
 /*
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a 
+    copyof this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation 
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+    and/or sell copies of the Software, and to permit persons to whom the 
+    Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included 
+    in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+    DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ============================================================================= */
+/* Includes ================================================================ */
 
 #include <float.h>
 
 #include "ferox.h"
 
-/* Typedefs ============================================================================= */
+/* Typedefs ================================================================ */
 
 /* A structure that represents the motion data of a rigid body. */
 typedef struct _frMotionData {
@@ -50,12 +50,12 @@ struct _frBody {
     void *ctx;
 };
 
-/* Constants ============================================================================ */
+/* Constants =============================================================== */
 
 /* Constants for `frNormalizeAngle()`. */
-static const float TWO_PI = 2.0f * M_PI, INVERSE_TWO_PI = 1.0f / (2.0f * M_PI);
+const float TWO_PI = 2.0f * M_PI, INVERSE_TWO_PI = 1.0f / (2.0f * M_PI);
 
-/* Private Function Prototypes ========================================================== */
+/* Private Function Prototypes ============================================= */
 
 /* Computes the mass and the moment of inertia for `b`. */
 static void frComputeBodyMass(frBody *b);
@@ -63,7 +63,7 @@ static void frComputeBodyMass(frBody *b);
 /* Normalizes the `angle` to a range `[0, 2π]`. */
 static FR_API_INLINE float frNormalizeAngle(float angle);
 
-/* Public Functions ===================================================================== */
+/* Public Functions ======================================================== */
 
 /* Creates a rigid body at `position`. */
 frBody *frCreateBody(frBodyType type, frVector2 position) {
@@ -361,7 +361,8 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
 
 /* 
     Calculates the acceleration of `b` from the accumulated forces,
-    then integrates the acceleration over `dt` to calculate the velocity of `b`.
+    then integrates the acceleration over `dt` to calculate the 
+    velocity of `b`.
 */
 void frIntegrateForBodyVelocity(frBody *b, float dt) {
     if (b == NULL || b->mtn.inverseMass <= 0.0f || dt <= 0.0f) return;
@@ -374,7 +375,10 @@ void frIntegrateForBodyVelocity(frBody *b, float dt) {
     b->mtn.angularVelocity += (b->mtn.torque * b->mtn.inverseInertia) * dt;
 }
 
-/* Integrates the velocity of `b` over `dt` to calculate the position of `b`. */
+/* 
+    Integrates the velocity of `b` over `dt` 
+    to calculate the position of `b`. 
+*/
 void frIntegrateForBodyPosition(frBody *b, float dt) {
     if (b == NULL || b->type == FR_BODY_STATIC || dt <= 0.0f) return;
 
@@ -466,7 +470,7 @@ void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseD
     }
 }
 
-/* Private Functions ==================================================================== */
+/* Private Functions ======================================================= */
 
 /* Computes the mass and the moment of inertia for `b`. */
 static void frComputeBodyMass(frBody *b) {

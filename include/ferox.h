@@ -1,23 +1,23 @@
 /*
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a 
+    copyof this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation 
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+    and/or sell copies of the Software, and to permit persons to whom the 
+    Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included 
+    in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+    DEALINGS IN THE SOFTWARE.
 */
 
 #ifndef FEROX_H
@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-/* Includes ============================================================================= */
+/* Includes ================================================================ */
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -36,7 +36,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdlib.h>
 
-/* User-Defined Macros ================================================================== */
+/* User-Defined Macros ===================================================== */
 
 /* Defines the maximum number of vertices for a convex polygon. */
 #define FR_GEOMETRY_MAX_VERTEX_COUNT  8
@@ -59,7 +59,7 @@ extern "C" {
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     4096
 
-/* Macros =============================================================================== */
+/* Macros ================================================================== */
 
 #ifdef _MSC_VER
     #define FR_API_INLINE __forceinline
@@ -76,7 +76,7 @@ extern "C" {
 /* Empty-initializes the given object. */
 #define FR_API_STRUCT_ZERO(T) ((T) { 0 })
 
-/* Typedefs ============================================================================= */
+/* Typedefs ================================================================ */
 
 /* A structure that represents a two-dimensional vector. */
 typedef struct _frVector2 { 
@@ -100,7 +100,7 @@ typedef struct _frBody frBody;
 /* A structure that represents a simulation container. */
 typedef struct _frWorld frWorld;
 
-/* (From 'broad-phase.c') =============================================================== */
+/* (From 'broad-phase.c') ================================================== */
 
 /* A structure that represents a spatial hash. */
 typedef struct _frSpatialHash frSpatialHash;
@@ -108,7 +108,7 @@ typedef struct _frSpatialHash frSpatialHash;
 /* A callback function type for `frQuerySpatialHash()`. */
 typedef bool (*frHashQueryFunc)(int index, void *ctx);
 
-/* (From 'collision.c') ================================================================= */
+/* (From 'collision.c') ==================================================== */
 
 /* A structure that represents the contact points of two colliding bodies. */
 typedef struct _frCollision {
@@ -143,7 +143,7 @@ typedef struct _frRaycastHit {
     bool inside;
 } frRaycastHit;
 
-/* (From 'geometry.c') ================================================================== */
+/* (From 'geometry.c') ===================================================== */
 
 /* An enumeration that represents the type of a collision shape. */
 typedef enum _frShapeType {
@@ -152,7 +152,10 @@ typedef enum _frShapeType {
     FR_SHAPE_POLYGON
 } frShapeType;
 
-/* A structure that represents the physical quantities of a collision shape. */
+/* 
+    A structure that represents the physical quantities 
+    of a collision shape. 
+*/
 typedef struct _frMaterial {
     float density;
     float friction;
@@ -165,7 +168,7 @@ typedef struct _frVertices {
     int count;
 } frVertices;
 
-/* (From 'rigid-body.c') ================================================================ */
+/* (From 'rigid-body.c') =================================================== */
 
 /* An enumeration that represents the type of a rigid body. */
 typedef enum _frBodyType {
@@ -195,7 +198,7 @@ typedef struct _frTransform {
     float angle;
 } frTransform;
 
-/* (From 'world.c') ===================================================================== */
+/* (From 'world.c') ======================================================== */
 
 /* A structure that represents a pair of two rigid bodies. */
 typedef struct _frBodyPair {
@@ -213,9 +216,9 @@ typedef struct _frCollisionHandler {
 /* A callback function type for `frComputeRaycastForWorld()`. */
 typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit);
 
-/* Public Function Prototypes =========================================================== */
+/* Public Function Prototypes ============================================== */
 
-/* (From 'broad-phase.c') =============================================================== */
+/* (From 'broad-phase.c') ================================================== */
 
 /* Creates a new spatial hash with the given `cellSize`. */
 frSpatialHash *frCreateSpatialHash(float cellSize);
@@ -235,7 +238,7 @@ void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value);
 /* Query `sh` for any objects that overlap the given `aabb`. */
 void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, void *ctx);
 
-/* (From 'collision.c') ================================================================= */
+/* (From 'collision.c') ==================================================== */
 
 /* 
     Checks whether `s1` and `s2` are colliding,
@@ -250,7 +253,7 @@ bool frComputeCollision(
 /* Casts a `ray` against `b`. */
 bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit);
 
-/* (From 'geometry.c') ================================================================== */
+/* (From 'geometry.c') ===================================================== */
 
 /* Creates a 'circle' collision shape. */
 frShape *frCreateCircle(frMaterial material, float radius);
@@ -330,13 +333,16 @@ void frSetShapeRestitution(frShape *s, float restitution);
 /* Sets the `radius` of `s`, assuming `s` is a 'circle' collision shape. */
 void frSetCircleRadius(frShape *s, float radius);
 
-/* Sets the `width` and `height` of `s`, assuming `s` is a 'rectangle' collision shape. */
+/* 
+    Sets the `width` and `height` of `s`, assuming `s` is a 'rectangle'
+    collision shape.
+*/
 void frSetRectangleDimensions(frShape *s, float width, float height);
 
 /* Sets the `vertices` of `s`, assuming `s` is a 'polygon' collision shape. */
 void frSetPolygonVertices(frShape *s, const frVertices *vertices);
 
-/* (From 'rigid-body.c') ================================================================ */
+/* (From 'rigid-body.c') =================================================== */
 
 /* Creates a rigid body at `position`. */
 frBody *frCreateBody(frBodyType type, frVector2 position);
@@ -442,22 +448,26 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx);
 
 /* 
     Calculates the acceleration of `b` from the accumulated forces,
-    then integrates the acceleration over `dt` to calculate the velocity of `b`.
+    then integrates the acceleration over `dt` to calculate the 
+    velocity of `b`.
 */
 void frIntegrateForBodyVelocity(frBody *b, float dt);
 
-/* Integrates the velocity of `b` over `dt` to calculate the position of `b`. */
+/* 
+    Integrates the velocity of `b` over `dt` 
+    to calculate the position of `b`. 
+*/
 void frIntegrateForBodyPosition(frBody *b, float dt);
 
 /* Resolves the collision between `b1` and `b2`. */
 void frResolveCollision(frBody *b1, frBody *b2, frCollision *ctx, float inverseDt);
 
-/* (From 'timer.c') ===================================================================== */
+/* (From 'timer.c') ======================================================== */
 
 /* Returns the current time of the monotonic clock, in seconds. */
 double frGetCurrentTime(void);
 
-/* (From 'world.c') ===================================================================== */
+/* (From 'world.c') ======================================================== */
 
 /* 
     Creates a world with the `gravity` vector and `cellSize` 
@@ -507,7 +517,7 @@ void frUpdateWorld(frWorld *w, float dt);
 */
 void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func);
 
-/* Inline Functions ===================================================================== */
+/* Inline Functions ======================================================== */
 
 /* Adds `v1` and `v2`. */
 FR_API_INLINE frVector2 frVector2Add(frVector2 v1, frVector2 v2) {
@@ -536,7 +546,7 @@ FR_API_INLINE float frVector2Dot(frVector2 v1, frVector2 v2) {
 
 /* Returns the magnitude of the cross product of `v1` and `v2`. */
 FR_API_INLINE float frVector2Cross(frVector2 v1, frVector2 v2) {
-    // NOTE: This is also known as the "two-dimensional perpendicular dot product."
+    // NOTE: This is also known as the "perpendicular dot product."
     return (v1.x * v2.y) - (v1.y * v2.x);
 }
 
@@ -610,9 +620,9 @@ FR_API_INLINE float frVector2Angle(frVector2 v1, frVector2 v2) {
 }
 
 /*
-    Returns ​a negative integer value if `v1, `v2` and `v3` form a clockwise angle, 
-    a positive integer value if `v1, `v2` and `v3` form a counter-clockwise angle
-    and zero if `v1, `v2` and `v3` are collinear.
+    Returns ​a negative integer value if `v1, `v2` and `v3` form 
+    a clockwise angle, a positive integer value if `v1, `v2` and `v3` form
+    a counter-clockwise angle and zero if `v1, `v2` and `v3` are collinear.
 */
 FR_API_INLINE int frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector2 v3) {
     /*

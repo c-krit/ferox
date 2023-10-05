@@ -1,33 +1,33 @@
 /*
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a 
+    copyof this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation 
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+    and/or sell copies of the Software, and to permit persons to whom the 
+    Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included 
+    in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+    DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ============================================================================= */
+/* Includes ================================================================ */
 
 /* NOTE: `STB_DS_IMPLEMENTATION` is already defined in 'broad-phase.c' */
 #include "external/stb_ds.h"
 
 #include "ferox.h"
 
-/* Typedefs ============================================================================= */
+/* Typedefs ================================================================ */
 
 /* A structure that represents the key-value pair of the contact cache. */
 typedef struct _frContactCacheEntry {
@@ -45,20 +45,26 @@ struct _frWorld {
     double accumulator, timestamp;
 };
 
-/* A structure that represents the context data for `frPreStepHashQueryCallback()`. */
+/* 
+    A structure that represents the context data 
+    for `frPreStepHashQueryCallback()`. 
+*/
 typedef struct _frPreStepHashQueryCtx {
     frWorld *world;
     int bodyIndex;
 } frPreStepHashQueryCtx;
 
-/* A structure that represents the context data for `frRaycastHashQueryCallback()`. */
+/*
+    A structure that represents the context data 
+    for `frRaycastHashQueryCallback()`.
+*/
 typedef struct _frRaycastHashQueryCtx {
     frRay ray;
     frWorld *world;
     frRaycastQueryFunc func;
 } frRaycastHashQueryCtx;
 
-/* Private Function Prototypes ========================================================== */
+/* Private Function Prototypes ============================================= */
 
 /* 
     A callback function for `frQuerySpatialHash()` 
@@ -81,7 +87,7 @@ static void frPreStepWorld(frWorld *w);
 */
 static void frPostStepWorld(frWorld *w);
 
-/* Public Functions ===================================================================== */
+/* Public Functions ======================================================== */
 
 /* 
     Creates a world with the `gravity` vector and `cellSize` 
@@ -269,7 +275,7 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
     );
 }
 
-/* Private Functions ==================================================================== */
+/* Private Functions ======================================================= */
 
 /* 
     A callback function for `frQuerySpatialHash()` 
@@ -293,7 +299,11 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
     frCollision collision = { .count = 0 };
 
     if (!frComputeCollision(s1, tx1, s2, tx2, &collision)) {
-        // NOTE: `hmdel()` returns `0` if `key` is not in `queryCtx->world->cache`!
+        /*
+            NOTE: `hmdel()` returns `0` if `key` is not 
+            in `queryCtx->world->cache`!
+        */
+
         hmdel(queryCtx->world->cache, key);
 
         return false;

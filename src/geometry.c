@@ -1,32 +1,32 @@
 /*
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a 
+    copyof this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation 
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+    and/or sell copies of the Software, and to permit persons to whom the 
+    Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included 
+    in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+    DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ============================================================================= */
+/* Includes ================================================================ */
 
 #include <float.h>
 
 #include "ferox.h"
 
-/* Typedefs ============================================================================= */
+/* Typedefs ================================================================ */
 
 /* A union that represents the internal data of a collision shape. */
 typedef union _frShapeData {
@@ -49,7 +49,7 @@ struct _frShape {
     float area;
 };
 
-/* Private Function Prototypes ========================================================== */
+/* Private Function Prototypes ============================================= */
 
 /* 
     Computes the convex hull for the given `input` points 
@@ -57,7 +57,7 @@ struct _frShape {
 */
 static void frJarvisMarch(const frVertices *input, frVertices *output);
 
-/* Public Functions ===================================================================== */
+/* Public Functions ======================================================== */
 
 /* Creates a 'circle' collision shape. */
 frShape *frCreateCircle(frMaterial material, float radius) {
@@ -157,7 +157,9 @@ float frGetShapeInertia(const frShape *s) {
     if (s == NULL || s->material.density <= 0.0f) return 0.0f;
 
     if (s->type == FR_SHAPE_CIRCLE) {
-        return 0.5f * frGetShapeMass(s) * (s->data.circle.radius * s->data.circle.radius);
+        const float radius = s->data.circle.radius;
+
+        return 0.5f * frGetShapeMass(s) * (radius * radius);
     } else if (s->type == FR_SHAPE_POLYGON) {
         float numerator = 0.0f, denominator = 0.0f;
 
@@ -295,7 +297,10 @@ void frSetCircleRadius(frShape *s, float radius) {
     s->area = M_PI * (radius * radius);
 }
 
-/* Sets the `width` and `height` of `s`, assuming `s` is a 'rectangle' collision shape. */
+/* 
+    Sets the `width` and `height` of `s`, assuming `s` is a 'rectangle'
+    collision shape.
+*/
 void frSetRectangleDimensions(frShape *s, float width, float height) {
     if (s == NULL || width <= 0.0f || height <= 0.0f) return;
 
@@ -362,7 +367,7 @@ void frSetPolygonVertices(frShape *s, const frVertices *vertices) {
     s->area = fabsf(0.5f * twiceAreaSum);
 }
 
-/* Private Functions ==================================================================== */
+/* Private Functions ======================================================= */
 
 /* 
     Computes the convex hull for the given `input` points 
@@ -372,8 +377,9 @@ static void frJarvisMarch(const frVertices *input, frVertices *output) {
     if (input == NULL || output == NULL || input->count < 3) return;
 
     /* 
-        NOTE: Since the `input` size is most likely to be small (less than 128?),
-        we do not need advanced convex hull algorithms like Graham scan, Quickhull, etc.
+        NOTE: Since the `input` size is most likely to be small 
+        (less than 128?), we do not need advanced convex hull 
+        algorithms like Graham scan, Quickhull, etc.
     */
 
     int lowestIndex = 0;

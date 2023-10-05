@@ -1,33 +1,33 @@
 /*
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a 
+    copyof this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation 
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+    and/or sell copies of the Software, and to permit persons to whom the 
+    Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included 
+    in all copies or substantial portions of the Software.
 
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+    DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ============================================================================= */
+/* Includes ================================================================ */
 
 #define STB_DS_IMPLEMENTATION
 #include "external/stb_ds.h"
 
 #include "ferox.h"
 
-/* Typedefs ============================================================================= */
+/* Typedefs ================================================================ */
 
 /* A structure that represents the key of a spatial hash entry. */
 typedef struct _frSpatialHashKey { 
@@ -50,15 +50,16 @@ struct _frSpatialHash {
     frSpatialHashEntry *entries;
 };
 
-/* Private Function Prototypes ========================================================== */
+/* Private Function Prototypes ============================================= */
 
 /* 
-    Returns ​a negative integer value if `a` is less than `b`, ​a positive integer value 
-    if `a` is greater than `b` and zero if `a` and `b` are equivalent.
+    Returns ​a negative integer value if `a` is less than `b`, ​a positive 
+    integer value if `a` is greater than `b` and zero if `a` and `b` 
+    are equivalent.
 */
 static int frQSortCompare(const void *a, const void *b);
 
-/* Public Functions ===================================================================== */
+/* Public Functions ======================================================== */
 
 /* Creates a new spatial hash with the given `cellSize`. */
 frSpatialHash *frCreateSpatialHash(float cellSize) {
@@ -112,7 +113,7 @@ void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value) {
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
-            const frSpatialHashKey key = { x, y };
+            const frSpatialHashKey key = { .x = x, .y = y };
 
             frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
@@ -144,7 +145,7 @@ void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, vo
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
-            const frSpatialHashKey key = { x, y };
+            const frSpatialHashKey key = { .x = x, .y = y };
 
             const frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
@@ -173,18 +174,19 @@ void frQuerySpatialHash(frSpatialHash *sh, frAABB aabb, frHashQueryFunc func, vo
     }
 
     /*
-        NOTE: For each object in the query result, the callback `func`tion will be called
-        with the user data pointer `ctx`.
+        NOTE: For each object in the query result, the callback `func`tion
+        will be called with the user data pointer `ctx`.
     */
     for (int i = 0; i < arrlen(sh->queryResult); i++) 
         func(sh->queryResult[i], ctx);
 }
 
-/* Private Functions ==================================================================== */
+/* Private Functions ======================================================= */
 
 /* 
-    Returns ​a negative integer value if `a` is less than `b`, ​a positive integer value 
-    if `a` is greater than `b` and zero if `a` and `b` are equivalent.
+    Returns ​a negative integer value if `a` is less than `b`, ​a positive 
+    integer value if `a` is greater than `b` and zero if `a` and `b` 
+    are equivalent.
 */
 static int frQSortCompare(const void *a, const void *b) {
     const int x = *(const int *) a;
