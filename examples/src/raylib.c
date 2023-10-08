@@ -34,13 +34,17 @@
 
 /* Macros ================================================================== */
 
-#define TARGET_FPS 60
+// clang-format off
 
-#define SCREEN_WIDTH  1280
-#define SCREEN_HEIGHT 800
+#define TARGET_FPS             60
 
-#define LOGO_WIDTH_IN_PIECES  40
-#define LOGO_HEIGHT_IN_PIECES 40
+#define SCREEN_WIDTH           1280
+#define SCREEN_HEIGHT          800
+
+#define LOGO_WIDTH_IN_PIECES   40
+#define LOGO_HEIGHT_IN_PIECES  40
+
+// clang-format on
 
 /* Typedefs ================================================================ */
 

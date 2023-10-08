@@ -34,12 +34,16 @@
 
 /* Macros ================================================================== */
 
-#define TARGET_FPS 60
+// clang-format off
 
-#define SCREEN_WIDTH  1280
-#define SCREEN_HEIGHT 800
+#define TARGET_FPS       60
 
-#define MAX_ENEMY_COUNT 256
+#define SCREEN_WIDTH     1280
+#define SCREEN_HEIGHT    800
+
+#define MAX_ENEMY_COUNT  256
+
+// clang-format on
 
 /* Typedefs ================================================================ */
 

@@ -34,13 +34,17 @@ extern "C" {
 
 /* Macros ================================================================== */
 
-#define FR_DRAW_ARROW_HEAD_LENGTH    8.0f
-#define FR_DRAW_CIRCLE_SEGMENT_COUNT 32
+// clang-format off
+
+#define FR_DRAW_ARROW_HEAD_LENGTH     8.0f
+#define FR_DRAW_CIRCLE_SEGMENT_COUNT  32
 
 #define FR_DRAW_COLOR_MATTEBLACK \
     CLITERAL(Color) {            \
         23, 23, 23, 255          \
     }
+
+// clang-format on
 
 /* Public Function Prototypes ============================================== */
 

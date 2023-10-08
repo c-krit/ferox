@@ -34,10 +34,14 @@
 
 /* Macros ================================================================== */
 
-#define TARGET_FPS 60
+// clang-format off
 
-#define SCREEN_WIDTH  800
-#define SCREEN_HEIGHT 600
+#define TARGET_FPS     60
+
+#define SCREEN_WIDTH   800
+#define SCREEN_HEIGHT  600
+
+// clang-format on
 
 /* Constants =============================================================== */
 
