@@ -398,6 +398,9 @@ float frGetBodyGravityScale(const frBody *b);
 /* Returns the velocity of `b`. */
 frVector2 frGetBodyVelocity(const frBody *b);
 
+/* Returns the angular velocity of `b`. */
+float frGetBodyAngularVelocity(const frBody *b);
+
 /* Returns the AABB (Axis-Aligned Bounding Box) of `b`. */
 frAABB frGetBodyAABB(const frBody *b);
 

@@ -157,6 +157,11 @@ frVector2 frGetBodyVelocity(const frBody *b) {
     return (b != NULL) ? b->mtn.velocity : FR_API_STRUCT_ZERO(frVector2);
 }
 
+/* Returns the angular velocity of `b`. */
+float frGetBodyAngularVelocity(const frBody *b) {
+    return (b != NULL) ? b->mtn.angularVelocity : 0.0f;
+}
+
 /* Returns the AABB (Axis-Aligned Bounding Box) of `b`. */
 frAABB frGetBodyAABB(const frBody *b) {
     return (b != NULL && b->shape != NULL) ? b->aabb
