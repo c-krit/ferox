@@ -536,22 +536,22 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func);
 
 /* Adds `v1` and `v2`. */
 FR_API_INLINE frVector2 frVector2Add(frVector2 v1, frVector2 v2) {
-    return (frVector2) { v1.x + v2.x, v1.y + v2.y };
+    return (frVector2) { .x = v1.x + v2.x, .y = v1.y + v2.y };
 }
 
 /* Subtracts `v2` from `v1`. */
 FR_API_INLINE frVector2 frVector2Subtract(frVector2 v1, frVector2 v2) {
-    return (frVector2) { v1.x - v2.x, v1.y - v2.y };
+    return (frVector2) { .x = v1.x - v2.x, .y = v1.y - v2.y };
 }
 
 /* Returns the negated vector of `v`. */
 FR_API_INLINE frVector2 frVector2Negate(frVector2 v) {
-    return (frVector2) { -v.x, -v.y };
+    return (frVector2) { .x = -v.x, .y = -v.y };
 }
 
 /* Multiplies `v` by `k`. */
 FR_API_INLINE frVector2 frVector2ScalarMultiply(frVector2 v, float k) {
-    return (frVector2) { v.x * k, v.y * k };
+    return (frVector2) { .x = v.x * k, .y = v.y * k };
 }
 
 /* Returns the dot product of `v1` and `v2`. */
@@ -595,12 +595,12 @@ FR_API_INLINE frVector2 frVector2Normalize(frVector2 v) {
 
 /* Returns the left normal vector of `v`. */
 FR_API_INLINE frVector2 frVector2LeftNormal(frVector2 v) {
-    return frVector2Normalize((frVector2) { -v.y, v.x });
+    return frVector2Normalize((frVector2) { .x = -v.y, .y = v.x });
 }
 
 /* Returns the right normal vector of `v`. */
 FR_API_INLINE frVector2 frVector2RightNormal(frVector2 v) {
-    return frVector2Normalize((frVector2) { v.y, -v.x });
+    return frVector2Normalize((frVector2) { .x = v.y, .y = -v.x });
 }
 
 /* Rotates `v` through the `angle` about the origin of a coordinate plane. */
@@ -608,7 +608,8 @@ FR_API_INLINE frVector2 frVector2Rotate(frVector2 v, float angle) {
     const float _sin = sinf(angle);
     const float _cos = cosf(angle);
 
-    return (frVector2) { v.x * _cos - v.y * _sin, v.x * _sin + v.y * _cos };
+    return (frVector2) { .x = v.x * _cos - v.y * _sin,
+                         .y = v.x * _sin + v.y * _cos };
 }
 
 /* Rotates `v` through `tx` about the origin of a coordinate plane. */
