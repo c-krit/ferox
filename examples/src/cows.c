@@ -85,7 +85,7 @@ static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
 static EntityData entityData[ENTITY_COUNT_] = {
     { .type = ENTITY_PLAYER, .attackSpeed = 0.1f },
     { .type = ENTITY_BULLET, .movementSpeed = 64.0f },
-    { .type = ENTITY_ENEMY, .movementSpeed = 4.0f }
+    { .type = ENTITY_ENEMY, .movementSpeed = 3.5f }
 };
 
 static frVertices bulletVertices, playerVertices;
@@ -188,20 +188,20 @@ static void UpdateExample(void) {
         frVector2 position = { .x = 0.5f * SCREEN_WIDTH,
                                .y = 0.5f * SCREEN_HEIGHT };
 
-        while (position.x >= 0.35f * SCREEN_WIDTH
-               && position.x <= 0.65f * SCREEN_WIDTH)
+        while (position.x >= 0.0f * SCREEN_WIDTH
+               && position.x <= 1.0f * SCREEN_WIDTH)
             position.x = GetRandomValue(-2.5f * SCREEN_WIDTH,
                                         2.5f * SCREEN_WIDTH);
 
-        while (position.y >= 0.35f * SCREEN_HEIGHT
-               && position.y <= 0.65f * SCREEN_HEIGHT)
+        while (position.y >= 0.0f * SCREEN_HEIGHT
+               && position.y <= 1.0f * SCREEN_HEIGHT)
             position.y = GetRandomValue(-2.5f * SCREEN_HEIGHT,
                                         2.5f * SCREEN_HEIGHT);
 
         frBody *enemy = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
             frVector2PixelsToUnits(position),
-            frCreateCircle(MATERIAL_ENEMY, 0.5f * GetRandomValue(2, 4)));
+            frCreateCircle(MATERIAL_ENEMY, 0.35f * GetRandomValue(3, 5)));
 
         frSetBodyUserData(enemy, (void *) &entityData[ENTITY_ENEMY]);
 
@@ -365,6 +365,8 @@ static void UpdateBullets(void) {
 }
 
 static void OnPreStep(frBodyPair key, frCollision *value) {
+    if (value->count == 0) return;
+
     const EntityData *bodyData1 = frGetBodyUserData(key.first);
     const EntityData *bodyData2 = frGetBodyUserData(key.second);
 

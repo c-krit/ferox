@@ -524,7 +524,8 @@ static void frComputeBodyMass(frBody *b) {
     }
 }
 
-/* Normalizes the `angle` to a range `[0, 2π]`. */
+/* Normalizes the `angle` to a range `[-2π, 2π]`. */
 static FR_API_INLINE float frNormalizeAngle(float angle) {
-    return angle - (TWO_PI * floorf(angle * INVERSE_TWO_PI));
+    // return angle - (TWO_PI * floorf((angle + (M_PI - ?)) * INVERSE_TWO_PI));
+    return angle - (TWO_PI * floorf((angle + -M_PI) * INVERSE_TWO_PI));
 }
