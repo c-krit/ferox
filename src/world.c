@@ -285,11 +285,10 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
     const frBodyPair key = { .first = b1, .second = b2 };
 
     frShape *s1 = frGetBodyShape(b1), *s2 = frGetBodyShape(b2);
-    frTransform tx1 = frGetBodyTransform(b1), tx2 = frGetBodyTransform(b2);
 
     frCollision collision = { .count = 0 };
 
-    if (!frComputeCollision(s1, tx1, s2, tx2, &collision)) {
+    if (!frComputeCollision(b1, b2, &collision)) {
         /*
             NOTE: `hmdel()` returns `0` if `key` is not 
             in `queryCtx->world->cache`!
