@@ -2,7 +2,7 @@
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
-    copyof this software and associated documentation files (the "Software"),
+    copy of this software and associated documentation files (the "Software"),
     to deal in the Software without restriction, including without limitation 
     the rights to use, copy, modify, merge, publish, distribute, sublicense, 
     and/or sell copies of the Software, and to permit persons to whom the 
@@ -507,13 +507,13 @@ static bool frComputeCollisionPolys(const frShape *s1,
         const float edgeDot1 = frVector2Dot(edgeVector1, direction);
         const float edgeDot2 = frVector2Dot(edgeVector2, direction);
 
-        bool incEdgeFlipped = false;
+        bool refEdgeFlipped = false;
 
         if (fabsf(edgeDot1) > fabsf(edgeDot2)) {
             refEdge = edge2, incEdge = edge1;
             refTx = tx2, incTx = tx1;
 
-            incEdgeFlipped = true;
+            refEdgeFlipped = true;
         }
 
         frVector2 refEdgeVector = frVector2Normalize(
@@ -537,12 +537,12 @@ static bool frComputeCollisionPolys(const frShape *s1,
 
         collision->direction = direction;
 
-        collision->contacts[0].id = (!incEdgeFlipped)
+        collision->contacts[0].id = (!refEdgeFlipped)
                                         ? FR_GEOMETRY_MAX_VERTEX_COUNT
                                               + incEdge.indexes[0]
                                         : incEdge.indexes[0];
 
-        collision->contacts[1].id = (!incEdgeFlipped)
+        collision->contacts[1].id = (!refEdgeFlipped)
                                         ? FR_GEOMETRY_MAX_VERTEX_COUNT
                                               + incEdge.indexes[1]
                                         : incEdge.indexes[1];
