@@ -47,10 +47,10 @@
 
 /* Constants =============================================================== */
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
-
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
+
+static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 

@@ -36,25 +36,36 @@
 
 // clang-format off
 
-#define TARGET_FPS     60
+#define TARGET_FPS        60
 
-#define SCREEN_WIDTH   800
-#define SCREEN_HEIGHT  600
+#define SCREEN_WIDTH      600
+#define SCREEN_HEIGHT     800
+
+#define MAX_RADIUS_COUNT  1
+#define MAX_WALL_COUNT    3
 
 // clang-format on
 
 /* Constants =============================================================== */
 
+static const frMaterial MATERIAL_WALL = { .density = 1.25f,
+                                          .friction = 0.75f,
+                                          .restitution = 0.0f };
+
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
+
+static const float MELON_RADII[MAX_RADIUS_COUNT] = { 0.5f };
 
 static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
+static frVertices wallVertices;
+
 static frWorld *world;
 
-static frBody *box, *ground;
+static frBody *walls[MAX_WALL_COUNT];
 
 /* Private Function Prototypes ============================================= */
 
@@ -67,7 +78,7 @@ static void DeinitExample(void);
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | basic.c");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | melon.c");
 
     InitExample();
 
@@ -94,27 +105,18 @@ static void InitExample(void) {
                                                   2.5f),
                           CELL_SIZE);
 
-    ground = frCreateBodyFromShape(
+    walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
-                                             .y = 0.85f * SCREEN_HEIGHT }),
-        frCreateRectangle((frMaterial) { .density = 1.25f, .friction = 0.5f },
-                          frPixelsToUnits(0.75f * SCREEN_WIDTH),
+                                             .y = 0.95f * SCREEN_HEIGHT }),
+        frCreateRectangle(MATERIAL_WALL,
+                          frPixelsToUnits(1.0f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
 
-    frAddBodyToWorld(world, ground);
+    // TODO: ...
 
-    box = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC,
-        frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
-                                             .y = 0.35f * SCREEN_HEIGHT }),
-        frCreateRectangle((frMaterial) { .density = 1.0f, .friction = 0.35f },
-                          frPixelsToUnits(45.0f),
-                          frPixelsToUnits(45.0f)));
-
-    // frSetBodyAngle(box, DEG2RAD * 25.0f);
-
-    frAddBodyToWorld(world, box);
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frAddBodyToWorld(world, walls[i]);
 }
 
 static void UpdateExample(void) {
@@ -130,10 +132,8 @@ static void UpdateExample(void) {
                    0.25f,
                    ColorAlpha(DARKGRAY, 0.75f));
 
-        frDrawBodyLines(ground, 1.0f, GRAY);
-
-        frDrawBodyLines(box, 1.0f, ColorAlpha(RED, 0.85f));
-        // frDrawBodyAABB(box, 1.0f, ColorAlpha(GREEN, 0.25f));
+        for (int i = 0; i < MAX_WALL_COUNT; i++)
+            frDrawBodyLines(walls[i], 1.0f, DARKGRAY);
 
         DrawFPS(8, 8);
 
@@ -142,8 +142,8 @@ static void UpdateExample(void) {
 }
 
 static void DeinitExample(void) {
-    frReleaseShape(frGetBodyShape(ground));
-    frReleaseShape(frGetBodyShape(box));
+    for (int i = 0; i < MAX_WALL_COUNT; i++)
+        frReleaseShape(frGetBodyShape(walls[i]));
 
     frReleaseWorld(world);
 }

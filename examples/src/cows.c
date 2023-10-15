@@ -63,8 +63,6 @@ typedef struct _EntityData {
 
 /* Constants =============================================================== */
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
-
 static const frMaterial MATERIAL_BULLET = { .density = 2.25f,
                                             .friction = 0.85f,
                                             .restitution = 0.0f };
@@ -79,6 +77,8 @@ static const frMaterial MATERIAL_PLAYER = { .density = 1.25f,
 
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
+
+static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 

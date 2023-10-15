@@ -55,10 +55,10 @@ typedef struct _Piece {
 
 /* Constants =============================================================== */
 
-static const float CELL_SIZE = 2.8f, DELTA_TIME = 1.0f / TARGET_FPS;
-
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
+
+static const float CELL_SIZE = 2.8f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
