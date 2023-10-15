@@ -665,20 +665,23 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
 
     v = frVector2Rotate(v, -tx.angle);
 
+    const frVector2 supportVertex =
+        frVector2Transform(vertices->data[supportIndex], tx);
+
     if (frVector2Dot(prevEdgeVector, v) < frVector2Dot(nextEdgeVector, v)) {
-        return (frEdge) {
-            .data = { frVector2Transform(vertices->data[prevIndex], tx),
-                      frVector2Transform(vertices->data[supportIndex], tx) },
-            .indexes = { prevIndex, supportIndex },
-            .count = 2
-        };
+        const frVector2 prevVertex =
+            frVector2Transform(vertices->data[prevIndex], tx);
+
+        return (frEdge) { .data = { prevVertex, supportVertex },
+                          .indexes = { prevIndex, supportIndex },
+                          .count = 2 };
     } else {
-        return (frEdge) {
-            .data = { frVector2Transform(vertices->data[supportIndex], tx),
-                      frVector2Transform(vertices->data[nextIndex], tx) },
-            .indexes = { supportIndex, nextIndex },
-            .count = 2
-        };
+        const frVector2 nextVertex =
+            frVector2Transform(vertices->data[nextIndex], tx);
+
+        return (frEdge) { .data = { supportVertex, nextVertex },
+                          .indexes = { supportIndex, nextIndex },
+                          .count = 2 };
     }
 }
 
