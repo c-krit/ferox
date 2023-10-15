@@ -30,7 +30,7 @@
 
 /* A structure that represents an edge of a convex polygon. */
 typedef struct _frEdge {
-    frVector2 data[2];
+    frVector2 data[3];
     int indexes[2];
     int count;
 } frEdge;
@@ -524,13 +524,15 @@ static bool frComputeCollisionPolys(const frShape *s1,
         const float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
         const float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
 
-        if (!frClipEdge(&incEdge, refEdgeVector, refDot1)) return false;
+        if (!frClipEdge(&incEdge, refEdgeVector, refDot1))
+            return false;
+        
         if (!frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2))
             return false;
 
         frVector2 refEdgeNormal = frVector2RightNormal(refEdgeVector);
 
-        const float maxDepth = frVector2Dot(refEdge.data[0], refEdgeNormal);
+        const float maxDepth = frVector2Dot(refEdge.data[2], refEdgeNormal);
 
         const float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal)
                              - maxDepth;
@@ -674,14 +676,14 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
         const frVector2 prevVertex =
             frVector2Transform(vertices->data[prevIndex], tx);
 
-        return (frEdge) { .data = { prevVertex, supportVertex },
+        return (frEdge) { .data = { prevVertex, supportVertex, supportVertex },
                           .indexes = { prevIndex, supportIndex },
                           .count = 2 };
     } else {
         const frVector2 nextVertex =
             frVector2Transform(vertices->data[nextIndex], tx);
 
-        return (frEdge) { .data = { supportVertex, nextVertex },
+        return (frEdge) { .data = { supportVertex, nextVertex, supportVertex },
                           .indexes = { supportIndex, nextIndex },
                           .count = 2 };
     }
