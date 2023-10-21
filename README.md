@@ -174,6 +174,13 @@ $ git clone https://github.com/c-krit/ferox && cd ferox
 $ make
 ```
 
+### Arch
+```console
+$ sudo pacman -Syu
+$ sudo pacman -S base-devel raylib git
+$ make
+```
+
 In order to compile the examples, do:
 
 ```console
