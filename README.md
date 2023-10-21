@@ -178,6 +178,7 @@ $ make
 ```console
 $ sudo pacman -Syu
 $ sudo pacman -S base-devel raylib git
+$ git clone https://github.com/c-krit/ferox && cd ferox
 $ make
 ```
 
