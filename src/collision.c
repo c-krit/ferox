@@ -2,7 +2,7 @@
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
-    copyof this software and associated documentation files (the "Software"),
+    copy of this software and associated documentation files (the "Software"),
     to deal in the Software without restriction, including without limitation 
     the rights to use, copy, modify, merge, publish, distribute, sublicense, 
     and/or sell copies of the Software, and to permit persons to whom the 
@@ -30,7 +30,7 @@
 
 /* A structure that represents an edge of a convex polygon. */
 typedef struct _frEdge {
-    frVector2 data[2];
+    frVector2 data[3];
     int indexes[2];
     int count;
 } frEdge;
@@ -110,25 +110,27 @@ frGetSupportPointIndex(const frVertices *vertices, frTransform tx, frVector2 v);
 /* Public Functions ======================================================== */
 
 /* 
-    Checks whether `s1` and `s2` are colliding,
+    Checks whether `b1` and `b2` are colliding,
     then stores the collision information to `collision`.
 */
-bool frComputeCollision(const frShape *s1,
-                        frTransform tx1,
-                        const frShape *s2,
-                        frTransform tx2,
-                        frCollision *collision) {
-    if (s1 == NULL || s2 == NULL) return false;
+bool frComputeCollision(frBody *b1, frBody *b2, frCollision *collision) {
+    if (b1 == NULL || b2 == NULL) return false;
 
-    frShapeType t1 = frGetShapeType(s1);
-    frShapeType t2 = frGetShapeType(s2);
+    const frShape *s1 = frGetBodyShape(b1);
+    frTransform tx1 = frGetBodyTransform(b1);
 
-    if (t1 == FR_SHAPE_CIRCLE && t2 == FR_SHAPE_CIRCLE)
+    const frShape *s2 = frGetBodyShape(b2);
+    frTransform tx2 = frGetBodyTransform(b2);
+
+    frShapeType type1 = frGetShapeType(s1);
+    frShapeType type2 = frGetShapeType(s2);
+
+    if (type1 == FR_SHAPE_CIRCLE && type2 == FR_SHAPE_CIRCLE)
         return frComputeCollisionCircles(s1, tx1, s2, tx2, collision);
-    else if ((t1 == FR_SHAPE_CIRCLE && t2 == FR_SHAPE_POLYGON)
-             || (t1 == FR_SHAPE_POLYGON && t2 == FR_SHAPE_CIRCLE))
+    else if ((type1 == FR_SHAPE_CIRCLE && type2 == FR_SHAPE_POLYGON)
+             || (type1 == FR_SHAPE_POLYGON && type2 == FR_SHAPE_CIRCLE))
         return frComputeCollisionCirclePoly(s1, tx1, s2, tx2, collision);
-    else if (t1 == FR_SHAPE_POLYGON && t2 == FR_SHAPE_POLYGON)
+    else if (type1 == FR_SHAPE_POLYGON && type2 == FR_SHAPE_POLYGON)
         return frComputeCollisionPolys(s1, tx1, s2, tx2, collision);
     else
         return false;
@@ -494,26 +496,26 @@ static bool frComputeCollisionPolys(const frShape *s1,
         if (frVector2Dot(deltaPosition, direction) < 0.0f)
             direction = frVector2Negate(direction);
 
-        frEdge edge1 = frGetContactEdge(s1, tx1, direction);
-        frEdge edge2 = frGetContactEdge(s2, tx2, frVector2Negate(direction));
+        frEdge e1 = frGetContactEdge(s1, tx1, direction);
+        frEdge e2 = frGetContactEdge(s2, tx2, frVector2Negate(direction));
 
-        frEdge refEdge = edge1, incEdge = edge2;
+        frEdge refEdge = e1, incEdge = e2;
 
         frTransform refTx = tx1, incTx = tx2;
 
-        frVector2 edgeVector1 = frVector2Subtract(edge1.data[1], edge1.data[0]);
-        frVector2 edgeVector2 = frVector2Subtract(edge2.data[1], edge2.data[0]);
+        frVector2 edgeVector1 = frVector2Subtract(e1.data[1], e1.data[0]);
+        frVector2 edgeVector2 = frVector2Subtract(e2.data[1], e2.data[0]);
 
         const float edgeDot1 = frVector2Dot(edgeVector1, direction);
         const float edgeDot2 = frVector2Dot(edgeVector2, direction);
 
-        bool incEdgeFlipped = false;
+        bool refEdgeFlipped = false;
 
         if (fabsf(edgeDot1) > fabsf(edgeDot2)) {
-            refEdge = edge2, incEdge = edge1;
+            refEdge = e2, incEdge = e1;
             refTx = tx2, incTx = tx1;
 
-            incEdgeFlipped = true;
+            refEdgeFlipped = true;
         }
 
         frVector2 refEdgeVector = frVector2Normalize(
@@ -522,13 +524,15 @@ static bool frComputeCollisionPolys(const frShape *s1,
         const float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
         const float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
 
-        if (!frClipEdge(&incEdge, refEdgeVector, refDot1)) return false;
+        if (!frClipEdge(&incEdge, refEdgeVector, refDot1))
+            return false;
+        
         if (!frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2))
             return false;
 
         frVector2 refEdgeNormal = frVector2RightNormal(refEdgeVector);
 
-        const float maxDepth = frVector2Dot(refEdge.data[0], refEdgeNormal);
+        const float maxDepth = frVector2Dot(refEdge.data[2], refEdgeNormal);
 
         const float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal)
                              - maxDepth;
@@ -537,12 +541,12 @@ static bool frComputeCollisionPolys(const frShape *s1,
 
         collision->direction = direction;
 
-        collision->contacts[0].id = (!incEdgeFlipped)
+        collision->contacts[0].id = (!refEdgeFlipped)
                                         ? FR_GEOMETRY_MAX_VERTEX_COUNT
                                               + incEdge.indexes[0]
                                         : incEdge.indexes[0];
 
-        collision->contacts[1].id = (!incEdgeFlipped)
+        collision->contacts[1].id = (!refEdgeFlipped)
                                         ? FR_GEOMETRY_MAX_VERTEX_COUNT
                                               + incEdge.indexes[1]
                                         : incEdge.indexes[1];
@@ -665,20 +669,23 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
 
     v = frVector2Rotate(v, -tx.angle);
 
+    const frVector2 supportVertex =
+        frVector2Transform(vertices->data[supportIndex], tx);
+
     if (frVector2Dot(prevEdgeVector, v) < frVector2Dot(nextEdgeVector, v)) {
-        return (frEdge) {
-            .data = { frVector2Transform(vertices->data[prevIndex], tx),
-                      frVector2Transform(vertices->data[supportIndex], tx) },
-            .indexes = { prevIndex, supportIndex },
-            .count = 2
-        };
+        const frVector2 prevVertex =
+            frVector2Transform(vertices->data[prevIndex], tx);
+
+        return (frEdge) { .data = { prevVertex, supportVertex, supportVertex },
+                          .indexes = { prevIndex, supportIndex },
+                          .count = 2 };
     } else {
-        return (frEdge) {
-            .data = { frVector2Transform(vertices->data[supportIndex], tx),
-                      frVector2Transform(vertices->data[nextIndex], tx) },
-            .indexes = { supportIndex, nextIndex },
-            .count = 2
-        };
+        const frVector2 nextVertex =
+            frVector2Transform(vertices->data[nextIndex], tx);
+
+        return (frEdge) { .data = { supportVertex, nextVertex, supportVertex },
+                          .indexes = { supportIndex, nextIndex },
+                          .count = 2 };
     }
 }
 

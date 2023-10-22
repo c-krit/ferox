@@ -50,7 +50,7 @@ extern "C" {
 #define FR_WORLD_BAUMGARTE_FACTOR     0.24f
 
 /* Defines the 'slop' for the Baumgarte stabilization scheme. */
-#define FR_WORLD_BAUMGARTE_SLOP       0.01f
+#define FR_WORLD_BAUMGARTE_SLOP       0.02f
 
 /* Defines the default gravity acceleration vector for a world. */
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
@@ -250,14 +250,10 @@ void frQuerySpatialHash(frSpatialHash *sh,
 /* (From 'collision.c') ==================================================== */
 
 /* 
-    Checks whether `s1` and `s2` are colliding,
+    Checks whether `b1` and `b2` are colliding,
     then stores the collision information to `collision`.
 */
-bool frComputeCollision(const frShape *s1,
-                        frTransform tx1,
-                        const frShape *s2,
-                        frTransform tx2,
-                        frCollision *collision);
+bool frComputeCollision(frBody *b1, frBody *b2, frCollision *collision);
 
 /* Casts a `ray` against `b`. */
 bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit);
