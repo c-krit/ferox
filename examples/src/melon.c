@@ -41,31 +41,43 @@
 #define SCREEN_WIDTH      600
 #define SCREEN_HEIGHT     800
 
-#define MAX_RADIUS_COUNT  1
 #define MAX_WALL_COUNT    3
+#define MELON_KIND_COUNT  4
 
 // clang-format on
+
+/* Typedefs ================================================================ */
+
+typedef struct _MelonKind {
+    int index;
+    Color color;
+} MelonKind;
 
 /* Constants =============================================================== */
 
 static const frMaterial MATERIAL_WALL = { .density = 1.25f,
                                           .friction = 0.75f,
-                                          .restitution = 0.0f };
+                                          .restitution = 0.1f };
 
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float MELON_RADII[MAX_RADIUS_COUNT] = { 0.5f };
+static const MelonKind MELON_KINDS[MELON_KIND_COUNT] = {
+    { .index = 0, .color = RED },
+    { .index = 1, .color = ORANGE },
+    { .index = 2, .color = YELLOW },
+    { .index = 3, .color = GREEN }
+};
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / (2.0f * TARGET_FPS);
 
 /* Private Variables ======================================================= */
 
-static frVertices wallVertices;
-
 static frWorld *world;
 
-static frBody *walls[MAX_WALL_COUNT];
+static frShape *melonShapes[MELON_KIND_COUNT];
+
+static frBody *cursor, *walls[MAX_WALL_COUNT];
 
 /* Private Function Prototypes ============================================= */
 
@@ -102,8 +114,15 @@ int main(void) {
 
 static void InitExample(void) {
     world = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                  2.5f),
+                                                  2.0f),
                           CELL_SIZE);
+
+    for (int i = 0; i < MELON_KIND_COUNT; i++)
+        melonShapes[i] = frCreateCircle((frMaterial) { .density = 3.5f
+                                                                  / (i + 1),
+                                                       .friction = 0.65f,
+                                                       .restitution = 0.1f },
+                                        0.4f * (i + 3));
 
     walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
@@ -113,13 +132,90 @@ static void InitExample(void) {
                           frPixelsToUnits(1.0f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
 
-    // TODO: ...
+    const frVertices wallVertices1 = {
+        .data = { frVector2PixelsToUnits(
+                      (frVector2) { .x = -80.0f, .y = 400.0f }),
+                  frVector2PixelsToUnits(
+                      (frVector2) { .x = -80.0f, .y = -400.0f }),
+                  frVector2PixelsToUnits(
+                      (frVector2) { .x = 120.0f, .y = 400.0f }),
+                  frVector2PixelsToUnits(
+                      (frVector2) { .x = 0.0f, .y = -400.0f }) },
+        .count = 4
+    };
+
+    walls[1] = frCreateBodyFromShape(FR_BODY_STATIC,
+                                     frVector2PixelsToUnits((frVector2) {
+                                         .x = 0.02f * SCREEN_WIDTH,
+                                         .y = 0.5f * SCREEN_HEIGHT }),
+                                     frCreatePolygon(MATERIAL_WALL,
+                                                     &wallVertices1));
+
+    const frVertices wallVertices2 = {
+        .data = { frVector2PixelsToUnits(
+                      (frVector2) { .x = 0.0f, .y = -400.0f }),
+                  frVector2PixelsToUnits(
+                      (frVector2) { .x = -120.0f, .y = 400.0f }),
+                  frVector2PixelsToUnits(
+                      (frVector2) { .x = 80.0f, .y = 400.0f }),
+                  frVector2PixelsToUnits(
+                      (frVector2) { .x = 80.0f, .y = -400.0f }) },
+        .count = 4
+    };
+
+    walls[2] = frCreateBodyFromShape(FR_BODY_STATIC,
+                                     frVector2PixelsToUnits((frVector2) {
+                                         .x = 0.98f * SCREEN_WIDTH,
+                                         .y = 0.5f * SCREEN_HEIGHT }),
+                                     frCreatePolygon(MATERIAL_WALL,
+                                                     &wallVertices2));
 
     for (int i = 0; i < MAX_WALL_COUNT; i++)
         frAddBodyToWorld(world, walls[i]);
+
+    cursor = frCreateBodyFromShape(FR_BODY_KINEMATIC,
+                                   frVector2PixelsToUnits((frVector2) {
+                                       .x = 0.5f * SCREEN_WIDTH,
+                                       .y = 0.15f * SCREEN_HEIGHT }),
+                                   melonShapes[0]);
+
+    frSetBodyUserData(cursor, (void *) &MELON_KINDS[0]);
 }
 
 static void UpdateExample(void) {
+    const MelonKind *cursorKind = frGetBodyUserData(cursor);
+
+    {
+        frVector2 cursorPosition = frGetBodyPosition(cursor);
+
+        if (IsKeyDown(KEY_LEFT)) cursorPosition.x -= 0.2f;
+        if (IsKeyDown(KEY_RIGHT)) cursorPosition.x += 0.2f;
+
+        if (cursorPosition.x < frPixelsToUnits(0.1f * SCREEN_WIDTH))
+            cursorPosition.x = frPixelsToUnits(0.1f * SCREEN_WIDTH);
+
+        if (cursorPosition.x > frPixelsToUnits(0.9f * SCREEN_WIDTH))
+            cursorPosition.x = frPixelsToUnits(0.9f * SCREEN_WIDTH);
+
+        frSetBodyPosition(cursor, cursorPosition);
+
+        if (IsKeyPressed(KEY_SPACE)) {
+            frBody *melon =
+                frCreateBodyFromShape(FR_BODY_DYNAMIC,
+                                      cursorPosition,
+                                      melonShapes[cursorKind->index]);
+
+            frSetBodyUserData(melon, (void *) cursorKind);
+
+            frAddBodyToWorld(world, melon);
+
+            const int cursorIndex = GetRandomValue(0, MELON_KIND_COUNT - 1);
+
+            frSetBodyShape(cursor, melonShapes[cursorIndex]);
+            frSetBodyUserData(cursor, (void *) &MELON_KINDS[cursorIndex]);
+        }
+    }
+
     frUpdateWorld(world, DELTA_TIME);
 
     {
@@ -135,6 +231,18 @@ static void UpdateExample(void) {
         for (int i = 0; i < MAX_WALL_COUNT; i++)
             frDrawBodyLines(walls[i], 1.0f, DARKGRAY);
 
+        const int bodyCount = frGetBodyCountForWorld(world);
+
+        for (int i = MAX_WALL_COUNT; i < bodyCount; i++) {
+            frBody *melon = frGetBodyFromWorld(world, i);
+
+            const MelonKind *melonKind = frGetBodyUserData(melon);
+
+            frDrawBodyLines(melon, 2.0f, melonKind->color);
+        }
+
+        frDrawBodyLines(cursor, 2.0f, ColorAlpha(cursorKind->color, 0.5f));
+
         DrawFPS(8, 8);
 
         EndDrawing();
@@ -142,8 +250,12 @@ static void UpdateExample(void) {
 }
 
 static void DeinitExample(void) {
+    for (int i = 0; i < MELON_KIND_COUNT; i++)
+        frReleaseShape(melonShapes[i]);
+
     for (int i = 0; i < MAX_WALL_COUNT; i++)
         frReleaseShape(frGetBodyShape(walls[i]));
 
+    frReleaseBody(cursor);
     frReleaseWorld(world);
 }
