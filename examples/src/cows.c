@@ -2,7 +2,7 @@
     Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
-    copyof this software and associated documentation files (the "Software"),
+    copy of this software and associated documentation files (the "Software"),
     to deal in the Software without restriction, including without limitation 
     the rights to use, copy, modify, merge, publish, distribute, sublicense, 
     and/or sell copies of the Software, and to permit persons to whom the 
@@ -63,8 +63,6 @@ typedef struct _EntityData {
 
 /* Constants =============================================================== */
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
-
 static const frMaterial MATERIAL_BULLET = { .density = 2.25f,
                                             .friction = 0.85f,
                                             .restitution = 0.0f };
@@ -79,6 +77,8 @@ static const frMaterial MATERIAL_PLAYER = { .density = 1.25f,
 
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
+
+static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
