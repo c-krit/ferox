@@ -166,15 +166,8 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 <details>
 <summary>Compiling for GNU/Linux</summary>
 
-### Debian / Ubuntu
+### Arch Linux / Manjaro Linux
 
-```console
-$ sudo apt install build-essential git
-$ git clone https://github.com/c-krit/ferox && cd ferox
-$ make
-```
-
-### Arch
 ```console
 $ sudo pacman -Syu
 $ sudo pacman -S base-devel raylib git
@@ -185,8 +178,21 @@ $ make
 In order to compile the examples, do:
 
 ```console
-$ cd examples
+$ cd examples && make
+```
+
+### Debian / Ubuntu
+
+```console
+$ sudo apt install build-essential git
+$ git clone https://github.com/c-krit/ferox && cd ferox
 $ make
+```
+
+In order to compile the examples, do:
+
+```console
+$ cd examples && make
 ```
 
 </details>
