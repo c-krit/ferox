@@ -103,13 +103,13 @@ float frGetSpatialHashCellSize(const frSpatialHash *sh) {
 void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value) {
     if (sh == NULL) return;
 
-    const float inverseCellSize = sh->inverseCellSize;
+    float inverseCellSize = sh->inverseCellSize;
 
-    const int minX = key.x * inverseCellSize;
-    const int minY = key.y * inverseCellSize;
+    int minX = key.x * inverseCellSize;
+    int minY = key.y * inverseCellSize;
 
-    const int maxX = (key.x + key.width) * inverseCellSize;
-    const int maxY = (key.y + key.height) * inverseCellSize;
+    int maxX = (key.x + key.width) * inverseCellSize;
+    int maxY = (key.y + key.height) * inverseCellSize;
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
@@ -136,13 +136,13 @@ void frQuerySpatialHash(frSpatialHash *sh,
                         void *ctx) {
     if (sh == NULL) return;
 
-    const float inverseCellSize = sh->inverseCellSize;
+    float inverseCellSize = sh->inverseCellSize;
 
-    const int minX = aabb.x * inverseCellSize;
-    const int minY = aabb.y * inverseCellSize;
+    int minX = aabb.x * inverseCellSize;
+    int minY = aabb.y * inverseCellSize;
 
-    const int maxX = (aabb.x + aabb.width) * inverseCellSize;
-    const int maxY = (aabb.y + aabb.height) * inverseCellSize;
+    int maxX = (aabb.x + aabb.width) * inverseCellSize;
+    int maxY = (aabb.y + aabb.height) * inverseCellSize;
 
     arrsetlen(sh->queryResult, 0);
 
@@ -150,7 +150,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
         for (int x = minX; x <= maxX; x++) {
             const frSpatialHashKey key = { .x = x, .y = y };
 
-            const frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
+            frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
             if (entry == NULL) continue;
 
@@ -158,7 +158,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
                 arrput(sh->queryResult, entry->value[i]);
         }
 
-    const size_t oldLength = arrlen(sh->queryResult);
+    size_t oldLength = arrlen(sh->queryResult);
 
     if (oldLength > 1) {
         // NOTE: Sort the array first, then remove duplicates!

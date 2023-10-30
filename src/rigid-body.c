@@ -268,9 +268,9 @@ bool frBodyContainsPoint(const frBody *b, frVector2 point) {
 
         return (deltaX * deltaX) + (deltaY * deltaY) <= radius * radius;
     } else if (type == FR_SHAPE_POLYGON) {
-        const frRay ray = { .origin = point,
-                            .direction = { .x = 1.0f, .y = 0.0f },
-                            .maxDistance = FLT_MAX };
+        frRay ray = { .origin = point,
+                      .direction = { .x = 1.0f, .y = 0.0f },
+                      .maxDistance = FLT_MAX };
 
         frRaycastHit raycastHit = { .distance = 0.0f };
 
@@ -335,11 +335,10 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
         return;
     }
 
-    const frVector2 ctxTangent = { .x = ctx->direction.y,
-                                   .y = -ctx->direction.x };
+    frVector2 ctxTangent = { .x = ctx->direction.y, .y = -ctx->direction.x };
 
     for (int i = 0; i < ctx->count; i++) {
-        const frVector2 contactPoint = ctx->contacts[i].point;
+        frVector2 contactPoint = ctx->contacts[i].point;
 
         frVector2 relPosition1 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b1));
@@ -349,12 +348,11 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
         float relPositionCross1 = frVector2Cross(relPosition1, ctx->direction);
         float relPositionCross2 = frVector2Cross(relPosition2, ctx->direction);
 
-        const float normalMass = (b1->mtn.inverseMass + b2->mtn.inverseMass)
-                                 + b1->mtn.inverseInertia
-                                       * (relPositionCross1 * relPositionCross1)
-                                 + b2->mtn.inverseInertia
-                                       * (relPositionCross2
-                                          * relPositionCross2);
+        float normalMass = (b1->mtn.inverseMass + b2->mtn.inverseMass)
+                           + b1->mtn.inverseInertia
+                                 * (relPositionCross1 * relPositionCross1)
+                           + b2->mtn.inverseInertia
+                                 * (relPositionCross2 * relPositionCross2);
 
         ctx->contacts[i].cache.normalMass = 1.0f / normalMass;
 
@@ -414,11 +412,10 @@ void frResolveCollision(frBody *b1,
         || inverseDt <= 0.0f)
         return;
 
-    const frVector2 ctxTangent = { .x = ctx->direction.y,
-                                   .y = -ctx->direction.x };
+    frVector2 ctxTangent = { .x = ctx->direction.y, .y = -ctx->direction.x };
 
     for (int i = 0; i < ctx->count; i++) {
-        const frVector2 contactPoint = ctx->contacts[i].point;
+        frVector2 contactPoint = ctx->contacts[i].point;
 
         frVector2 relPosition1 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b1));
@@ -438,10 +435,10 @@ void frResolveCollision(frBody *b1,
 
         float relVelocityDot = frVector2Dot(relVelocity, ctx->direction);
 
-        const float biasScalar = -(FR_WORLD_BAUMGARTE_FACTOR * inverseDt)
-                                 * fminf(0.0f,
-                                         -ctx->contacts[i].depth
-                                             + FR_WORLD_BAUMGARTE_SLOP);
+        float biasScalar = -(FR_WORLD_BAUMGARTE_FACTOR * inverseDt)
+                           * fminf(0.0f,
+                                   -ctx->contacts[i].depth
+                                       + FR_WORLD_BAUMGARTE_SLOP);
 
         float normalScalar = ((-(1.0f + ctx->restitution) * relVelocityDot)
                               + biasScalar)
@@ -472,7 +469,7 @@ void frResolveCollision(frBody *b1,
                               * ctx->contacts[i].cache.tangentMass;
 
         {
-            const float maxTangentScalar = fabsf(ctx->friction * normalScalar);
+            float maxTangentScalar = fabsf(ctx->friction * normalScalar);
 
             tangentScalar = fminf(fmaxf(tangentScalar, -maxTangentScalar),
                                   maxTangentScalar);

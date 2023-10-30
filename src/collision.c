@@ -506,8 +506,8 @@ static bool frComputeCollisionPolys(const frShape *s1,
         frVector2 edgeVector1 = frVector2Subtract(e1.data[1], e1.data[0]);
         frVector2 edgeVector2 = frVector2Subtract(e2.data[1], e2.data[0]);
 
-        const float edgeDot1 = frVector2Dot(edgeVector1, direction);
-        const float edgeDot2 = frVector2Dot(edgeVector2, direction);
+        float edgeDot1 = frVector2Dot(edgeVector1, direction);
+        float edgeDot2 = frVector2Dot(edgeVector2, direction);
 
         bool refEdgeFlipped = false;
 
@@ -521,8 +521,8 @@ static bool frComputeCollisionPolys(const frShape *s1,
         frVector2 refEdgeVector = frVector2Normalize(
             frVector2Subtract(refEdge.data[1], refEdge.data[0]));
 
-        const float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
-        const float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
+        float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
+        float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
 
         if (!frClipEdge(&incEdge, refEdgeVector, refDot1))
             return false;
@@ -532,12 +532,10 @@ static bool frComputeCollisionPolys(const frShape *s1,
 
         frVector2 refEdgeNormal = frVector2RightNormal(refEdgeVector);
 
-        const float maxDepth = frVector2Dot(refEdge.data[2], refEdgeNormal);
+        float maxDepth = frVector2Dot(refEdge.data[2], refEdgeNormal);
 
-        const float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal)
-                             - maxDepth;
-        const float depth2 = frVector2Dot(incEdge.data[1], refEdgeNormal)
-                             - maxDepth;
+        float depth1 = frVector2Dot(incEdge.data[0], refEdgeNormal) - maxDepth;
+        float depth2 = frVector2Dot(incEdge.data[1], refEdgeNormal) - maxDepth;
 
         collision->direction = direction;
 
@@ -587,12 +585,12 @@ static bool frComputeIntersectionCircleLine(frVector2 center,
                                             frVector2 origin,
                                             frVector2 direction,
                                             float *lambda) {
-    const frVector2 originToCenter = frVector2Subtract(center, origin);
+    frVector2 originToCenter = frVector2Subtract(center, origin);
 
-    const float dot = frVector2Dot(originToCenter, direction);
+    float dot = frVector2Dot(originToCenter, direction);
 
-    const float heightSqr = frVector2MagnitudeSqr(originToCenter) - (dot * dot);
-    const float baseSqr = (radius * radius) - heightSqr;
+    float heightSqr = frVector2MagnitudeSqr(originToCenter) - (dot * dot);
+    float baseSqr = (radius * radius) - heightSqr;
 
     if (lambda != NULL) *lambda = dot - sqrtf(baseSqr);
 
@@ -669,19 +667,19 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
 
     v = frVector2Rotate(v, -tx.angle);
 
-    const frVector2 supportVertex =
-        frVector2Transform(vertices->data[supportIndex], tx);
+    frVector2 supportVertex = frVector2Transform(vertices->data[supportIndex],
+                                                 tx);
 
     if (frVector2Dot(prevEdgeVector, v) < frVector2Dot(nextEdgeVector, v)) {
-        const frVector2 prevVertex =
-            frVector2Transform(vertices->data[prevIndex], tx);
+        frVector2 prevVertex = frVector2Transform(vertices->data[prevIndex],
+                                                  tx);
 
         return (frEdge) { .data = { prevVertex, supportVertex, supportVertex },
                           .indexes = { prevIndex, supportIndex },
                           .count = 2 };
     } else {
-        const frVector2 nextVertex =
-            frVector2Transform(vertices->data[nextIndex], tx);
+        frVector2 nextVertex = frVector2Transform(vertices->data[nextIndex],
+                                                  tx);
 
         return (frEdge) { .data = { supportVertex, nextVertex, supportVertex },
                           .indexes = { supportIndex, nextIndex },

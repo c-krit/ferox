@@ -282,7 +282,7 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
     if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
         return false;
 
-    const frBodyPair key = { .first = b1, .second = b2 };
+    frBodyPair key = { .first = b1, .second = b2 };
 
     frShape *s1 = frGetBodyShape(b1), *s2 = frGetBodyShape(b2);
 
@@ -319,10 +319,10 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
             }
 
             if (k >= 0) {
-                const float accNormalScalar = entry->value.contacts[k]
-                                                  .cache.normalScalar;
-                const float accTangentScalar = entry->value.contacts[k]
-                                                   .cache.tangentScalar;
+                float accNormalScalar = entry->value.contacts[k]
+                                            .cache.normalScalar;
+                float accTangentScalar = entry->value.contacts[k]
+                                             .cache.tangentScalar;
 
                 collision.contacts[i].cache.normalScalar = accNormalScalar;
                 collision.contacts[i].cache.tangentScalar = accTangentScalar;

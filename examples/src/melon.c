@@ -57,7 +57,7 @@ typedef struct _MelonKind {
 
 static const frMaterial MATERIAL_WALL = { .density = 1.25f,
                                           .friction = 0.75f,
-                                          .restitution = 0.1f };
+                                          .restitution = 0.05f };
 
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
@@ -121,7 +121,7 @@ static void InitExample(void) {
         melonShapes[i] = frCreateCircle((frMaterial) { .density = 3.5f
                                                                   / (i + 1),
                                                        .friction = 0.65f,
-                                                       .restitution = 0.1f },
+                                                       .restitution = 0.02f },
                                         0.4f * (i + 3));
 
     walls[0] = frCreateBodyFromShape(

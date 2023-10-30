@@ -82,7 +82,7 @@ frShape *frCreateRectangle(frMaterial material, float width, float height) {
     result->type = FR_SHAPE_POLYGON;
     result->material = material;
 
-    const float halfWidth = 0.5f * width, halfHeight = 0.5f * height;
+    float halfWidth = 0.5f * width, halfHeight = 0.5f * height;
 
     // NOTE: https://en.cppreference.com/w/c/language/compound_literal
     frSetPolygonVertices(result,
@@ -161,16 +161,16 @@ float frGetShapeInertia(const frShape *s) {
     } else if (s->type == FR_SHAPE_POLYGON) {
         float numerator = 0.0f, denominator = 0.0f;
 
-        const int vertexCount = s->data.polygon.vertices.count;
+        int vertexCount = s->data.polygon.vertices.count;
 
         // NOTE: https://en.wikipedia.org/wiki/List_of_moments_of_inertia
         for (int j = vertexCount - 1, i = 0; i < vertexCount; j = i, i++) {
             frVector2 v1 = s->data.polygon.vertices.data[j];
             frVector2 v2 = s->data.polygon.vertices.data[i];
 
-            const float cross = frVector2Cross(v1, v2),
-                        dotSum = (frVector2Dot(v1, v1) + frVector2Dot(v1, v2)
-                                  + frVector2Dot(v2, v2));
+            float cross = frVector2Cross(v1, v2),
+                  dotSum = (frVector2Dot(v1, v1) + frVector2Dot(v1, v2)
+                            + frVector2Dot(v2, v2));
 
             numerator += (cross * dotSum), denominator += cross;
         }
@@ -206,8 +206,8 @@ frAABB frGetShapeAABB(const frShape *s, frTransform tx) {
                 if (maxVertex.y < v.y) maxVertex.y = v.y;
             }
 
-            const float deltaX = maxVertex.x - minVertex.x;
-            const float deltaY = maxVertex.y - minVertex.y;
+            float deltaX = maxVertex.x - minVertex.x;
+            float deltaY = maxVertex.y - minVertex.y;
 
             result.x = minVertex.x;
             result.y = minVertex.y;
@@ -303,7 +303,7 @@ void frSetCircleRadius(frShape *s, float radius) {
 void frSetRectangleDimensions(frShape *s, float width, float height) {
     if (s == NULL || width <= 0.0f || height <= 0.0f) return;
 
-    const float halfWidth = 0.5f * width, halfHeight = 0.5f * height;
+    float halfWidth = 0.5f * width, halfHeight = 0.5f * height;
 
     // NOTE: https://en.cppreference.com/w/c/language/compound_literal
     frSetPolygonVertices(s,
@@ -345,7 +345,7 @@ void frSetPolygonVertices(frShape *s, const frVertices *vertices) {
             then computes the area for each triangle.
         */
 
-        const float twiceArea = frVector2Cross(
+        float twiceArea = frVector2Cross(
             frVector2Subtract(s->data.polygon.vertices.data[i],
                               s->data.polygon.vertices.data[0]),
             frVector2Subtract(s->data.polygon.vertices.data[i + 1],
@@ -393,18 +393,17 @@ static void frJarvisMarch(const frVertices *input, frVertices *output) {
         for (int i = 0; i < input->count; i++) {
             if (i == currentIndex || i == nextIndex) continue;
 
-            const int direction =
-                frVector2CounterClockwise(input->data[currentIndex],
-                                          input->data[i],
-                                          input->data[nextIndex]);
+            int direction = frVector2CounterClockwise(input->data[currentIndex],
+                                                      input->data[i],
+                                                      input->data[nextIndex]);
 
             if (direction < 0) continue;
 
-            const float toCandidate =
-                frVector2DistanceSqr(input->data[currentIndex], input->data[i]);
+            float toCandidate = frVector2DistanceSqr(input->data[currentIndex],
+                                                     input->data[i]);
 
-            const float toNext = frVector2DistanceSqr(input->data[currentIndex],
-                                                      input->data[nextIndex]);
+            float toNext = frVector2DistanceSqr(input->data[currentIndex],
+                                                input->data[nextIndex]);
 
             if (direction != 0 || (direction == 0 && (toCandidate > toNext)))
                 nextIndex = i;
