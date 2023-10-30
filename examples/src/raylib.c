@@ -153,8 +153,8 @@ static void InitExample(void) {
                            frPixelsToUnits(20.0f)));
 
         frApplyImpulseToBody(ball,
-                             FR_API_STRUCT_ZERO(frVector2),
-                             (frVector2) { .x = 2048.0f, .y = 0.0f });
+                             frGetBodyPosition(ball),
+                             (frVector2) { .x = 2048.0f });
 
         frAddBodyToWorld(world, ball);
     }

@@ -293,8 +293,10 @@ void frClearBodyForces(frBody *b) {
 void frApplyForceToBody(frBody *b, frVector2 point, frVector2 force) {
     if (b == NULL || b->mtn.inverseMass <= 0.0f) return;
 
+    frVector2 localPoint = frVector2Subtract(point, b->tx.position);
+
     b->mtn.force = frVector2Add(b->mtn.force, force);
-    b->mtn.torque += frVector2Cross(point, force);
+    b->mtn.torque += frVector2Cross(localPoint, force);
 }
 
 /* Applies a gravity force to `b` with the `g`ravity acceleration vector. */
@@ -311,12 +313,14 @@ void frApplyGravityToBody(frBody *b, frVector2 g) {
 void frApplyImpulseToBody(frBody *b, frVector2 point, frVector2 impulse) {
     if (b == NULL || b->mtn.inverseMass <= 0.0f) return;
 
+    frVector2 localPoint = frVector2Subtract(point, b->tx.position);
+
     b->mtn.velocity = frVector2Add(b->mtn.velocity,
                                    frVector2ScalarMultiply(impulse,
                                                            b->mtn.inverseMass));
 
     b->mtn.angularVelocity += b->mtn.inverseInertia
-                              * frVector2Cross(point, impulse);
+                              * frVector2Cross(localPoint, impulse);
 }
 
 /* Applies accumulated impulses to `b1` and `b2`. */
@@ -454,8 +458,23 @@ void frResolveCollision(frBody *b1,
         frVector2 normalImpulse = frVector2ScalarMultiply(ctx->direction,
                                                           normalScalar);
 
-        frApplyImpulseToBody(b1, relPosition1, frVector2Negate(normalImpulse));
-        frApplyImpulseToBody(b2, relPosition2, normalImpulse);
+        {
+            b1->mtn.velocity = frVector2Subtract(
+                b1->mtn.velocity,
+                frVector2ScalarMultiply(normalImpulse, b1->mtn.inverseMass));
+
+            b1->mtn.angularVelocity -= b1->mtn.inverseInertia
+                                       * frVector2Cross(relPosition1,
+                                                        normalImpulse);
+
+            b2->mtn.velocity = frVector2Add(
+                b2->mtn.velocity,
+                frVector2ScalarMultiply(normalImpulse, b2->mtn.inverseMass));
+
+            b2->mtn.angularVelocity += b2->mtn.inverseInertia
+                                       * frVector2Cross(relPosition2,
+                                                        normalImpulse);
+        }
 
         relVelocity = frVector2Subtract(
             frVector2Add(b2->mtn.velocity,
@@ -481,8 +500,23 @@ void frResolveCollision(frBody *b1,
         frVector2 tangentImpulse = frVector2ScalarMultiply(ctxTangent,
                                                            tangentScalar);
 
-        frApplyImpulseToBody(b1, relPosition1, frVector2Negate(tangentImpulse));
-        frApplyImpulseToBody(b2, relPosition2, tangentImpulse);
+        {
+            b1->mtn.velocity = frVector2Subtract(
+                b1->mtn.velocity,
+                frVector2ScalarMultiply(tangentImpulse, b1->mtn.inverseMass));
+
+            b1->mtn.angularVelocity -= b1->mtn.inverseInertia
+                                       * frVector2Cross(relPosition1,
+                                                        tangentImpulse);
+
+            b2->mtn.velocity = frVector2Add(
+                b2->mtn.velocity,
+                frVector2ScalarMultiply(tangentImpulse, b2->mtn.inverseMass));
+
+            b2->mtn.angularVelocity += b2->mtn.inverseInertia
+                                       * frVector2Cross(relPosition2,
+                                                        tangentImpulse);
+        }
     }
 }
 
