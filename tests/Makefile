@@ -36,7 +36,7 @@ LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
 TARGETS ?= \
-	${SOURCE_PATH}/basic.out
+	${SOURCE_PATH}/collision.out
 
 CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
