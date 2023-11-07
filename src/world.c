@@ -42,7 +42,7 @@ struct _frWorld {
     frSpatialHash *hash;
     frContactCacheEntry *cache;
     frCollisionHandler handler;
-    double accumulator, timestamp;
+    float accumulator, timestamp;
 };
 
 /* 
@@ -228,8 +228,8 @@ void frStepWorld(frWorld *w, float dt) {
 void frUpdateWorld(frWorld *w, float dt) {
     if (w == NULL || dt <= 0.0f) return;
 
-    double currentTime = frGetCurrentTime();
-    double elapsedTime = currentTime - w->timestamp;
+    float currentTime = frGetCurrentTime();
+    float elapsedTime = currentTime - w->timestamp;
 
     w->timestamp = currentTime, w->accumulator += elapsedTime;
 

@@ -476,7 +476,7 @@ void frResolveCollision(frBody *b1,
 /* (From 'timer.c') ======================================================== */
 
 /* Returns the current time of the monotonic clock, in seconds. */
-double frGetCurrentTime(void);
+float frGetCurrentTime(void);
 
 /* (From 'world.c') ======================================================== */
 

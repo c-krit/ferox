@@ -32,6 +32,11 @@
 
 #include "ferox.h"
 
+/* Constants =============================================================== */
+
+/* Constant for `frGetCurrentTime()`. */
+const float TICKS_TO_SECONDS = 1.0f / 1000000000.0f;
+
 /* Private Variables ======================================================= */
 
 static bool initialized = false;
@@ -39,12 +44,12 @@ static bool initialized = false;
 /* Public Functions ======================================================== */
 
 /* Returns the current time of the monotonic clock, in seconds. */
-double frGetCurrentTime(void) {
+float frGetCurrentTime(void) {
     if (!initialized) {
         initialized = true;
 
         stm_setup();
     }
 
-    return stm_sec(stm_now());
+    return stm_now() * TICKS_TO_SECONDS;
 }
