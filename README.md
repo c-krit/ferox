@@ -169,8 +169,7 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 ### Arch Linux / Manjaro Linux
 
 ```console
-$ sudo pacman -Syu
-$ sudo pacman -S base-devel raylib git
+$ sudo pacman -Syu && sudo pacman -S base-devel raylib git
 $ git clone https://github.com/c-krit/ferox && cd ferox
 $ make
 ```

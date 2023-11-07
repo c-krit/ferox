@@ -280,7 +280,7 @@ static bool frComputeCollisionCircles(const frShape *s1,
         collision->direction = (magnitude > 0.0f)
                                    ? frVector2ScalarMultiply(direction,
                                                              1.0f / magnitude)
-                                   : (frVector2) { .x = 1.0f };
+                                   : (frVector2) { .y = 1.0f };
 
         collision->contacts[0].id = 0;
 
