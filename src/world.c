@@ -305,32 +305,7 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
         collision.friction = entry->value.friction;
         collision.restitution = entry->value.restitution;
 
-        for (int i = 0; i < collision.count; i++) {
-            int k = -1;
-
-            for (int j = 0; j < entry->value.count; j++) {
-                const int id = entry->value.contacts[j].id;
-
-                if (collision.contacts[i].id == id) {
-                    k = j;
-
-                    break;
-                }
-            }
-
-            if (k >= 0) {
-                float accNormalScalar = entry->value.contacts[k]
-                                            .cache.normalScalar;
-                float accTangentScalar = entry->value.contacts[k]
-                                             .cache.tangentScalar;
-
-                collision.contacts[i].cache.normalScalar = accNormalScalar;
-                collision.contacts[i].cache.tangentScalar = accTangentScalar;
-            } else {
-                collision.contacts[i].cache.normalScalar = 0.0f;
-                collision.contacts[i].cache.tangentScalar = 0.0f;
-            }
-        }
+        /* TODO: ... */
     } else {
         collision.friction = 0.5f
                              * (frGetShapeFriction(s1)
@@ -338,8 +313,8 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
         collision.restitution = fminf(frGetShapeRestitution(s1),
                                       frGetShapeRestitution(s2));
 
-        if (collision.friction <= 0.0f) collision.friction = 0.0f;
-        if (collision.restitution <= 0.0f) collision.restitution = 0.0f;
+        if (collision.friction < 0.0f) collision.friction = 0.0f;
+        if (collision.restitution < 0.0f) collision.restitution = 0.0f;
     }
 
     hmputs(queryCtx->world->cache,

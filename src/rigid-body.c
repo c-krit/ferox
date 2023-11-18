@@ -269,7 +269,7 @@ bool frBodyContainsPoint(const frBody *b, frVector2 point) {
         return (deltaX * deltaX) + (deltaY * deltaY) <= radius * radius;
     } else if (type == FR_SHAPE_POLYGON) {
         frRay ray = { .origin = point,
-                      .direction = { .x = 1.0f, .y = 0.0f },
+                      .direction = { .x = 1.0f },
                       .maxDistance = FLT_MAX };
 
         frRaycastHit raycastHit = { .distance = 0.0f };
