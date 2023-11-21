@@ -42,7 +42,7 @@ CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 	-O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH}
-LDLIBS = -lferox -lm
+LDLIBS = -lferox
 
 all: pre-build build post-build
 
@@ -64,4 +64,4 @@ post-build:
 
 clean:
 	@printf "${PROJECT_PREFIX} Cleaning up.\n"
-	${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.out
+	@rm -f ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.out

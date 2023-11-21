@@ -34,8 +34,8 @@ GREATEST_MAIN_DEFS();
 SUITE(CollisionSuite);
 
 TEST CircleVsCircle(void);
-// TEST CircleVsPolygon(void);
-// TEST PolygonVsPolygon(void);
+TEST CircleVsPolygon(void);
+TEST PolygonVsPolygon(void);
 
 /* Public Functions ======================================================== */
 
@@ -43,7 +43,6 @@ int main(int argc, char *argv[]) {
     GREATEST_MAIN_BEGIN();
 
     RUN_SUITE(CollisionSuite);
-    // RUN_SUITE(RaycastSuite);
 
     GREATEST_MAIN_END();
 }
@@ -52,9 +51,23 @@ int main(int argc, char *argv[]) {
 
 SUITE(CollisionSuite) {
     RUN_TEST(CircleVsCircle);
+    RUN_TEST(CircleVsPolygon);
+    RUN_TEST(PolygonVsPolygon);
 }
 
 TEST CircleVsCircle(void) {
+    /* TODO: ... */
+
+    PASS();
+}
+
+TEST CircleVsPolygon(void) {
+    /* TODO: ... */
+
+    PASS();
+}
+
+TEST PolygonVsPolygon(void) {
     /* TODO: ... */
 
     PASS();
