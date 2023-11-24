@@ -84,7 +84,29 @@ TEST CircleVsCircle(void) {
 }
 
 TEST CircleVsPolygon(void) {
-    /* TODO: ... */
+    frShape *s1 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.0f);
+    frShape *s2 = frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial), 4.0f, 3.0f);
+
+    frBody *b1 = frCreateBodyFromShape(FR_BODY_DYNAMIC,
+                                       (frVector2) { .x = -2.0f },
+                                       s1);
+
+    frBody *b2 = frCreateBodyFromShape(FR_BODY_DYNAMIC,
+                                       (frVector2) { .x = 2.0f },
+                                       s2);
+
+    frCollision collision = { .count = 0 };
+
+    ASSERT_EQ(frComputeCollision(b1, b2, &collision), false);
+
+    frSetBodyPosition(b2, (frVector2) { .x = 1.0f });
+
+    ASSERT_EQ(frComputeCollision(b1, b2, &collision), true);
+
+    ASSERT_EQ(collision.count, 1);
+
+    frReleaseBody(b2), frReleaseBody(b1);
+    frReleaseShape(s2), frReleaseShape(s1);
 
     PASS();
 }
