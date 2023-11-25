@@ -81,14 +81,14 @@ static bool frComputeIntersectionCircleLine(frVector2 center,
                                             float radius,
                                             frVector2 origin,
                                             frVector2 direction,
-                                            float *lambda);
+                                            float *distance);
 
 /* Computes the intersection of two lines. */
 static bool frComputeIntersectionLines(frVector2 origin1,
                                        frVector2 direction1,
                                        frVector2 origin2,
                                        frVector2 direction2,
-                                       float *lambda);
+                                       float *distance);
 
 /* Returns the edge of `s` that is most perpendicular to `v`. */
 static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v);
@@ -147,28 +147,28 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
 
     frShapeType type = frGetShapeType(s);
 
-    float lambda = FLT_MAX;
+    float distance = FLT_MAX;
 
     if (type == FR_SHAPE_CIRCLE) {
         bool intersects = frComputeIntersectionCircleLine(tx.position,
                                                           frGetCircleRadius(s),
                                                           ray.origin,
                                                           ray.direction,
-                                                          &lambda);
+                                                          &distance);
 
-        bool result = (lambda >= 0.0f) && (lambda <= ray.maxDistance);
+        bool result = (distance >= 0.0f) && (distance <= ray.maxDistance);
 
         if (raycastHit != NULL) {
             raycastHit->body = (frBody *) b;
 
             raycastHit->point = frVector2Add(
-                ray.origin, frVector2ScalarMultiply(ray.direction, lambda));
+                ray.origin, frVector2ScalarMultiply(ray.direction, distance));
 
             raycastHit->normal = frVector2LeftNormal(
                 frVector2Subtract(ray.origin, raycastHit->point));
 
-            raycastHit->distance = lambda;
-            raycastHit->inside = (lambda < 0.0f);
+            raycastHit->distance = distance;
+            raycastHit->inside = (distance < 0.0f);
         }
 
         return result;
@@ -177,7 +177,7 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
 
         int intersectionCount = 0;
 
-        float minLambda = FLT_MAX;
+        float minDistance = FLT_MAX;
 
         for (int j = vertices->count - 1, i = 0; i < vertices->count;
              j = i, i++) {
@@ -190,16 +190,17 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
                                                          ray.direction,
                                                          v2,
                                                          edgeVector,
-                                                         &lambda);
+                                                         &distance);
 
-            if (intersects && lambda <= ray.maxDistance) {
-                if (minLambda > lambda) {
-                    minLambda = lambda;
+            if (intersects && distance <= ray.maxDistance) {
+                if (minDistance > distance) {
+                    minDistance = distance;
 
                     if (raycastHit != NULL) {
-                        raycastHit->point = frVector2Add(
-                            ray.origin,
-                            frVector2ScalarMultiply(ray.direction, minLambda));
+                        raycastHit->point =
+                            frVector2Add(ray.origin,
+                                         frVector2ScalarMultiply(ray.direction,
+                                                                 minDistance));
 
                         raycastHit->normal = frVector2LeftNormal(edgeVector);
                     }
@@ -282,7 +283,7 @@ static bool frComputeCollisionCircles(const frShape *s1,
                                                              1.0f / magnitude)
                                    : (frVector2) { .y = 1.0f };
 
-        collision->contacts[0].id = 0;
+        /* TODO: ... */
 
         collision->contacts[0].point =
             frVector2Transform(frVector2ScalarMultiply(collision->direction,
@@ -368,7 +369,7 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
             if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                 collision->direction = frVector2Negate(collision->direction);
 
-            collision->contacts[0].id = 0;
+            /* TODO: ... */
 
             collision->contacts[0].point = frVector2Add(
                 circleTx.position,
@@ -421,7 +422,7 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
                     collision->direction = frVector2Negate(
                         collision->direction);
 
-                collision->contacts[0].id = 0;
+                /* TODO: ... */
 
                 collision->contacts[0].point = frVector2Transform(
                     frVector2ScalarMultiply(collision->direction, radius),
@@ -447,7 +448,7 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
                     collision->direction = frVector2Negate(
                         collision->direction);
 
-                collision->contacts[0].id = 0;
+                /* TODO: ... */
 
                 collision->contacts[0].point = frVector2Add(
                     circleTx.position,
@@ -539,15 +540,7 @@ static bool frComputeCollisionPolys(const frShape *s1,
 
         collision->direction = direction;
 
-        collision->contacts[0].id = (!refEdgeFlipped)
-                                        ? FR_GEOMETRY_MAX_VERTEX_COUNT
-                                              + incEdge.indexes[0]
-                                        : incEdge.indexes[0];
-
-        collision->contacts[1].id = (!refEdgeFlipped)
-                                        ? FR_GEOMETRY_MAX_VERTEX_COUNT
-                                              + incEdge.indexes[1]
-                                        : incEdge.indexes[1];
+        /* TODO: ... */
 
         if (depth1 < 0.0f) {
             collision->contacts[0].point = incEdge.data[1];
@@ -584,7 +577,7 @@ static bool frComputeIntersectionCircleLine(frVector2 center,
                                             float radius,
                                             frVector2 origin,
                                             frVector2 direction,
-                                            float *lambda) {
+                                            float *distance) {
     frVector2 originToCenter = frVector2Subtract(center, origin);
 
     float dot = frVector2Dot(originToCenter, direction);
@@ -592,7 +585,7 @@ static bool frComputeIntersectionCircleLine(frVector2 center,
     float heightSqr = frVector2MagnitudeSqr(originToCenter) - (dot * dot);
     float baseSqr = (radius * radius) - heightSqr;
 
-    if (lambda != NULL) *lambda = dot - sqrtf(baseSqr);
+    if (distance != NULL) *distance = dot - sqrtf(baseSqr);
 
     return (dot >= 0.0f && baseSqr >= 0.0f);
 }
@@ -602,7 +595,7 @@ static bool frComputeIntersectionLines(frVector2 origin1,
                                        frVector2 direction1,
                                        frVector2 origin2,
                                        frVector2 direction2,
-                                       float *lambda) {
+                                       float *distance) {
     float rXs = frVector2Cross(direction1, direction2);
 
     frVector2 qp = frVector2Subtract(origin2, origin1);
@@ -616,7 +609,7 @@ static bool frComputeIntersectionLines(frVector2 origin1,
         float t = qpXs * inverseRxS, u = qpXr * inverseRxS;
 
         if ((t >= 0.0f && t <= 1.0f) && (u >= 0.0f && u <= 1.0f)) {
-            if (lambda != NULL) *lambda = t;
+            if (distance != NULL) *distance = t;
 
             return true;
         }
@@ -637,7 +630,7 @@ static bool frComputeIntersectionLines(frVector2 origin1,
         if (sDr < 0.0f) k = t0, t0 = t1, t1 = k;
 
         if ((t0 < 0.0f && t1 == 0.0f) || (t0 == 1.0f && t1 > 1.0f)) {
-            if (lambda != NULL) *lambda = (t0 == 1.0f);
+            if (distance != NULL) *distance = (t0 == 1.0f);
 
             return 1;
         }
