@@ -120,7 +120,7 @@ typedef struct _frCollision {
     float restitution;
     frVector2 direction;
     struct {
-        // uint32_t id;
+        uint32_t id;
         frVector2 point;
         float depth;
         struct {

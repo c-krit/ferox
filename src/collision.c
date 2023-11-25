@@ -540,29 +540,33 @@ static bool frComputeCollisionPolys(const frShape *s1,
 
         collision->direction = direction;
 
-        /* TODO: ... */
+        // TODO: ...
+        uint32_t bitMask = (refEdgeFlipped << 16) | (refEdge.indexes[0] << 8);
+
+        collision->contacts[0].id = bitMask | incEdge.indexes[0];
+        collision->contacts[1].id = bitMask | incEdge.indexes[1];
 
         if (depth1 < 0.0f) {
+            collision->contacts[0].id = collision->contacts[1].id;
+
             collision->contacts[0].point = incEdge.data[1];
             collision->contacts[0].depth = depth2;
 
-            collision->contacts[1].point = collision->contacts[0].point;
-            collision->contacts[1].depth = collision->contacts[0].depth;
+            collision->contacts[1] = collision->contacts[0];
 
             collision->count = 1;
         } else if (depth2 < 0.0f) {
             collision->contacts[0].point = incEdge.data[0];
             collision->contacts[0].depth = depth1;
 
-            collision->contacts[1].point = collision->contacts[0].point;
-            collision->contacts[1].depth = collision->contacts[0].depth;
+            collision->contacts[1] = collision->contacts[0];
 
             collision->count = 1;
         } else {
             collision->contacts[0].point = incEdge.data[0];
-            collision->contacts[1].point = incEdge.data[1];
-
             collision->contacts[0].depth = depth1;
+
+            collision->contacts[1].point = incEdge.data[1];
             collision->contacts[1].depth = depth2;
 
             collision->count = 2;

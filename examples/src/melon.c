@@ -56,7 +56,7 @@ typedef struct _MelonKind {
 /* Constants =============================================================== */
 
 static const frMaterial MATERIAL_WALL = { .density = 1.25f,
-                                          .friction = 0.75f,
+                                          .friction = 0.5f,
                                           .restitution = 0.05f };
 
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
@@ -125,11 +125,11 @@ static void InitExample(void) {
                                });
 
     for (int i = 0; i < MELON_KIND_COUNT; i++)
-        melonShapes[i] = frCreateCircle((frMaterial) { .density = 3.5f
+        melonShapes[i] = frCreateCircle((frMaterial) { .density = 2.5f
                                                                   / (i + 1),
-                                                       .friction = 0.65f,
+                                                       .friction = 0.5f,
                                                        .restitution = 0.02f },
-                                        0.4f * (i + 3));
+                                        0.36f * (i + 3));
 
     walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
@@ -268,8 +268,6 @@ static void DeinitExample(void) {
 }
 
 static void OnPreStep(frBodyPair key, frCollision *value) {
-    if (value->count == 0) return;
-
     const MelonKind *bodyData1 = frGetBodyUserData(key.first);
     const MelonKind *bodyData2 = frGetBodyUserData(key.second);
 

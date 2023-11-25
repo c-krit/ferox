@@ -426,8 +426,8 @@ void frResolveCollision(frBody *b1,
         frVector2 relPosition2 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b2));
 
-        frVector2 relNormal1 = frVector2LeftNormal(relPosition1);
-        frVector2 relNormal2 = frVector2LeftNormal(relPosition2);
+        frVector2 relNormal1 = { .x = -relPosition1.y, .y = relPosition1.x };
+        frVector2 relNormal2 = { .x = -relPosition2.y, .y = relPosition2.x };
 
         frVector2 relVelocity = frVector2Subtract(
             frVector2Add(b2->mtn.velocity,
@@ -448,9 +448,9 @@ void frResolveCollision(frBody *b1,
                               + biasScalar)
                              * ctx->contacts[i].cache.normalMass;
 
-        if (normalScalar < 0.0f) normalScalar = 0.0f;
-
         {
+            if (normalScalar < 0.0f) normalScalar = 0.0f;
+            
             // TODO: ...
             ctx->contacts[i].cache.normalScalar = normalScalar;
         }

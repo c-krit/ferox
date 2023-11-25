@@ -187,9 +187,12 @@ void frStepWorld(frWorld *w, float dt) {
 
     frPreStepWorld(w);
 
-    for (int j = 0; j < hmlen(w->cache); j++)
-        if (w->handler.preStep != NULL)
-            w->handler.preStep(w->cache[j].key, &w->cache[j].value);
+    for (int j = 0; j < hmlen(w->cache); j++) {
+        frCollision *collision = &w->cache[j].value;
+
+        if (w->handler.preStep != NULL && collision->count > 0)
+            w->handler.preStep(w->cache[j].key, collision);
+    }
 
     for (int i = 0; i < arrlen(w->bodies); i++) {
         frApplyGravityToBody(w->bodies[i], w->gravity);
@@ -214,9 +217,12 @@ void frStepWorld(frWorld *w, float dt) {
     for (int i = 0; i < arrlen(w->bodies); i++)
         frIntegrateForBodyPosition(w->bodies[i], dt);
 
-    for (int j = 0; j < hmlen(w->cache); j++)
-        if (w->handler.postStep != NULL)
-            w->handler.postStep(w->cache[j].key, &w->cache[j].value);
+    for (int j = 0; j < hmlen(w->cache); j++) {
+        frCollision *collision = &w->cache[j].value;
+
+        if (w->handler.postStep != NULL && collision->count > 0)
+            w->handler.postStep(w->cache[j].key, collision);
+    }
 
     frPostStepWorld(w);
 }
@@ -305,7 +311,31 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
         collision.friction = entry->value.friction;
         collision.restitution = entry->value.restitution;
 
-        /* TODO: ... */
+        /*
+        for (int i = 0; i < collision.count; i++) {
+            int contactIndex = -1;
+
+            for (int j = 0; j < entry->value.count; j++) {
+                uint32_t oldContactId = entry->value.contacts[j].id;
+
+                if (collision.contacts[i].id == oldContactId) {
+                    contactIndex = j;
+
+                    break;
+                }
+            }
+
+            if (contactIndex < 0) continue;
+
+            float accNormalScalar = entry->value.contacts[contactIndex]
+                                        .cache.normalScalar;
+            float accTangentScalar = entry->value.contacts[contactIndex]
+                                         .cache.tangentScalar;
+
+            collision.contacts[i].cache.normalScalar = accNormalScalar;
+            collision.contacts[i].cache.tangentScalar = accTangentScalar;
+        }
+        */
     } else {
         collision.friction = 0.5f
                              * (frGetShapeFriction(s1)
