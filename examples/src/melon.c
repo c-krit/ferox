@@ -27,7 +27,7 @@
 
 #define FEROX_RAYLIB_IMPLEMENTATION
 #include "ferox-raylib.h"
-#include <stdio.h>
+
 #ifdef PLATFORM_WEB
     #include <emscripten/emscripten.h>
 #endif
@@ -84,6 +84,7 @@ static frBody *cursor, *walls[MAX_WALL_COUNT];
 static void InitExample(void);
 static void UpdateExample(void);
 static void DeinitExample(void);
+
 static void OnPreStep(frBodyPair key, frCollision *value);
 
 /* Public Functions ======================================================== */
@@ -282,10 +283,9 @@ static void OnPreStep(frBodyPair key, frCollision *value) {
     frRemoveBodyFromWorld(world, melon1);
     frRemoveBodyFromWorld(world, melon2);
 
-    frBody *newMelon =
-                frCreateBodyFromShape(FR_BODY_DYNAMIC,
-                                      frGetBodyPosition(melon2),
-                                      melonShapes[bodyData1->index + 1]);
+    frBody *newMelon = frCreateBodyFromShape(FR_BODY_DYNAMIC,
+                                             frGetBodyPosition(melon2),
+                                             melonShapes[bodyData1->index + 1]);
 
     frSetBodyUserData(newMelon, (void *) &MELON_KINDS[bodyData1->index + 1]);
 
