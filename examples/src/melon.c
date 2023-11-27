@@ -71,7 +71,7 @@ static const MelonKind MELON_KINDS[MELON_KIND_COUNT] = {
     { .index = 3, .color = GREEN }
 };
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / (2.0f * TARGET_FPS);
+static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / (2.0f * TARGET_FPS);
 
 /* Private Variables ======================================================= */
 
@@ -81,7 +81,7 @@ static frShape *melonShapes[MELON_KIND_COUNT];
 
 static frBody *cursor, *walls[MAX_WALL_COUNT];
 
-static float cursorCounter = CURSOR_COOLDOWN;
+static float cursorCounter;
 
 /* Private Function Prototypes ============================================= */
 
@@ -120,7 +120,7 @@ int main(void) {
 
 static void InitExample(void) {
     world = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                  2.0f),
+                                                  1.0f),
                           CELL_SIZE);
 
     frSetWorldCollisionHandler(world,
@@ -133,7 +133,7 @@ static void InitExample(void) {
                                                                   / (i + 1),
                                                        .friction = 0.35f,
                                                        .restitution = 0.05f },
-                                        0.36f * (i + 3));
+                                        0.18f * (i + 3));
 
     walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
@@ -191,6 +191,8 @@ static void InitExample(void) {
                                    melonShapes[0]);
 
     frSetBodyUserData(cursor, (void *) &MELON_KINDS[0]);
+
+    cursorCounter = CURSOR_COOLDOWN;
 }
 
 static void UpdateExample(void) {

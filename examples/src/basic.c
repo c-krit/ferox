@@ -48,7 +48,7 @@
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
@@ -91,7 +91,7 @@ int main(void) {
 
 static void InitExample(void) {
     world = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                  2.5f),
+                                                  2.0f),
                           CELL_SIZE);
 
     ground = frCreateBodyFromShape(

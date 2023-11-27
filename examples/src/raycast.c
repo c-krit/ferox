@@ -126,18 +126,18 @@ static void InitExample(void) {
     for (int i = 0; i < MAX_OBJECT_COUNT; i++) {
         frVector2 position = {
             .x = GetRandomValue(0, 1)
-                     ? GetRandomValue(0, 0.48f * SCREEN_WIDTH)
-                     : GetRandomValue(0.52f * SCREEN_WIDTH, SCREEN_WIDTH),
+                     ? GetRandomValue(0, 0.47f * SCREEN_WIDTH)
+                     : GetRandomValue(0.53f * SCREEN_WIDTH, SCREEN_WIDTH),
             .y = GetRandomValue(0, 1)
-                     ? GetRandomValue(0, 0.48f * SCREEN_HEIGHT)
-                     : GetRandomValue(0.52f * SCREEN_HEIGHT, SCREEN_HEIGHT)
+                     ? GetRandomValue(0, 0.47f * SCREEN_HEIGHT)
+                     : GetRandomValue(0.53f * SCREEN_HEIGHT, SCREEN_HEIGHT)
         };
 
         frBody *object =
             frCreateBodyFromShape(FR_BODY_STATIC,
                                   frVector2PixelsToUnits(position),
                                   frCreateCircle(FR_API_STRUCT_ZERO(frMaterial),
-                                                 0.5f * GetRandomValue(2, 4)));
+                                                 0.22f * GetRandomValue(2, 4)));
 
         frAddBodyToWorld(world, object);
     }

@@ -42,6 +42,7 @@
 #define SCREEN_HEIGHT      800
 
 #define ENEMY_SPAWN_DELAY  0.35f
+
 #define MAX_ENEMY_COUNT    256
 
 // clang-format on
@@ -79,14 +80,14 @@ static const frMaterial MATERIAL_PLAYER = { .density = 1.25f,
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 3.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
 static EntityData entityData[ENTITY_COUNT_] = {
     { .type = ENTITY_PLAYER, .attackSpeed = 0.08f },
-    { .type = ENTITY_BULLET, .movementSpeed = 64.0f },
-    { .type = ENTITY_ENEMY, .movementSpeed = 3.5f }
+    { .type = ENTITY_BULLET, .movementSpeed = 48.0f },
+    { .type = ENTITY_ENEMY, .movementSpeed = 3.0f }
 };
 
 static frVertices bulletVertices, playerVertices;
@@ -95,7 +96,7 @@ static frWorld *world;
 
 static frBody *player;
 
-static float spawnCounter = ENEMY_SPAWN_DELAY;
+static float spawnCounter;
 
 static int enemyCount;
 
@@ -184,6 +185,8 @@ static void InitExample(void) {
     frSetBodyUserData(player, (void *) &entityData[ENTITY_PLAYER]);
 
     frAddBodyToWorld(world, player);
+
+    spawnCounter = ENEMY_SPAWN_DELAY;
 }
 
 static void UpdateExample(void) {
@@ -204,7 +207,7 @@ static void UpdateExample(void) {
         frBody *enemy = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
             frVector2PixelsToUnits(position),
-            frCreateCircle(MATERIAL_ENEMY, 0.35f * GetRandomValue(3, 5)));
+            frCreateCircle(MATERIAL_ENEMY, 0.2f * GetRandomValue(3, 5)));
 
         frSetBodyUserData(enemy, (void *) &entityData[ENTITY_ENEMY]);
 

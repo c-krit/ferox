@@ -44,7 +44,7 @@ extern "C" {
 #define FR_GEOMETRY_MAX_VERTEX_COUNT  8
 
 /* Defines how many pixels represent a unit of length (meter). */
-#define FR_GEOMETRY_PIXELS_PER_UNIT   16.0f
+#define FR_GEOMETRY_PIXELS_PER_UNIT   32.0f
 
 /* Defines the 'bias factor' for the Baumgarte stabilization scheme. */
 #define FR_WORLD_BAUMGARTE_FACTOR     0.2f
@@ -56,7 +56,7 @@ extern "C" {
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
 
 /* Defines the iteration count for the constraint solver. */
-#define FR_WORLD_ITERATION_COUNT      16
+#define FR_WORLD_ITERATION_COUNT      12
 
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     2048

@@ -58,7 +58,7 @@ typedef struct _Piece {
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float CELL_SIZE = 2.8f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 0.75f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
@@ -149,12 +149,12 @@ static void InitExample(void) {
             FR_BODY_DYNAMIC,
             frVector2PixelsToUnits(
                 (frVector2) { .x = -SCREEN_WIDTH, .y = 0.5f * SCREEN_HEIGHT }),
-            frCreateCircle((frMaterial) { .density = 1.85f, .friction = 0.75f },
-                           frPixelsToUnits(20.0f)));
+            frCreateCircle((frMaterial) { .density = 4.0f, .friction = 0.35f },
+                           frPixelsToUnits(18.0f)));
 
         frApplyImpulseToBody(ball,
                              frGetBodyPosition(ball),
-                             (frVector2) { .x = 2048.0f });
+                             (frVector2) { .x = 256.0f });
 
         frAddBodyToWorld(world, ball);
     }
