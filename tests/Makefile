@@ -42,7 +42,7 @@ CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 	-O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH}
-LDLIBS = -lferox
+LDLIBS = -lferox -lm
 
 all: pre-build build post-build
 
