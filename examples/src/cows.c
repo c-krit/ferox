@@ -36,12 +36,13 @@
 
 // clang-format off
 
-#define TARGET_FPS       60
+#define TARGET_FPS         60
 
-#define SCREEN_WIDTH     1280
-#define SCREEN_HEIGHT    800
+#define SCREEN_WIDTH       1280
+#define SCREEN_HEIGHT      800
 
-#define MAX_ENEMY_COUNT  256
+#define ENEMY_SPAWN_DELAY  0.35f
+#define MAX_ENEMY_COUNT    256
 
 // clang-format on
 
@@ -83,7 +84,7 @@ static const float CELL_SIZE = 4.0f, DELTA_TIME = 1.0f / TARGET_FPS;
 /* Private Variables ======================================================= */
 
 static EntityData entityData[ENTITY_COUNT_] = {
-    { .type = ENTITY_PLAYER, .attackSpeed = 0.1f },
+    { .type = ENTITY_PLAYER, .attackSpeed = 0.08f },
     { .type = ENTITY_BULLET, .movementSpeed = 64.0f },
     { .type = ENTITY_ENEMY, .movementSpeed = 3.5f }
 };
@@ -93,6 +94,8 @@ static frVertices bulletVertices, playerVertices;
 static frWorld *world;
 
 static frBody *player;
+
+static float spawnCounter = ENEMY_SPAWN_DELAY;
 
 static int enemyCount;
 
@@ -184,19 +187,19 @@ static void InitExample(void) {
 }
 
 static void UpdateExample(void) {
-    for (int i = 0; i < MAX_ENEMY_COUNT - enemyCount; i++) {
+    if (enemyCount < MAX_ENEMY_COUNT && spawnCounter >= ENEMY_SPAWN_DELAY) {
         frVector2 position = { .x = 0.5f * SCREEN_WIDTH,
                                .y = 0.5f * SCREEN_HEIGHT };
 
         while (position.x >= 0.0f * SCREEN_WIDTH
                && position.x <= 1.0f * SCREEN_WIDTH)
-            position.x = GetRandomValue(-2.5f * SCREEN_WIDTH,
-                                        2.5f * SCREEN_WIDTH);
+            position.x = GetRandomValue(-1.25f * SCREEN_WIDTH,
+                                        1.25f * SCREEN_WIDTH);
 
         while (position.y >= 0.0f * SCREEN_HEIGHT
                && position.y <= 1.0f * SCREEN_HEIGHT)
-            position.y = GetRandomValue(-2.5f * SCREEN_HEIGHT,
-                                        2.5f * SCREEN_HEIGHT);
+            position.y = GetRandomValue(-1.25f * SCREEN_HEIGHT,
+                                        1.25f * SCREEN_HEIGHT);
 
         frBody *enemy = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
@@ -207,8 +210,10 @@ static void UpdateExample(void) {
 
         frAddBodyToWorld(world, enemy);
 
-        enemyCount++;
+        spawnCounter = 0.0f, enemyCount++;
     }
+
+    spawnCounter += GetFrameTime();
 
     const int bodyCount = frGetBodyCountForWorld(world);
 

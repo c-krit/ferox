@@ -41,6 +41,8 @@
 #define SCREEN_WIDTH      600
 #define SCREEN_HEIGHT     800
 
+#define CURSOR_COOLDOWN   0.5f
+
 #define MAX_WALL_COUNT    3
 #define MELON_KIND_COUNT  4
 
@@ -78,6 +80,8 @@ static frWorld *world;
 static frShape *melonShapes[MELON_KIND_COUNT];
 
 static frBody *cursor, *walls[MAX_WALL_COUNT];
+
+static float cursorCounter = CURSOR_COOLDOWN;
 
 /* Private Function Prototypes ============================================= */
 
@@ -127,8 +131,8 @@ static void InitExample(void) {
     for (int i = 0; i < MELON_KIND_COUNT; i++)
         melonShapes[i] = frCreateCircle((frMaterial) { .density = 2.5f
                                                                   / (i + 1),
-                                                       .friction = 0.5f,
-                                                       .restitution = 0.02f },
+                                                       .friction = 0.35f,
+                                                       .restitution = 0.05f },
                                         0.36f * (i + 3));
 
     walls[0] = frCreateBodyFromShape(
@@ -206,12 +210,13 @@ static void UpdateExample(void) {
 
         frSetBodyPosition(cursor, cursorPosition);
 
-        if (IsKeyPressed(KEY_SPACE)) {
+        if (IsKeyPressed(KEY_SPACE) && cursorCounter >= CURSOR_COOLDOWN) {
             frBody *melon =
                 frCreateBodyFromShape(FR_BODY_DYNAMIC,
                                       cursorPosition,
                                       melonShapes[cursorKind->index]);
 
+            frSetBodyAngle(melon, DEG2RAD * GetRandomValue(0, 360));
             frSetBodyUserData(melon, (void *) cursorKind);
 
             frAddBodyToWorld(world, melon);
@@ -220,7 +225,11 @@ static void UpdateExample(void) {
 
             frSetBodyShape(cursor, melonShapes[cursorIndex]);
             frSetBodyUserData(cursor, (void *) &MELON_KINDS[cursorIndex]);
+
+            cursorCounter = 0.0f;
         }
+
+        cursorCounter += GetFrameTime();
     }
 
     frUpdateWorld(world, DELTA_TIME);
@@ -250,6 +259,17 @@ static void UpdateExample(void) {
 
         frDrawBodyLines(cursor, 2.0f, ColorAlpha(cursorKind->color, 0.5f));
 
+        const Font font = GetFontDefault();
+
+        DrawTextEx(font,
+                   TextFormat("%d/%d bodies",
+                              frGetBodyCountForWorld(world),
+                              FR_WORLD_MAX_OBJECT_COUNT),
+                   (Vector2) { .x = 8.0f, .y = 32.0f },
+                   font.baseSize,
+                   2.0f,
+                   WHITE);
+
         DrawFPS(8, 8);
 
         EndDrawing();
@@ -271,21 +291,27 @@ static void OnPreStep(frBodyPair key, frCollision *value) {
     const MelonKind *bodyData1 = frGetBodyUserData(key.first);
     const MelonKind *bodyData2 = frGetBodyUserData(key.second);
 
-    if (bodyData1 == NULL || bodyData2 == NULL
-        || bodyData1->index != bodyData2->index
+    if (key.first == cursor || key.second == cursor || bodyData1 == NULL
+        || bodyData2 == NULL || bodyData1->index != bodyData2->index
         || bodyData1->index >= MELON_KIND_COUNT - 1)
         return;
 
-    frBody *melon1 = key.first, *melon2 = key.second;
+    frVector2 bodyPosition1 = frGetBodyPosition(key.first);
+    frVector2 bodyPosition2 = frGetBodyPosition(key.second);
 
-    frRemoveBodyFromWorld(world, melon1);
-    frRemoveBodyFromWorld(world, melon2);
+    frVector2 newPosition = (bodyPosition1.y < bodyPosition2.y) ? bodyPosition1
+                                                                : bodyPosition2;
+
+    int newIndex = bodyData1->index + 1;
+
+    frRemoveBodyFromWorld(world, key.first);
+    frRemoveBodyFromWorld(world, key.second);
 
     frBody *newMelon = frCreateBodyFromShape(FR_BODY_DYNAMIC,
-                                             frGetBodyPosition(melon2),
-                                             melonShapes[bodyData1->index + 1]);
+                                             newPosition,
+                                             melonShapes[newIndex]);
 
-    frSetBodyUserData(newMelon, (void *) &MELON_KINDS[bodyData1->index + 1]);
+    frSetBodyUserData(newMelon, (void *) &MELON_KINDS[newIndex]);
 
     frAddBodyToWorld(world, newMelon);
 
