@@ -56,7 +56,7 @@ typedef struct _MelonKind {
 /* Constants =============================================================== */
 
 static const frMaterial MATERIAL_WALL = { .density = 1.25f,
-                                          .friction = 0.75f,
+                                          .friction = 0.5f,
                                           .restitution = 0.05f };
 
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
@@ -84,6 +84,8 @@ static frBody *cursor, *walls[MAX_WALL_COUNT];
 static void InitExample(void);
 static void UpdateExample(void);
 static void DeinitExample(void);
+
+static void OnPreStep(frBodyPair key, frCollision *value);
 
 /* Public Functions ======================================================== */
 
@@ -117,12 +119,17 @@ static void InitExample(void) {
                                                   2.0f),
                           CELL_SIZE);
 
+    frSetWorldCollisionHandler(world,
+                               (frCollisionHandler) {
+                                   .preStep = OnPreStep,
+                               });
+
     for (int i = 0; i < MELON_KIND_COUNT; i++)
-        melonShapes[i] = frCreateCircle((frMaterial) { .density = 3.5f
+        melonShapes[i] = frCreateCircle((frMaterial) { .density = 2.5f
                                                                   / (i + 1),
-                                                       .friction = 0.65f,
+                                                       .friction = 0.5f,
                                                        .restitution = 0.02f },
-                                        0.4f * (i + 3));
+                                        0.36f * (i + 3));
 
     walls[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
@@ -258,4 +265,29 @@ static void DeinitExample(void) {
 
     frReleaseBody(cursor);
     frReleaseWorld(world);
+}
+
+static void OnPreStep(frBodyPair key, frCollision *value) {
+    const MelonKind *bodyData1 = frGetBodyUserData(key.first);
+    const MelonKind *bodyData2 = frGetBodyUserData(key.second);
+
+    if (bodyData1 == NULL || bodyData2 == NULL
+        || bodyData1->index != bodyData2->index
+        || bodyData1->index >= MELON_KIND_COUNT - 1)
+        return;
+
+    frBody *melon1 = key.first, *melon2 = key.second;
+
+    frRemoveBodyFromWorld(world, melon1);
+    frRemoveBodyFromWorld(world, melon2);
+
+    frBody *newMelon = frCreateBodyFromShape(FR_BODY_DYNAMIC,
+                                             frGetBodyPosition(melon2),
+                                             melonShapes[bodyData1->index + 1]);
+
+    frSetBodyUserData(newMelon, (void *) &MELON_KINDS[bodyData1->index + 1]);
+
+    frAddBodyToWorld(world, newMelon);
+
+    value->count = 0;
 }

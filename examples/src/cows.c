@@ -365,8 +365,6 @@ static void UpdateBullets(void) {
 }
 
 static void OnPreStep(frBodyPair key, frCollision *value) {
-    if (value->count == 0) return;
-
     const EntityData *bodyData1 = frGetBodyUserData(key.first);
     const EntityData *bodyData2 = frGetBodyUserData(key.second);
 
