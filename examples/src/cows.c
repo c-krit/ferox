@@ -149,9 +149,7 @@ static void InitExample(void) {
 
     SetMousePosition(0.5f * SCREEN_WIDTH, 0.5f * SCREEN_HEIGHT);
 
-    world = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                  0.0f),
-                          CELL_SIZE);
+    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), CELL_SIZE);
 
     frSetWorldCollisionHandler(world,
                                (frCollisionHandler) {

@@ -133,13 +133,13 @@ static void InitExample(void) {
                      : GetRandomValue(0.53f * SCREEN_HEIGHT, SCREEN_HEIGHT)
         };
 
-        frBody *object =
+        frBody *body =
             frCreateBodyFromShape(FR_BODY_STATIC,
                                   frVector2PixelsToUnits(position),
                                   frCreateCircle(FR_API_STRUCT_ZERO(frMaterial),
                                                  0.22f * GetRandomValue(2, 4)));
 
-        frAddBodyToWorld(world, object);
+        frAddBodyToWorld(world, body);
     }
 }
 
@@ -186,11 +186,10 @@ static void UpdateExample(void) {
 
         const int bodyCount = frGetBodyCountForWorld(world);
 
-        for (int i = 1; i < bodyCount; i++) {
-            frBody *object = frGetBodyFromWorld(world, i);
-
-            frDrawBodyLines(object, 2.0f, ColorAlpha(LIGHTGRAY, 0.95f));
-        }
+        for (int i = 1; i < bodyCount; i++)
+            frDrawBodyLines(frGetBodyFromWorld(world, i),
+                            2.0f,
+                            ColorAlpha(LIGHTGRAY, 0.95f));
 
         frComputeRaycastForWorld(world, ray, OnRaycastQuery);
 
