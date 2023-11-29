@@ -60,7 +60,7 @@ static frSpatialHash *hash;
 
 static frBody *bodies[MAX_OBJECT_COUNT];
 
-static Color primaryColor, secondaryColor;
+static Color primaryColor, secondaryColor, greenColor;
 
 /* Private Function Prototypes ============================================= */
 
@@ -211,5 +211,6 @@ static frAABB GetCursorBounds(void) {
 }
 
 static bool OnHashQuery(int index, void *ctx) {
-    /* TODO: ... */
+    frSetBodyUserData(bodies[index], (void *) &secondaryColor);
+    return true;
 }
