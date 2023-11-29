@@ -43,6 +43,7 @@ TARGETS ?= \
 	${SOURCE_PATH}/basic.out   \
 	${SOURCE_PATH}/cows.out    \
 	${SOURCE_PATH}/melon.out   \
+	${SOURCE_PATH}/query.out   \
 	${SOURCE_PATH}/raycast.out \
 	${SOURCE_PATH}/raylib.out
 
