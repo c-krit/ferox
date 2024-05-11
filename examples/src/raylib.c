@@ -58,6 +58,8 @@ typedef struct _Piece {
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
+static const char *RAYLIB_TEXTURE_PATH = "../res/images/raylib-40.png";
+
 static const float CELL_SIZE = 0.75f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
@@ -108,7 +110,10 @@ int main(void) {
 static void InitExample(void) {
     world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), CELL_SIZE);
 
-    raylibTexture = LoadTexture("../res/images/raylib-40.png");
+    raylibTexture = FileExists(RAYLIB_TEXTURE_PATH)
+                        ? LoadTexture(RAYLIB_TEXTURE_PATH)
+                        : LoadTexture(RAYLIB_TEXTURE_PATH
+                                      + (3 * sizeof *(RAYLIB_TEXTURE_PATH)));
 
     if (raylibTexture.id > 0) {
         pieceWidth = raylibTexture.width / LOGO_WIDTH_IN_PIECES;
@@ -128,7 +133,8 @@ static void InitExample(void) {
             0.5f * (SCREEN_HEIGHT - raylibTexture.height)
         };
 
-        for (int i = 0; i < LOGO_WIDTH_IN_PIECES * LOGO_HEIGHT_IN_PIECES; i++) {
+        for (int i = 0; i < LOGO_WIDTH_IN_PIECES * LOGO_HEIGHT_IN_PIECES;
+                i++) {
             pieces[i].offset.x = (i % LOGO_WIDTH_IN_PIECES) * pieceWidth;
             pieces[i].offset.y = (i / LOGO_WIDTH_IN_PIECES) * pieceHeight;
 
@@ -138,23 +144,24 @@ static void InitExample(void) {
             };
 
             pieces[i].body = frCreateBodyFromShape(FR_BODY_DYNAMIC,
-                                                   frVector2PixelsToUnits(
-                                                       position),
-                                                   pieceShape);
+                                                    frVector2PixelsToUnits(
+                                                        position),
+                                                    pieceShape);
 
             frAddBodyToWorld(world, pieces[i].body);
         }
 
         ball = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
-            frVector2PixelsToUnits(
-                (frVector2) { .x = -SCREEN_WIDTH, .y = 0.5f * SCREEN_HEIGHT }),
-            frCreateCircle((frMaterial) { .density = 4.0f, .friction = 0.35f },
-                           frPixelsToUnits(18.0f)));
+            frVector2PixelsToUnits((frVector2) {
+                .x = -SCREEN_WIDTH, .y = 0.5f * SCREEN_HEIGHT }),
+            frCreateCircle((frMaterial) { .density = 4.0f,
+                                            .friction = 0.35f },
+                            frPixelsToUnits(18.0f)));
 
         frApplyImpulseToBody(ball,
-                             frGetBodyPosition(ball),
-                             (frVector2) { .x = 256.0f });
+                                frGetBodyPosition(ball),
+                                (frVector2) { .x = 256.0f });
 
         frAddBodyToWorld(world, ball);
     }
