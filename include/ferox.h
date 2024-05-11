@@ -183,7 +183,7 @@ typedef enum _frBodyType {
 } frBodyType;
 
 /* An enumeration that represents a property flag of a rigid body. */
-typedef enum frBodyFlag {
+typedef enum _frBodyFlag {
     FR_FLAG_NONE,
     FR_FLAG_INFINITE_MASS,
     FR_FLAG_INFINITE_INERTIA

@@ -34,7 +34,6 @@ SOURCE_PATH = src
 TARGETS = \
 	${SOURCE_PATH}/basic.html   \
 	${SOURCE_PATH}/cows.html    \
-	${SOURCE_PATH}/melon.html   \
 	${SOURCE_PATH}/query.html   \
 	${SOURCE_PATH}/raycast.html \
 	${SOURCE_PATH}/raylib.html

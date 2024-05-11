@@ -371,7 +371,7 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
 
         ctx->contacts[i].cache.tangentMass = 1.0f / tangentMass;
 
-        // TODO: ...
+        /* TODO: ... */
     }
 }
 

@@ -27,6 +27,10 @@
 
 #include "ferox.h"
 
+/* Macros ================================================================== */
+
+#define FR_WORLD_SCHEDULER_COUNT  2
+
 /* Typedefs ================================================================ */
 
 /* A structure that represents the key-value pair of the contact cache. */
@@ -40,6 +44,10 @@ struct _frWorld {
     frVector2 gravity;
     frBody **bodies;
     frSpatialHash *hash;
+    struct {
+        frBody *key;
+        int value;
+    } *schedulers[FR_WORLD_SCHEDULER_COUNT];
     frContactCacheEntry *cache;
     frCollisionHandler handler;
     float accumulator, timestamp;
@@ -111,9 +119,11 @@ void frReleaseWorld(frWorld *w) {
     for (int i = 0; i < arrlen(w->bodies); i++)
         frReleaseBody(w->bodies[i]);
 
-    frReleaseSpatialHash(w->hash);
-
     arrfree(w->bodies), hmfree(w->cache);
+
+    hmfree(w->schedulers[0]), hmfree(w->schedulers[1]);
+
+    frReleaseSpatialHash(w->hash);
 
     free(w);
 }
@@ -133,7 +143,7 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         || arrlen(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
         return false;
 
-    arrput(w->bodies, b);
+    hmput(w->schedulers[0], b, -1);
 
     return true;
 }
@@ -144,8 +154,7 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
 
     for (int i = 0; i < arrlen(w->bodies); i++) {
         if (w->bodies[i] == b) {
-            // NOTE: `O(1)` performance!
-            arrdelswap(w->bodies, i);
+            hmput(w->schedulers[1], b, i);
 
             return true;
         }
@@ -311,31 +320,7 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
         collision.friction = entry->value.friction;
         collision.restitution = entry->value.restitution;
 
-        /*
-        for (int i = 0; i < collision.count; i++) {
-            int contactIndex = -1;
-
-            for (int j = 0; j < entry->value.count; j++) {
-                uint32_t oldContactId = entry->value.contacts[j].id;
-
-                if (collision.contacts[i].id == oldContactId) {
-                    contactIndex = j;
-
-                    break;
-                }
-            }
-
-            if (contactIndex < 0) continue;
-
-            float accNormalScalar = entry->value.contacts[contactIndex]
-                                        .cache.normalScalar;
-            float accTangentScalar = entry->value.contacts[contactIndex]
-                                         .cache.tangentScalar;
-
-            collision.contacts[i].cache.normalScalar = accNormalScalar;
-            collision.contacts[i].cache.tangentScalar = accTangentScalar;
-        }
-        */
+        /* TODO: ... */
     } else {
         collision.friction = 0.5f
                              * (frGetShapeFriction(s1)
@@ -374,6 +359,17 @@ static bool frRaycastHashQueryCallback(int bodyIndex, void *ctx) {
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w) {
+    for (int i = 0; i < FR_WORLD_SCHEDULER_COUNT; i++) {
+        bool shouldAddToWorld = (i == 0);
+
+        for (int j = 0; j < hmlen(w->schedulers[i]); j++) {
+            if (shouldAddToWorld) arrput(w->bodies, w->schedulers[i][j].key);
+            else arrdelswap(w->bodies, w->schedulers[i][j].value);
+
+            hmdel(w->schedulers[i], w->schedulers[i][j].key);
+        }
+    }
+
     for (int i = 0; i < arrlen(w->bodies); i++)
         frInsertToSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
 

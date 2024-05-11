@@ -35,9 +35,7 @@ INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
-TARGETS ?= \
-	${SOURCE_PATH}/broad-phase.out \
-	${SOURCE_PATH}/collision.out
+TARGETS ?= 
 
 CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
