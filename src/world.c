@@ -121,7 +121,8 @@ void frReleaseWorld(frWorld *w) {
 
     arrfree(w->bodies), hmfree(w->cache);
 
-    hmfree(w->schedulers[0]), hmfree(w->schedulers[1]);
+    for (int i = 0; i < FR_WORLD_SCHEDULER_COUNT; i++)
+        hmfree(w->schedulers[i]);
 
     frReleaseSpatialHash(w->hash);
 
