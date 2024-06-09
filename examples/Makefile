@@ -23,11 +23,11 @@
 .PHONY: all clean
 .SUFFIXES: .c .exe .html .out
 
-_COLOR_BEGIN = \033[1;36m
+_COLOR_BEGIN = \033[1;38;5;202m
 _COLOR_END = \033[m
 
 PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox
+PROJECT_FULL_NAME = c-krit/ferox (examples)
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 

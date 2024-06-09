@@ -123,8 +123,7 @@ static void InitExample(void) {
         halfPieceHeight = 0.5f * pieceHeight;
 
         frShape *pieceShape = frCreateRectangle(
-            (frMaterial) {
-                .density = 1.25f, .friction = 0.5f, .restitution = 0.0f },
+            (frMaterial) { .density = 1.25f, .friction = 0.5f },
             frPixelsToUnits(pieceWidth),
             frPixelsToUnits(pieceHeight));
 

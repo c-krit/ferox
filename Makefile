@@ -22,7 +22,7 @@
 
 .PHONY: all clean
 
-_COLOR_BEGIN = \033[1;36m
+_COLOR_BEGIN = \033[1;38;5;202m
 _COLOR_END = \033[m
 
 PROJECT_NAME = ferox
@@ -54,7 +54,8 @@ CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
 all: pre-build build post-build
 
 pre-build:
-	@printf "${PROJECT_PREFIX} Using: '${CC}' and '${AR}' to build this project.\n"
+	@printf "${PROJECT_PREFIX} Using: '${CC}' and '${AR}' "
+	@printf "to build this project.\n"
 
 build: ${TARGETS}
 

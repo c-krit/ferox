@@ -21,21 +21,30 @@
 #
 
 .PHONY: all clean
-.SUFFIXES: .c .exe .out
+.SUFFIXES: .c .out
 
-_COLOR_BEGIN = \033[1;36m
+_COLOR_BEGIN = \033[1;38;5;202m
 _COLOR_END = \033[m
 
 PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox
+PROJECT_FULL_NAME = c-krit/ferox (tests)
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
+BINARY_PATH = bin
 INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
-TARGETS ?= 
+OBJECTS = \
+	${SOURCE_PATH}/broad-phase.o \
+	${SOURCE_PATH}/collision.o   \
+	${SOURCE_PATH}/ferox-tests.o \
+	${SOURCE_PATH}/geometry.o    \
+	${SOURCE_PATH}/rigid-body.o  \
+	${SOURCE_PATH}/world.o
+
+TARGETS = ${BINARY_PATH}/ferox-tests.out
 
 CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
@@ -46,21 +55,23 @@ LDLIBS = -lferox -lm
 all: pre-build build post-build
 
 pre-build:
-	@printf "${PROJECT_PREFIX} Using: '${CC}' to build all tests.\n"
+	@printf "${PROJECT_PREFIX} Using: '${CC}' to build test suites.\n"
 
 build: ${TARGETS}
 
-.c.exe .c.out:
+.c.o:
 	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
-	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
+	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
-.c.html:
-	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
-	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
+${TARGETS}: ${OBJECTS}
+	@mkdir -p ${BINARY_PATH}
+	@printf "${PROJECT_PREFIX} Linking: ${TARGETS}\n"
+	@${CC} ${OBJECTS} -o ${TARGETS} ${LDFLAGS} ${LDLIBS}
 
 post-build:
 	@printf "${PROJECT_PREFIX} Build complete.\n"
 
 clean:
 	@printf "${PROJECT_PREFIX} Cleaning up.\n"
-	@rm -f ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.out
+	@rm -f ${BINARY_PATH}/*.out
+	@rm -f ${SOURCE_PATH}/*.o
