@@ -27,14 +27,34 @@
 
 /* Private Function Prototypes ============================================= */
 
-// TODO: ...
+TEST utPointInPolygon(void);
 
 /* Public Functions ======================================================== */
 
 SUITE(rigid_body) {
-    // TODO: ...
+    RUN_TEST(utPointInPolygon);
 }
 
 /* Private Functions ======================================================= */
 
-// TODO: ...
+TEST utPointInPolygon(void) {
+    frShape *s = frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial), 8.0f, 8.0f);
+
+    frBody *b = frCreateBodyFromShape(FR_BODY_STATIC,
+                                      FR_API_STRUCT_ZERO(frVector2),
+                                      s);
+
+    {
+        frSetBodyAngle(b, 0.25f * M_PI);
+
+        ASSERT_EQ(false,
+                  frBodyContainsPoint(b,
+                                      (frVector2) { .x = -4.0f, .y = -4.0f }));
+
+        // TODO: ...
+    }
+
+    frReleaseBody(b), frReleaseShape(s);
+
+    PASS();
+}

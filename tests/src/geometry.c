@@ -22,19 +22,68 @@
 
 /* Includes ================================================================ */
 
+#include <float.h>
+
 #include "ferox.h"
 #include "greatest.h"
 
 /* Private Function Prototypes ============================================= */
 
-// TODO: ...
+TEST utComputeAABBs(void);
+TEST utConvexHull(void);
 
 /* Public Functions ======================================================== */
 
 SUITE(geometry) {
-    // TODO: ...
+    RUN_TEST(utComputeAABBs);
+    RUN_TEST(utConvexHull);
 }
 
 /* Private Functions ======================================================= */
 
-// TODO: ...
+TEST utComputeAABBs(void) {
+    frShape *s1 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.0f);
+    frShape *s2 = frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial), 1.0f, 1.0f);
+
+    frBody *b = frCreateBodyFromShape(FR_BODY_STATIC,
+                                      FR_API_STRUCT_ZERO(frVector2),
+                                      s1);
+
+    frAABB aabb = frGetBodyAABB(b);
+
+    {
+        ASSERT_IN_RANGE(-1.0f, aabb.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(-1.0f, aabb.y, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(2.0f, aabb.width, FLT_EPSILON);
+        ASSERT_IN_RANGE(2.0f, aabb.height, FLT_EPSILON);
+    }
+
+    {
+        // TODO: ...
+    }
+
+    frReleaseBody(b), frReleaseShape(s2), frReleaseShape(s1);
+
+    PASS();
+}
+
+TEST utConvexHull(void) {
+    frShape *s = frCreatePolygon(FR_API_STRUCT_ZERO(frMaterial),
+                                 &(const frVertices) {
+                                    .data = {
+                                        (frVector2) { .x = 1.0f, .y = 1.0f },
+                                        (frVector2) { .x = 0.75f, .y = 1.5f },
+                                        (frVector2) { .x = -1.5f, .y = 1.5f },
+                                        (frVector2) { .x = -1.25f, .y = 1.0f },
+                                        (frVector2) { .x = -1.75f, .y = 0.5f },
+                                        (frVector2) { .x = -1.0f, .y = -0.75f },
+                                        (frVector2) { .x = -0.1f, .y = 0.5f },
+                                    },
+                                    .count = 7
+                                 });
+
+    ASSERT_EQ(5, frGetPolygonVertices(s)->count);
+
+    PASS();
+}

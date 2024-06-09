@@ -81,7 +81,7 @@ TEST utProximityQueries(void) {
 
             frQuerySpatialHash(sh, cursorBounds, utHashQuery, &queryResult);
 
-            ASSERT_EQ(queryResult, 1);
+            ASSERT_EQ(1, queryResult);
         }
 
         queryResult = 0;
@@ -91,7 +91,7 @@ TEST utProximityQueries(void) {
 
             frQuerySpatialHash(sh, cursorBounds, utHashQuery, &queryResult);
 
-            ASSERT_EQ(queryResult, 4);
+            ASSERT_EQ(4, queryResult);
         }
 
         frClearSpatialHash(sh);
