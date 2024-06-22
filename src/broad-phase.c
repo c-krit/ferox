@@ -100,7 +100,7 @@ float frGetSpatialHashCellSize(const frSpatialHash *sh) {
 }
 
 /* Inserts a `key`-`value` pair into `sh`. */
-void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value) {
+void frInsertIntoSpatialHash(frSpatialHash *sh, frAABB key, int value) {
     if (sh == NULL) return;
 
     float inverseCellSize = sh->inverseCellSize;

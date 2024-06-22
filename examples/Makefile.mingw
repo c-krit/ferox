@@ -32,6 +32,7 @@ SOURCE_PATH = src
 
 TARGETS = \
 	${SOURCE_PATH}/basic.exe   \
+	${SOURCE_PATH}/bricks.exe  \
 	${SOURCE_PATH}/cows.exe    \
 	${SOURCE_PATH}/melon.exe   \
 	${SOURCE_PATH}/query.exe   \

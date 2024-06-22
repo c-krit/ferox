@@ -68,7 +68,7 @@ static void InitExample(void);
 static void UpdateExample(void);
 static void DeinitExample(void);
 
-static void DrawCursor(void);
+static void DrawCursorBounds(void);
 static frAABB GetCursorBounds(void);
 
 static bool OnHashQuery(int index, void *ctx);
@@ -139,7 +139,7 @@ static void UpdateExample(void) {
         for (int i = 0; i < MAX_OBJECT_COUNT; i++) {
             frSetBodyUserData(bodies[i], (void *) &primaryColor);
 
-            frInsertToSpatialHash(hash, frGetBodyAABB(bodies[i]), i);
+            frInsertIntoSpatialHash(hash, frGetBodyAABB(bodies[i]), i);
         }
 
         frQuerySpatialHash(hash, GetCursorBounds(), OnHashQuery, NULL);
@@ -161,7 +161,7 @@ static void UpdateExample(void) {
             frDrawBodyLines(bodies[i], 2.0f, *color);
         }
 
-        DrawCursor();
+        DrawCursorBounds();
 
         DrawFPS(8, 8);
 
@@ -176,7 +176,7 @@ static void DeinitExample(void) {
     frReleaseSpatialHash(hash);
 }
 
-static void DrawCursor(void) {
+static void DrawCursorBounds(void) {
     const Vector2 mousePosition = GetMousePosition();
 
     Rectangle bounds = { .x = mousePosition.x - 0.5f * CURSOR_SIZE_IN_PIXELS,

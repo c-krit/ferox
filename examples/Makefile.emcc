@@ -33,6 +33,7 @@ SOURCE_PATH = src
 
 TARGETS = \
 	${SOURCE_PATH}/basic.html   \
+	${SOURCE_PATH}/bricks.html  \
 	${SOURCE_PATH}/cows.html    \
 	${SOURCE_PATH}/melon.html   \
 	${SOURCE_PATH}/query.html   \

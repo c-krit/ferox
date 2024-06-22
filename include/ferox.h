@@ -239,7 +239,7 @@ void frClearSpatialHash(frSpatialHash *sh);
 float frGetSpatialHashCellSize(const frSpatialHash *sh);
 
 /* Inserts a `key`-`value` pair into `sh`. */
-void frInsertToSpatialHash(frSpatialHash *sh, frAABB key, int value);
+void frInsertIntoSpatialHash(frSpatialHash *sh, frAABB key, int value);
 
 /* Query `sh` for any objects that overlap the given `aabb`. */
 void frQuerySpatialHash(frSpatialHash *sh,

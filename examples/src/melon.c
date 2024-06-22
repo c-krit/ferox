@@ -43,7 +43,7 @@
 
 #define CURSOR_COOLDOWN   0.65f
 
-#define MAX_WALL_COUNT    4
+#define BORDER_COUNT      4
 #define MELON_KIND_COUNT  4
 
 // clang-format on
@@ -75,7 +75,7 @@ static frWorld *world;
 
 static frShape *melonShapes[MELON_KIND_COUNT];
 
-static frBody *cursor, *walls[MAX_WALL_COUNT];
+static frBody *cursor, *borders[BORDER_COUNT];
 
 static float cursorCounter = CURSOR_COOLDOWN;
 
@@ -124,7 +124,7 @@ static void InitExample(void) {
                                    .postStep = OnPostStep,
                                });
 
-    walls[0] = frCreateBodyFromShape(
+    borders[0] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = 1.05f * SCREEN_HEIGHT }),
@@ -134,7 +134,7 @@ static void InitExample(void) {
                           frPixelsToUnits(1.0f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
 
-    walls[1] = frCreateBodyFromShape(
+    borders[1] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         frVector2PixelsToUnits((frVector2) { .x = 1.05f * SCREEN_WIDTH,
                                              .y = 0.5f * SCREEN_HEIGHT }),
@@ -144,7 +144,7 @@ static void InitExample(void) {
                           frPixelsToUnits(0.1f * SCREEN_WIDTH),
                           frPixelsToUnits(1.0f * SCREEN_HEIGHT)));
 
-    walls[2] = frCreateBodyFromShape(
+    borders[2] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = -0.05f * SCREEN_HEIGHT }),
@@ -154,7 +154,7 @@ static void InitExample(void) {
                           frPixelsToUnits(1.0f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
 
-    walls[3] = frCreateBodyFromShape(
+    borders[3] = frCreateBodyFromShape(
         FR_BODY_STATIC,
         frVector2PixelsToUnits((frVector2) { .x = -0.05f * SCREEN_WIDTH,
                                              .y = 0.5f * SCREEN_HEIGHT }),
@@ -164,8 +164,8 @@ static void InitExample(void) {
                           frPixelsToUnits(0.1f * SCREEN_WIDTH),
                           frPixelsToUnits(1.0f * SCREEN_HEIGHT)));
 
-    for (int i = 0; i < MAX_WALL_COUNT; i++)
-        frAddBodyToWorld(world, walls[i]);
+    for (int i = 0; i < BORDER_COUNT; i++)
+        frAddBodyToWorld(world, borders[i]);
 
     for (int i = 0; i < MELON_KIND_COUNT; i++)
         melonShapes[i] = frCreateCircle((frMaterial) { .density = 0.35f
@@ -252,7 +252,7 @@ static void UpdateExample(void) {
 
         const Font font = GetFontDefault();
 
-        DrawTextEx(GetFontDefault(),
+        DrawTextEx(font,
                    TextFormat("%d/%d bodies",
                               frGetBodyCountForWorld(world),
                               FR_WORLD_MAX_OBJECT_COUNT),

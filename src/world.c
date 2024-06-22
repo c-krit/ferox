@@ -263,7 +263,7 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
     frClearSpatialHash(w->hash);
 
     for (int i = 0; i < arrlen(w->bodies); i++)
-        frInsertToSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
+        frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
 
     frVector2 minVertex = ray.origin,
               maxVertex = frVector2Add(
@@ -372,7 +372,7 @@ static void frPreStepWorld(frWorld *w) {
     }
 
     for (int i = 0; i < arrlen(w->bodies); i++)
-        frInsertToSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
+        frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
 
     for (int i = 0; i < arrlen(w->bodies); i++)
         frQuerySpatialHash(w->hash,
