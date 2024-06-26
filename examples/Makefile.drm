@@ -20,7 +20,11 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
 .PHONY: all clean
+
+# ============================================================================>
 
 # TODO: Edit these values to match your raylib installation path!
 RAYLIB_INCLUDE_PATH ?= .
@@ -31,11 +35,16 @@ LIBRARY_PATH = ../lib
 RESOURCE_PATH = res
 SOURCE_PATH = src
 
+# ============================================================================>
+
 CC = gcc
-CFLAGS = -D_DEFAULT_SOURCE -DEGL_NO_X11 -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
-    -I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
+CFLAGS = -D_DEFAULT_SOURCE -DEGL_NO_X11 -g -I${INCLUDE_PATH} \
+	-I../${INCLUDE_PATH} -I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
-LDLIBS = -lferox -lraylib -latomic -ldl -ldrm -lEGL -lgbm -lGLESv2 -lm -lpthread -lrt
+LDLIBS = -lferox -lraylib -latomic -ldl -ldrm -lEGL -lgbm -lGLESv2 -lm \
+	-lpthread -lrt
+
+# ============================================================================>
 
 all:
 	@${MAKE} CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}"

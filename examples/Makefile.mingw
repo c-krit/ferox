@@ -20,7 +20,11 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
 .PHONY: all clean
+
+# ============================================================================>
 
 # TODO: Edit these values to match your raylib installation path!
 RAYLIB_INCLUDE_PATH ?= ../../raylib/src
@@ -39,15 +43,19 @@ TARGETS = \
 	${SOURCE_PATH}/raycast.exe \
 	${SOURCE_PATH}/raylib.exe
 
+# ============================================================================>
+
 CC = x86_64-w64-mingw32-gcc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
 LDLIBS = -lferox -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
 
+# ============================================================================>
+
 all:
-	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
-	LDLIBS="${LDLIBS}"
+	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" \
+	LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}"
 
 clean:
 	@${MAKE} $@

@@ -20,15 +20,23 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
 .PHONY: all clean
+
+# ============================================================================>
 
 _COLOR_BEGIN = \033[1;38;5;202m
 _COLOR_END = \033[m
+
+# ============================================================================>
 
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+
+# ============================================================================>
 
 INCLUDE_PATH = include
 LIBRARY_PATH = lib
@@ -44,12 +52,16 @@ OBJECTS = \
 
 TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a
 
+# ============================================================================>
+
 CC = cc
 AR = ar
 CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 
 CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
 	-Wno-unused-variable
+
+# ============================================================================>
 
 all: pre-build build post-build
 
@@ -61,7 +73,7 @@ build: ${TARGETS}
 
 .c.o:
 	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
-	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
+	@${CC} -c $< -o $@ ${CFLAGS}
 
 ${TARGETS}: ${OBJECTS}
 	@mkdir -p ${LIBRARY_PATH}

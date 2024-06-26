@@ -20,7 +20,11 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
 .PHONY: all clean
+
+# ============================================================================>
 
 # TODO: Edit these values to match your raylib installation path!
 RAYLIB_INCLUDE_PATH ?= ../../raylib/src
@@ -40,9 +44,11 @@ TARGETS = \
 	${SOURCE_PATH}/raycast.html \
 	${SOURCE_PATH}/raylib.html
 
+# ============================================================================>
+
 CC = emcc
-CFLAGS = -D_DEFAULT_SOURCE -DPLATFORM_WEB -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
-	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
+CFLAGS = -D_DEFAULT_SOURCE -DPLATFORM_WEB -g -I${INCLUDE_PATH} \
+	-I../${INCLUDE_PATH} -I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
 LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 WEBFLAGS = -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3 \
@@ -50,9 +56,11 @@ WEBFLAGS = -s FORCE_FILESYSTEM -s INITIAL_MEMORY=67108864 -s USE_GLFW=3 \
 
 CFLAGS += -Wno-limited-postlink-optimizations
 
+# ============================================================================>
+
 all:
-	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" \
-	LDLIBS="${LDLIBS}" WEBFLAGS="${WEBFLAGS}"
+	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" \
+	LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" WEBFLAGS="${WEBFLAGS}"
 
 clean:
 	@${MAKE} $@

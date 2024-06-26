@@ -20,16 +20,24 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
 .PHONY: all clean
 .SUFFIXES: .c .exe .html .out
 
+# ============================================================================>
+
 _COLOR_BEGIN = \033[1;38;5;202m
 _COLOR_END = \033[m
+
+# ============================================================================>
 
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox (examples)
 
 PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+
+# ============================================================================>
 
 # TODO: Edit these values to match your raylib installation path!
 RAYLIB_INCLUDE_PATH ?= .
@@ -48,11 +56,15 @@ TARGETS ?= \
 	${SOURCE_PATH}/raycast.out \
 	${SOURCE_PATH}/raylib.out
 
+# ============================================================================>
+
 CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 	-I${RAYLIB_INCLUDE_PATH} -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH} -L${RAYLIB_LIBRARY_PATH}
 LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
+
+# ============================================================================>
 
 all: pre-build build post-build
 

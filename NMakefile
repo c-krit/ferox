@@ -20,10 +20,14 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox
 
 PROJECT_PREFIX = $(PROJECT_FULL_NAME):
+
+# ============================================================================>
 
 INCLUDE_PATH = include
 LIBRARY_PATH = lib
@@ -39,10 +43,14 @@ OBJECTS = \
 
 TARGETS = $(LIBRARY_PATH)/$(PROJECT_NAME).lib
 
+# ============================================================================>
+
 CC = cl
 AR = lib
 CFLAGS = /I $(INCLUDE_PATH) /nologo /O2 /std:c11 /utf-8 /Zi
 LDFLAGS = /DEBUG
+
+# ============================================================================>
 
 all: pre-build build post-build
 
