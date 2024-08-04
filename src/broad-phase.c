@@ -30,7 +30,7 @@
 /* Typedefs ================================================================ */
 
 /* A structure that represents the key of a spatial hash entry. */
-typedef struct _frSpatialHashKey {
+typedef struct frSpatialHashKey_ {
     int x, y;
 } frSpatialHashKey;
 
@@ -38,13 +38,13 @@ typedef struct _frSpatialHashKey {
 typedef int *frSpatialHashValue;
 
 /* A structure that represents the key-value pair of a spatial hash.*/
-typedef struct _frSpatialHashEntry {
+typedef struct frSpatialHashEntry_ {
     frSpatialHashKey key;
     frSpatialHashValue value;
 } frSpatialHashEntry;
 
 /* A struct that represents a spatial hash. */
-struct _frSpatialHash {
+struct frSpatialHash_ {
     float cellSize, inverseCellSize;
     frSpatialHashValue queryResult;
     frSpatialHashEntry *entries;

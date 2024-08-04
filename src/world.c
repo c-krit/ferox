@@ -34,13 +34,13 @@
 /* Typedefs ================================================================ */
 
 /* A structure that represents the key-value pair of the contact cache. */
-typedef struct _frContactCacheEntry {
+typedef struct frContactCacheEntry_ {
     frBodyPair key;
     frCollision value;
 } frContactCacheEntry;
 
 /* A structure that represents a simulation container. */
-struct _frWorld {
+struct frWorld_ {
     frVector2 gravity;
     frBody **bodies;
     frSpatialHash *hash;
@@ -57,7 +57,7 @@ struct _frWorld {
     A structure that represents the context data 
     for `frPreStepHashQueryCallback()`. 
 */
-typedef struct _frPreStepHashQueryCtx {
+typedef struct frPreStepHashQueryCtx_ {
     frWorld *world;
     int bodyIndex;
 } frPreStepHashQueryCtx;
@@ -66,7 +66,7 @@ typedef struct _frPreStepHashQueryCtx {
     A structure that represents the context data 
     for `frRaycastHashQueryCallback()`.
 */
-typedef struct _frRaycastHashQueryCtx {
+typedef struct frRaycastHashQueryCtx_ {
     frRay ray;
     frWorld *world;
     frRaycastQueryFunc func;

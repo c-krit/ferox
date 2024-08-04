@@ -22,14 +22,12 @@
 
 /* Includes ================================================================ */
 
-#include <float.h>
-
 #include "ferox.h"
 
 /* Typedefs ================================================================ */
 
 /* A union that represents the internal data of a collision shape. */
-typedef union _frShapeData {
+typedef union frShapeData_ {
     struct {
         float radius;
     } circle;
@@ -42,7 +40,7 @@ typedef union _frShapeData {
     A structure that represents a collision shape, 
     which can be attached to a rigid body.
 */
-struct _frShape {
+struct frShape_ {
     frShapeType type;
     frShapeData data;
     frMaterial material;

@@ -22,14 +22,12 @@
 
 /* Includes ================================================================ */
 
-#include <float.h>
-
 #include "ferox.h"
 
 /* Typedefs ================================================================ */
 
 /* A structure that represents the motion data of a rigid body. */
-typedef struct _frMotionData {
+typedef struct frMotionData_ {
     float mass, inverseMass;
     float inertia, inverseInertia;
     float gravityScale;
@@ -40,7 +38,7 @@ typedef struct _frMotionData {
 } frMotionData;
 
 /* A structure that represents a rigid body. */
-struct _frBody {
+struct frBody_ {
     frBodyType type;
     frBodyFlags flags;
     frShape *shape;

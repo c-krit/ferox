@@ -22,14 +22,12 @@
 
 /* Includes ================================================================ */
 
-#include <float.h>
-
 #include "ferox.h"
 
 /* Typedefs ================================================================ */
 
 /* A structure that represents an edge of a convex polygon. */
-typedef struct _frEdge {
+typedef struct frEdge_ {
     frVector2 data[3];
     int indexes[2];
     int count;

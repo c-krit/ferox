@@ -32,6 +32,7 @@ extern "C" {
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <float.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -84,12 +85,12 @@ extern "C" {
 /* Typedefs ================================================================ */
 
 /* A structure that represents a two-dimensional vector. */
-typedef struct _frVector2 {
+typedef struct frVector2_ {
     float x, y;
 } frVector2;
 
 /* A structure that represents an axis-aligned bounding box. */
-typedef struct _frAABB {
+typedef struct frAABB_ {
     float x, y, width, height;
 } frAABB;
 
@@ -97,18 +98,18 @@ typedef struct _frAABB {
     A structure that represents a collision shape, 
     which can be attached to a rigid body.
 */
-typedef struct _frShape frShape;
+typedef struct frShape_ frShape;
 
 /* A structure that represents a rigid body. */
-typedef struct _frBody frBody;
+typedef struct frBody_ frBody;
 
 /* A structure that represents a simulation container. */
-typedef struct _frWorld frWorld;
+typedef struct frWorld_ frWorld;
 
 /* (From 'broad-phase.c') ================================================== */
 
 /* A structure that represents a spatial hash. */
-typedef struct _frSpatialHash frSpatialHash;
+typedef struct frSpatialHash_ frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
 typedef bool (*frHashQueryFunc)(int index, void *ctx);
@@ -116,7 +117,7 @@ typedef bool (*frHashQueryFunc)(int index, void *ctx);
 /* (From 'collision.c') ==================================================== */
 
 /* A structure that represents the contact points of two colliding bodies. */
-typedef struct _frCollision {
+typedef struct frCollision_ {
     float friction;
     float restitution;
     frVector2 direction;
@@ -133,14 +134,14 @@ typedef struct _frCollision {
 } frCollision;
 
 /* A structure that represents a ray. */
-typedef struct _frRay {
+typedef struct frRay_ {
     frVector2 origin;
     frVector2 direction;
     float maxDistance;
 } frRay;
 
 /* A struct that represents the information about a raycast hit. */
-typedef struct _frRaycastHit {
+typedef struct frRaycastHit_ {
     frBody *body;
     frVector2 point;
     frVector2 normal;
@@ -151,7 +152,7 @@ typedef struct _frRaycastHit {
 /* (From 'geometry.c') ===================================================== */
 
 /* An enumeration that represents the type of a collision shape. */
-typedef enum _frShapeType {
+typedef enum frShapeType_ {
     FR_SHAPE_UNKNOWN,
     FR_SHAPE_CIRCLE,
     FR_SHAPE_POLYGON
@@ -161,14 +162,14 @@ typedef enum _frShapeType {
     A structure that represents the physical quantities 
     of a collision shape. 
 */
-typedef struct _frMaterial {
+typedef struct frMaterial_ {
     float density;
     float friction;
     float restitution;
 } frMaterial;
 
 /* A structure that represents the vertices of a convex polygon. */
-typedef struct _frVertices {
+typedef struct frVertices_ {
     frVector2 data[FR_GEOMETRY_MAX_VERTEX_COUNT];
     int count;
 } frVertices;
@@ -176,7 +177,7 @@ typedef struct _frVertices {
 /* (From 'rigid-body.c') =================================================== */
 
 /* An enumeration that represents the type of a rigid body. */
-typedef enum _frBodyType {
+typedef enum frBodyType_ {
     FR_BODY_UNKNOWN,
     FR_BODY_STATIC,
     FR_BODY_KINEMATIC,
@@ -184,7 +185,7 @@ typedef enum _frBodyType {
 } frBodyType;
 
 /* An enumeration that represents a property flag of a rigid body. */
-typedef enum _frBodyFlag {
+typedef enum frBodyFlag_ {
     FR_FLAG_NONE,
     FR_FLAG_INFINITE_MASS,
     FR_FLAG_INFINITE_INERTIA
@@ -197,7 +198,7 @@ typedef uint_fast8_t frBodyFlags;
     A structure that represents the position of an object in meters,
     the rotation data of an object and the angle of an object in radians.
 */
-typedef struct _frTransform {
+typedef struct frTransform_ {
     frVector2 position;
     struct {
         float _sin, _cos;
@@ -208,7 +209,7 @@ typedef struct _frTransform {
 /* (From 'world.c') ======================================================== */
 
 /* A structure that represents a pair of two rigid bodies. */
-typedef struct _frBodyPair {
+typedef struct frBodyPair_ {
     frBody *first, *second;
 } frBodyPair;
 
@@ -216,7 +217,7 @@ typedef struct _frBodyPair {
 typedef void (*frCollisionEventFunc)(frBodyPair key, frCollision *value);
 
 /* A structure that represents the collision event callback functions. */
-typedef struct _frCollisionHandler {
+typedef struct frCollisionHandler_ {
     frCollisionEventFunc preStep, postStep;
 } frCollisionHandler;
 
