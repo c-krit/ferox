@@ -22,7 +22,7 @@
 
 # ============================================================================>
 
-.PHONY: all clean
+.PHONY: all clean rebuild
 
 # ============================================================================>
 
@@ -46,8 +46,11 @@ LDLIBS = -lferox -lraylib -latomic -ldl -ldrm -lEGL -lgbm -lGLESv2 -lm \
 
 # ============================================================================>
 
-all:
-	@${MAKE} CC=${CC} CFLAGS="${CFLAGS}" LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}"
+all rebuild:
+	@${MAKE} CC=${CC} CFLAGS="${CFLAGS}" \
+		LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" $@
+
+# ============================================================================>
 
 clean:
 	@${MAKE} $@

@@ -73,6 +73,12 @@ $(TARGETS): $(OBJECTS)
 post-build:
 	@echo $(LOG_PREFIX) Build complete. && echo;
 
+# ============================================================================>
+
+rebuild: clean all
+
+# ============================================================================>
+
 clean:
 	@echo $(LOG_PREFIX) Cleaning up. && echo;
 	@if exist $(LIBRARY_PATH)\*.lib del /Q /S $(LIBRARY_PATH)\*.lib > nul 2>&1

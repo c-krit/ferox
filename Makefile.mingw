@@ -26,7 +26,7 @@
 
 # ============================================================================>
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install rebuild uninstall
 
 # ============================================================================>
 
@@ -35,5 +35,5 @@ AR = x86_64-w64-mingw32-ar
 
 # ============================================================================>
 
-all clean install uninstall:
+all clean install rebuild uninstall:
 	@${MAKE} CC=${CC} AR=${AR} $@
