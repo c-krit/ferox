@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+# Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,28 @@
 # SOFTWARE.
 #
 
+# ============================================================================>
+
+.POSIX:
+
+# ============================================================================>
+
 .PHONY: all clean
 .SUFFIXES: .c .out
+
+# ============================================================================>
 
 _COLOR_BEGIN = \033[1;38;5;202m
 _COLOR_END = \033[m
 
+# ============================================================================>
+
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox (tests)
 
-PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+LOG_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+
+# ============================================================================>
 
 BINARY_PATH = bin
 INCLUDE_PATH = include
@@ -46,32 +58,36 @@ OBJECTS = \
 
 TARGETS = ${BINARY_PATH}/ferox-tests.out
 
+# ============================================================================>
+
 CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
 	-O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH}
 LDLIBS = -lferox -lm
 
+# ============================================================================>
+
 all: pre-build build post-build
 
 pre-build:
-	@printf "${PROJECT_PREFIX} Using: '${CC}' to build test suites.\n"
+	@printf "${LOG_PREFIX} Using: '${CC}' to build test suites.\n"
 
 build: ${TARGETS}
 
 .c.o:
-	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
+	@printf "${LOG_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
 ${TARGETS}: ${OBJECTS}
 	@mkdir -p ${BINARY_PATH}
-	@printf "${PROJECT_PREFIX} Linking: ${TARGETS}\n"
+	@printf "${LOG_PREFIX} Linking: ${TARGETS}\n"
 	@${CC} ${OBJECTS} -o ${TARGETS} ${LDFLAGS} ${LDLIBS}
 
 post-build:
-	@printf "${PROJECT_PREFIX} Build complete.\n"
+	@printf "${LOG_PREFIX} Build complete.\n"
 
 clean:
-	@printf "${PROJECT_PREFIX} Cleaning up.\n"
+	@printf "${LOG_PREFIX} Cleaning up.\n"
 	@rm -f ${BINARY_PATH}/*.out
 	@rm -f ${SOURCE_PATH}/*.o

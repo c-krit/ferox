@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+# Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ _COLOR_END = \033[m
 PROJECT_NAME = ferox
 PROJECT_FULL_NAME = c-krit/ferox (examples)
 
-PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+LOG_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
 # ============================================================================>
 
@@ -47,14 +47,16 @@ INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
+TARGET_SUFFIX ?= out
+
 TARGETS ?= \
-	${SOURCE_PATH}/basic.out   \
-	${SOURCE_PATH}/bricks.out  \
-	${SOURCE_PATH}/cows.out    \
-	${SOURCE_PATH}/melon.out   \
-	${SOURCE_PATH}/query.out   \
-	${SOURCE_PATH}/raycast.out \
-	${SOURCE_PATH}/raylib.out
+	${SOURCE_PATH}/basic.${TARGET_SUFFIX}    \
+	${SOURCE_PATH}/bricks.${TARGET_SUFFIX}   \
+	${SOURCE_PATH}/cows.${TARGET_SUFFIX}     \
+	${SOURCE_PATH}/melon.${TARGET_SUFFIX}    \
+	${SOURCE_PATH}/query.${TARGET_SUFFIX}    \
+	${SOURCE_PATH}/raycast.${TARGET_SUFFIX}  \
+	${SOURCE_PATH}/raylib.${TARGET_SUFFIX}
 
 # ============================================================================>
 
@@ -69,22 +71,22 @@ LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 all: pre-build build post-build
 
 pre-build:
-	@printf "${PROJECT_PREFIX} Using: '${CC}' to build all examples.\n"
+	@printf "${LOG_PREFIX} Using: '${CC}' to build all examples.\n"
 
 build: ${TARGETS}
 
 .c.exe .c.out:
-	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
+	@printf "${LOG_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
 
 .c.html:
-	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
+	@printf "${LOG_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS} ${WEBFLAGS}
 
 post-build:
-	@printf "${PROJECT_PREFIX} Build complete.\n"
+	@printf "${LOG_PREFIX} Build complete.\n"
 
 clean:
-	@printf "${PROJECT_PREFIX} Cleaning up.\n"
+	@printf "${LOG_PREFIX} Cleaning up.\n"
 	@rm -f ${SOURCE_PATH}/*.data ${SOURCE_PATH}/*.exe ${SOURCE_PATH}/*.js \
 	${SOURCE_PATH}/*.html ${SOURCE_PATH}/*.out ${SOURCE_PATH}/*.wasm

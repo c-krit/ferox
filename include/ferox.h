@@ -36,6 +36,24 @@ extern "C" {
 #include <stdint.h>
 #include <stdlib.h>
 
+/* Macros ================================================================== */
+
+/* Compiler-specific attribute for a function that must be inlined. */
+#ifdef _MSC_VER
+    #define FR_API_INLINE __forceinline
+#elif defined(__GNUC__)
+    #if defined(__STRICT_ANSI__)
+        #define FR_API_INLINE __inline__ __attribute__((always_inline))
+    #else
+        #define FR_API_INLINE inline __attribute__((always_inline))
+    #endif
+#else
+    #define FR_API_INLINE inline
+#endif
+
+/* Empty-initializes the given object. */
+#define FR_API_STRUCT_ZERO(T) ((T) { 0 })
+
 /* User-Defined Macros ===================================================== */
 
 // clang-format off
@@ -62,23 +80,6 @@ extern "C" {
 #define FR_WORLD_MAX_OBJECT_COUNT     2048
 
 // clang-format on
-
-/* Macros ================================================================== */
-
-#ifdef _MSC_VER
-    #define FR_API_INLINE __forceinline
-#elif defined(__GNUC__)
-    #if defined(__STRICT_ANSI__)
-        #define FR_API_INLINE __inline__ __attribute__((always_inline))
-    #else
-        #define FR_API_INLINE inline __attribute__((always_inline))
-    #endif
-#else
-    #define FR_API_INLINE inline
-#endif
-
-/* Empty-initializes the given object. */
-#define FR_API_STRUCT_ZERO(T) ((T) { 0 })
 
 /* Typedefs ================================================================ */
 

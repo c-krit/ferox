@@ -74,7 +74,7 @@ TEST utProximityQueries(void) {
                            .width = offset.x,
                            .height = offset.y };
 
-            frInsertToSpatialHash(sh, key, i);
+            frInsertIntoSpatialHash(sh, key, i);
         }
 
         {

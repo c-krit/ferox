@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+# Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,14 +35,7 @@ LIBRARY_PATH = ../lib
 RESOURCE_PATH = res
 SOURCE_PATH = src
 
-TARGETS = \
-	${SOURCE_PATH}/basic.html   \
-	${SOURCE_PATH}/bricks.html  \
-	${SOURCE_PATH}/cows.html    \
-	${SOURCE_PATH}/melon.html   \
-	${SOURCE_PATH}/query.html   \
-	${SOURCE_PATH}/raycast.html \
-	${SOURCE_PATH}/raylib.html
+TARGET_SUFFIX = html
 
 # ============================================================================>
 
@@ -59,7 +52,7 @@ CFLAGS += -Wno-limited-postlink-optimizations
 # ============================================================================>
 
 all:
-	@${MAKE} TARGETS="${TARGETS}" CC=${CC} CFLAGS="${CFLAGS}" \
+	@${MAKE} TARGET_SUFFIX=${TARGET_SUFFIX} CC=${CC} CFLAGS="${CFLAGS}" \
 	LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" WEBFLAGS="${WEBFLAGS}"
 
 clean:

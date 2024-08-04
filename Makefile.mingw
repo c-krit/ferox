@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+# Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,11 @@
 
 # ============================================================================>
 
-.PHONY: all clean
+.POSIX:
+
+# ============================================================================>
+
+.PHONY: all clean install uninstall
 
 # ============================================================================>
 
@@ -31,8 +35,5 @@ AR = x86_64-w64-mingw32-ar
 
 # ============================================================================>
 
-all:
-	@${MAKE} CC=${CC} AR=${AR}
-
-clean:
-	@${MAKE} $@
+all clean install uninstall:
+	@${MAKE} CC=${CC} AR=${AR} $@

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+# Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,11 @@
 
 # ============================================================================>
 
-.PHONY: all clean
+.POSIX:
+
+# ============================================================================>
+
+.PHONY: all clean install uninstall
 
 # ============================================================================>
 
@@ -32,9 +36,9 @@ _COLOR_END = \033[m
 # ============================================================================>
 
 PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox
+PROJECT_FULL_NAME = c-krit/${PROJECT_NAME}
 
-PROJECT_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+LOG_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
 
 # ============================================================================>
 
@@ -52,11 +56,13 @@ OBJECTS = \
 
 TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a
 
+PREFIX = ${DESTDIR}/usr/local
+
 # ============================================================================>
 
 CC = cc
 AR = ar
-CFLAGS ?= -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
+CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -O2 -std=gnu99
 
 CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
 	-Wno-unused-variable
@@ -66,24 +72,51 @@ CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
 all: pre-build build post-build
 
 pre-build:
-	@printf "${PROJECT_PREFIX} Using: '${CC}' and '${AR}' "
+	@printf "${LOG_PREFIX} Using: '${CC}' and '${AR}' "
 	@printf "to build this project.\n"
 
 build: ${TARGETS}
 
 .c.o:
-	@printf "${PROJECT_PREFIX} Compiling: $@ (from $<)\n"
+	@printf "${LOG_PREFIX} Compiling: $@ (from $<)\n"
 	@${CC} -c $< -o $@ ${CFLAGS}
 
 ${TARGETS}: ${OBJECTS}
 	@mkdir -p ${LIBRARY_PATH}
-	@printf "${PROJECT_PREFIX} Linking: ${TARGETS}\n"
+	@printf "${LOG_PREFIX} Linking: ${TARGETS}\n"
 	@${AR} rcs ${TARGETS} ${OBJECTS}
 
 post-build:
-	@printf "${PROJECT_PREFIX} Build complete.\n"
+	@printf "${LOG_PREFIX} Build complete.\n"
+
+# ============================================================================>
+
+superuser:
+	@if [ "$(shell id -u)" -ne 0 ]; then                   \
+		printf "${LOG_PREFIX} You must be superuser to ";  \
+		printf "install or uninstall this library.\n";     \
+														   \
+		exit 1;                                            \
+	fi
+
+install: superuser
+	@printf "${LOG_PREFIX} Installing: "
+	@printf "${PREFIX}/${INCLUDE_PATH}/${PROJECT_NAME}.h\n"
+	@install -m755 ${INCLUDE_PATH}/${PROJECT_NAME}.h \
+		${PREFIX}/${INCLUDE_PATH}
+	@printf "${LOG_PREFIX} Installing: ${PREFIX}/${TARGETS}\n"
+	@install -m755 ${TARGETS} ${PREFIX}/${TARGETS}
+
+uninstall: superuser
+	@printf "${LOG_PREFIX} Uninstalling: "
+	@printf "${PREFIX}/${INCLUDE_PATH}/${PROJECT_NAME}.h\n"
+	@rm -f ${PREFIX}/${INCLUDE_PATH}/${PROJECT_NAME}.h
+	@printf "${LOG_PREFIX} Uninstalling: ${PREFIX}/${TARGETS}\n"
+	@rm -f ${PREFIX}/${TARGETS}
+
+# ============================================================================>
 
 clean:
-	@printf "${PROJECT_PREFIX} Cleaning up.\n"
+	@printf "${LOG_PREFIX} Cleaning up.\n"
 	@rm -f ${LIBRARY_PATH}/*.a
 	@rm -f ${SOURCE_PATH}/*.o
