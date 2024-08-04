@@ -399,6 +399,12 @@ frVector2 frGetBodyVelocity(const frBody *b);
 /* Returns the angular velocity of `b`. */
 float frGetBodyAngularVelocity(const frBody *b);
 
+/* Returns the net force of `b`. */
+frVector2 frGetBodyForce(const frBody *b);
+
+/* Returns the net torque of `b`. */
+float frGetBodyTorque(const frBody *b);
+
 /* Returns the AABB (Axis-Aligned Bounding Box) of `b`. */
 frAABB frGetBodyAABB(const frBody *b);
 
