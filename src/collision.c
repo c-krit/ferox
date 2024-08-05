@@ -238,16 +238,16 @@ static bool frClipEdge(frEdge *e, frVector2 v, float dot) {
     } else {
         frVector2 edgeVector = frVector2Subtract(e->data[1], e->data[0]);
 
-        frVector2 midpoint = frVector2Add(
+        frVector2 midPoint = frVector2Add(
             e->data[0],
             frVector2ScalarMultiply(edgeVector, (dot1 / (dot1 - dot2))));
 
         if (dot1 > 0.0f && dot2 < 0.0f) {
-            e->data[1] = midpoint, e->count = 2;
+            e->data[1] = midPoint, e->count = 2;
 
             return true;
         } else if (dot1 < 0.0f && dot2 > 0.0f) {
-            e->data[0] = e->data[1], e->data[1] = midpoint, e->count = 2;
+            e->data[0] = e->data[1], e->data[1] = midPoint, e->count = 2;
 
             return true;
         } else {

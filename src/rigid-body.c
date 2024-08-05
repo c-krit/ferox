@@ -409,7 +409,8 @@ void frIntegrateForBodyPosition(frBody *b, float dt) {
     b->tx.position.x += b->mtn.velocity.x * dt;
     b->tx.position.y += b->mtn.velocity.y * dt;
 
-    frSetBodyAngle(b, b->tx.angle + (b->mtn.angularVelocity * dt));
+    if (b->mtn.angularVelocity != 0.0f)
+        frSetBodyAngle(b, b->tx.angle + (b->mtn.angularVelocity * dt));
 
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
