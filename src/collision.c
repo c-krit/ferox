@@ -276,10 +276,11 @@ static bool frComputeCollisionCircles(const frShape *s1,
     if (collision != NULL) {
         float magnitude = sqrtf(magnitudeSqr);
 
-        collision->direction = (magnitude > 0.0f)
-                                   ? frVector2ScalarMultiply(direction,
-                                                             1.0f / magnitude)
-                                   : (frVector2) { .y = 1.0f };
+        if (magnitude <= 0.0f)
+            direction.x = 0.0f, direction.y = magnitude = FLT_EPSILON;
+
+        collision->direction = frVector2ScalarMultiply(direction,
+                                                       1.0f / magnitude);
 
         /* TODO: ... */
 
@@ -288,9 +289,7 @@ static bool frComputeCollisionCircles(const frShape *s1,
                                                        frGetCircleRadius(s1)),
                                tx1);
 
-        collision->contacts[0].depth = (magnitude > 0.0f)
-                                           ? radiusSum - magnitude
-                                           : frGetCircleRadius(s1);
+        collision->contacts[0].depth = radiusSum - magnitude;
 
         collision->contacts[1] = collision->contacts[0];
 

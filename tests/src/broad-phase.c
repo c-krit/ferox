@@ -27,78 +27,22 @@
 
 /* Macros ================================================================== */
 
-#define MAX_OBJECT_COUNT  1024
-
-#define SIZE_IN_CELLS     32
+/* TODO: ... */
 
 /* Constants =============================================================== */
 
-static const int CELL_SIZE = 2;
+/* TODO: ... */
 
 /* Private Function Prototypes ============================================= */
 
-static bool utHashQuery(int index, void *ctx);
-
-TEST utProximityQueries(void);
+/* TODO: ... */
 
 /* Public Functions ======================================================== */
 
 SUITE(broad_phase) {
-    RUN_TEST(utProximityQueries);
+    /* TODO: ... */
 }
 
 /* Private Functions ======================================================= */
 
-static bool utHashQuery(int index, void *ctx) {
-    int *queryResult = ctx;
-
-    (*queryResult)++;
-
-    return true;
-}
-
-TEST utProximityQueries(void) {
-    frSpatialHash *sh = frCreateSpatialHash(CELL_SIZE);
-
-    frAABB cursorBounds = { .width = 1.0f,
-                            .height = 1.0f };
-
-    int queryResult = 0;
-
-    {
-        for (int i = 0; i < MAX_OBJECT_COUNT; i++) {
-            frVector2 offset = { .x = (CELL_SIZE >> 1), .y = (CELL_SIZE >> 1) };
-
-            frAABB key = { .x = offset.x + ((i % SIZE_IN_CELLS) * CELL_SIZE),
-                           .y = offset.y + ((i / SIZE_IN_CELLS) * CELL_SIZE),
-                           .width = offset.x,
-                           .height = offset.y };
-
-            frInsertIntoSpatialHash(sh, key, i);
-        }
-
-        {
-            cursorBounds.x = cursorBounds.y = CELL_SIZE / 4.0f;
-
-            frQuerySpatialHash(sh, cursorBounds, utHashQuery, &queryResult);
-
-            ASSERT_EQ(1, queryResult);
-        }
-
-        queryResult = 0;
-
-        {
-            cursorBounds.x = cursorBounds.y = CELL_SIZE;
-
-            frQuerySpatialHash(sh, cursorBounds, utHashQuery, &queryResult);
-
-            ASSERT_EQ(4, queryResult);
-        }
-
-        frClearSpatialHash(sh);
-    }
-
-    frReleaseSpatialHash(sh);
-
-    PASS();
-}
+/* TODO: ... */

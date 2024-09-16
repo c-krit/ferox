@@ -41,7 +41,7 @@
 #define SCREEN_WIDTH      600
 #define SCREEN_HEIGHT     800
 
-#define CURSOR_COOLDOWN   0.65f
+#define CURSOR_COOLDOWN   0.85f
 
 #define BORDER_COUNT      4
 #define MELON_KIND_COUNT  4
@@ -67,7 +67,7 @@ static const MelonKind MELON_KINDS[MELON_KIND_COUNT] = {
     { .index = 3, .color = GREEN }
 };
 
-static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / (TARGET_FPS << 1);
 
 /* Private Variables ======================================================= */
 
@@ -168,11 +168,11 @@ static void InitExample(void) {
         frAddBodyToWorld(world, borders[i]);
 
     for (int i = 0; i < MELON_KIND_COUNT; i++)
-        melonShapes[i] = frCreateCircle((frMaterial) { .density = 0.35f
+        melonShapes[i] = frCreateCircle((frMaterial) { .density = 0.25f
                                                                   / (i + 1),
-                                                       .friction = 0.35f,
-                                                       .restitution = 0.05f },
-                                        0.18f * (i + 3));
+                                                       .friction = 0.5f,
+                                                       .restitution = 0.03f },
+                                        0.75f + (0.1f * (i + 3)));
 
     cursor = frCreateBodyFromShape(FR_BODY_KINEMATIC,
                                    frVector2PixelsToUnits((frVector2) {
@@ -235,7 +235,11 @@ static void UpdateExample(void) {
                    0.25f,
                    ColorAlpha(DARKGRAY, 0.75f));
 
-        frDrawBodyLines(cursor, 2.0f, ColorAlpha(cursorKind->color, 0.5f));
+        float cursorAlpha = 0.15f + (cursorCounter >= CURSOR_COOLDOWN) * 0.25f;
+
+        frDrawBodyLines(cursor,
+                        2.0f,
+                        ColorAlpha(cursorKind->color, cursorAlpha));
 
         const int bodyCount = frGetBodyCountForWorld(world);
 

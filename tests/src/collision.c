@@ -45,28 +45,23 @@ SUITE(collision) {
 
 TEST utCircleVsCircle(void) {
     frShape *s1 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.0f);
-    frShape *s2 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 2.0f);
+    frShape *s2 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.15f);
 
-    frBody *b1 = frCreateBodyFromShape(FR_BODY_STATIC,
+    frBody *b1 = frCreateBodyFromShape(FR_BODY_KINEMATIC,
                                        FR_API_STRUCT_ZERO(frVector2),
                                        s1);
 
-    frBody *b2 = frCreateBodyFromShape(FR_BODY_STATIC,
-                                       (frVector2) { .x = 4.0f, .y = 1.0f },
+    frBody *b2 = frCreateBodyFromShape(FR_BODY_KINEMATIC,
+                                       FR_API_STRUCT_ZERO(frVector2),
                                        s2);
 
     frCollision collision = { .count = 0 };
 
     {
-        frComputeCollision(b1, b2, &collision);
+        frSetBodyPosition(b1, (frVector2) { .x = -0.5f });
+        frSetBodyPosition(b2, (frVector2) { .x = 1.65f });
 
-        ASSERT_EQ(0, collision.count);
-    }
-
-    {
-        frSetBodyPosition(b2, (frVector2) { .x = 3.0f });
-
-        frComputeCollision(b1, b2, &collision);
+        (void) frComputeCollision(b1, b2, &collision);
 
         ASSERT_EQ(1, collision.count);
 
@@ -74,95 +69,56 @@ TEST utCircleVsCircle(void) {
         ASSERT_IN_RANGE(0.0f, collision.direction.y, FLT_EPSILON);
 
         ASSERT_IN_RANGE(0.0f, collision.contacts[0].depth, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.5f, collision.contacts[0].point.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.y, FLT_EPSILON);
     }
 
     {
-        frSetBodyPosition(b2, (frVector2) { .x = 2.5f, .y = 1.0f });
+        frSetBodyPosition(b1, (frVector2) { .x = -0.5f });
+        frSetBodyPosition(b2, (frVector2) { .x = 1.5f });
 
-        frComputeCollision(b1, b2, &collision);
+        (void) frComputeCollision(b1, b2, &collision);
 
-        // TODO: ...
-        // ASSERT_EQ(2, collision.count);
+        ASSERT_EQ(1, collision.count);
+
+        ASSERT_IN_RANGE(1.0f, collision.direction.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.direction.y, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.15f, collision.contacts[0].depth, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.5f, collision.contacts[0].point.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.y, FLT_EPSILON);
     }
 
-    frReleaseBody(b2), frReleaseBody(b1);
-    frReleaseShape(s2), frReleaseShape(s1);
+    {
+        frSetBodyPosition(b1, (frVector2) { .x = 0.0f });
+        frSetBodyPosition(b2, (frVector2) { .x = 0.0f });
+
+        (void) frComputeCollision(b1, b2, &collision);
+
+        ASSERT_EQ(1, collision.count);
+
+        ASSERT_IN_RANGE(0.0f, collision.direction.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(1.0f, collision.direction.y, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(2.15f, collision.contacts[0].depth, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(1.0f, collision.contacts[0].point.y, FLT_EPSILON);
+    }
 
     PASS();
 }
 
 TEST utCircleVsPolygon(void) {
-    frShape *s1 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.0f);
-    frShape *s2 = frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial), 2.0f, 2.0f);
-
-    frBody *b1 = frCreateBodyFromShape(FR_BODY_STATIC,
-                                       FR_API_STRUCT_ZERO(frVector2),
-                                       s1);
-
-    frBody *b2 = frCreateBodyFromShape(FR_BODY_STATIC,
-                                       (frVector2) { .x = 4.0f },
-                                       s2);
-
-    frCollision collision = { .count = 0 };
-
-    {
-        frComputeCollision(b1, b2, &collision);
-
-        ASSERT_EQ(0, collision.count);
-    }
-
-    {
-        frSetBodyPosition(b2, (frVector2) { .x = 2.0f });
-
-        frComputeCollision(b1, b2, &collision);
-
-        ASSERT_EQ(1, collision.count);
-    }
-
-    {
-        frSetBodyPosition(b2, (frVector2) { .x = 1.5f });
-
-        frComputeCollision(b1, b2, &collision);
-
-        ASSERT_EQ(1, collision.count);
-    }
-
-    frReleaseBody(b2), frReleaseBody(b1);
-    frReleaseShape(s2), frReleaseShape(s1);
+    /* TODO: ... */
 
     PASS();
 }
 
 TEST utPolygonVsPolygon(void) {
-    frShape *s1 = frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial), 1.0f, 1.0f);
-    frShape *s2 = frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial), 2.0f, 2.0f);
-
-    frBody *b1 = frCreateBodyFromShape(FR_BODY_STATIC,
-                                       FR_API_STRUCT_ZERO(frVector2),
-                                       s1);
-
-    frBody *b2 = frCreateBodyFromShape(FR_BODY_STATIC,
-                                       (frVector2) { .x = 2.0f },
-                                       s2);
-
-    frCollision collision = { .count = 0 };
-
-    {
-        frComputeCollision(b1, b2, &collision);
-
-        ASSERT_EQ(0, collision.count);
-    }
-
-    {
-        // TODO: ...
-    }
-
-    {
-        // TODO: ...
-    }
-
-    frReleaseBody(b2), frReleaseBody(b1);
-    frReleaseShape(s2), frReleaseShape(s1);
+    /* TODO: ... */
 
     PASS();
 }

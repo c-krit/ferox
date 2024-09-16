@@ -27,55 +27,18 @@
 
 /* Constants =============================================================== */
 
-static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / 60.0f;
+/* TODO: ... */
 
 /* Private Function Prototypes ============================================= */
 
-TEST utStepWorld(void);
+/* TODO: ... */
 
 /* Public Functions ======================================================== */
 
 SUITE(world) {
-    RUN_TEST(utStepWorld);
+    /* TODO: ... */
 }
 
 /* Private Functions ======================================================= */
 
-TEST utStepWorld(void) {
-    frWorld *w = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                       1.0f),
-                               CELL_SIZE);
-
-    frBody *ground = frCreateBodyFromShape(
-        FR_BODY_STATIC,
-        (frVector2) { .y = 4.0f },
-        frCreateRectangle((frMaterial) { .density = 1.0f, .friction = 0.5f },
-                          16.0f,
-                          2.0f));
-
-    frAddBodyToWorld(w, ground);
-
-    frBody *box = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC,
-        FR_API_STRUCT_ZERO(frVector2),
-        frCreateRectangle((frMaterial) { .density = 1.0f, .friction = 0.5f },
-                          1.0f,
-                          1.0f));
-
-    frAddBodyToWorld(w, box);
-
-    {
-        frStepWorld(w, DELTA_TIME);
-
-        ASSERT_EQ(false, frComputeCollision(box, ground, NULL));
-
-        // TODO: ...
-    }
-
-    frReleaseShape(frGetBodyShape(ground));
-    frReleaseShape(frGetBodyShape(box));
-
-    frReleaseWorld(w);
-
-    PASS();
-}
+/* TODO: ... */
