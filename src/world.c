@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+    Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
     copy of this software and associated documentation files (the "Software"),
@@ -27,11 +27,20 @@
 
 #include "ferox.h"
 
-/* Macros ================================================================== */
-
-#define FR_WORLD_SCHEDULER_COUNT  2
-
 /* Typedefs ================================================================ */
+
+/* A structure that represents the type of an operation for a world. */
+typedef enum frWorldOpType_ {
+    FR_OPT_UNKNOWN,
+    FR_OPT_ADD_BODY,
+    FR_OPT_REMOVE_BODY
+} frWorldOpType;
+
+/* A structure that represents a ring buffer for storing world operations. */
+typedef struct frWorldOpQueue_ {
+    frIndexedData *data;
+    int head, tail, size;
+} frWorldOpQueue;
 
 /* A structure that represents the key-value pair of the contact cache. */
 typedef struct frContactCacheEntry_ {
@@ -44,10 +53,6 @@ struct frWorld_ {
     frVector2 gravity;
     frBody **bodies;
     frSpatialHash *hash;
-    struct {
-        frBody *key;
-        int value;
-    } *schedulers[FR_WORLD_SCHEDULER_COUNT];
     frContactCacheEntry *cache;
     frCollisionHandler handler;
     float accumulator, timestamp;
@@ -78,13 +83,13 @@ typedef struct frRaycastHashQueryCtx_ {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static bool frPreStepHashQueryCallback(int otherIndex, void *ctx);
+static bool frPreStepHashQueryCallback(frIndexedData arg);
 
 /* 
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(int bodyIndex, void *ctx);
+static bool frRaycastHashQueryCallback(frIndexedData arg);
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w);
@@ -121,9 +126,6 @@ void frReleaseWorld(frWorld *w) {
 
     arrfree(w->bodies), hmfree(w->cache);
 
-    for (int i = 0; i < FR_WORLD_SCHEDULER_COUNT; i++)
-        hmfree(w->schedulers[i]);
-
     frReleaseSpatialHash(w->hash);
 
     free(w);
@@ -144,7 +146,7 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         || arrlen(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
         return false;
 
-    hmput(w->schedulers[0], b, -1);
+    // TODO: ...
 
     return true;
 }
@@ -155,7 +157,7 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
 
     for (int i = 0; i < arrlen(w->bodies); i++) {
         if (w->bodies[i] == b) {
-            hmput(w->schedulers[1], b, i);
+            // TODO: ...
 
             return true;
         }
@@ -287,13 +289,13 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
-    frPreStepHashQueryCtx *queryCtx = ctx;
+static bool frPreStepHashQueryCallback(frIndexedData arg) {
+    frPreStepHashQueryCtx *queryCtx = arg.data;
 
-    if (otherBodyIndex <= queryCtx->bodyIndex) return false;
+    if (arg.idx <= queryCtx->bodyIndex) return false;
 
     frBody *b1 = queryCtx->world->bodies[queryCtx->bodyIndex];
-    frBody *b2 = queryCtx->world->bodies[otherBodyIndex];
+    frBody *b2 = queryCtx->world->bodies[arg.idx];
 
     if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
         return false;
@@ -343,12 +345,12 @@ static bool frPreStepHashQueryCallback(int otherBodyIndex, void *ctx) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(int bodyIndex, void *ctx) {
-    frRaycastHashQueryCtx *queryCtx = ctx;
+static bool frRaycastHashQueryCallback(frIndexedData arg) {
+    frRaycastHashQueryCtx *queryCtx = arg.data;
 
     frRaycastHit raycastHit = { .distance = 0.0f };
 
-    if (!frComputeRaycast(queryCtx->world->bodies[bodyIndex],
+    if (!frComputeRaycast(queryCtx->world->bodies[arg.idx],
                           queryCtx->ray,
                           &raycastHit))
         return false;
@@ -360,16 +362,7 @@ static bool frRaycastHashQueryCallback(int bodyIndex, void *ctx) {
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w) {
-    for (int i = 0; i < FR_WORLD_SCHEDULER_COUNT; i++) {
-        bool shouldAddToWorld = (i == 0);
-
-        for (int j = 0; j < hmlen(w->schedulers[i]); j++) {
-            if (shouldAddToWorld) arrput(w->bodies, w->schedulers[i][j].key);
-            else arrdelswap(w->bodies, w->schedulers[i][j].value);
-
-            hmdel(w->schedulers[i], w->schedulers[i][j].key);
-        }
-    }
+    // TODO: ...
 
     for (int i = 0; i < arrlen(w->bodies); i++)
         frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);

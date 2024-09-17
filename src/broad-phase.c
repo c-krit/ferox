@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+    Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
     copy of this software and associated documentation files (the "Software"),
@@ -184,7 +184,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
         will be called with the user data pointer `ctx`.
     */
     for (int i = 0; i < arrlen(sh->queryResult); i++)
-        func(sh->queryResult[i], ctx);
+        func((frIndexedData) { .idx = sh->queryResult[i], .data = ctx});
 }
 
 /* Private Functions ======================================================= */

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+    Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
     copyof this software and associated documentation files (the "Software"),
@@ -94,6 +94,12 @@ typedef struct frAABB_ {
     float x, y, width, height;
 } frAABB;
 
+/* A structure that represents arbitrary data with an index. */
+typedef struct frIndexedData_ {
+    int idx;
+    void *data;
+} frIndexedData;
+
 /* 
     A structure that represents a collision shape, 
     which can be attached to a rigid body.
@@ -112,7 +118,7 @@ typedef struct frWorld_ frWorld;
 typedef struct frSpatialHash_ frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
-typedef bool (*frHashQueryFunc)(int index, void *ctx);
+typedef bool (*frHashQueryFunc)(frIndexedData arg);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -201,7 +207,7 @@ typedef uint_fast8_t frBodyFlags;
 typedef struct frTransform_ {
     frVector2 position;
     struct {
-        float _sin, _cos;
+        float sin_, cos_;
     } rotation;
     float angle;
 } frTransform;
@@ -591,7 +597,7 @@ FR_API_INLINE float frVector2Distance(frVector2 v1, frVector2 v2) {
 
 /* Converts `v` to a unit vector. */
 FR_API_INLINE frVector2 frVector2Normalize(frVector2 v) {
-    const float magnitude = frVector2Magnitude(v);
+    float magnitude = frVector2Magnitude(v);
 
     return (magnitude > 0.0f) ? frVector2ScalarMultiply(v, 1.0f / magnitude)
                               : v;
@@ -609,24 +615,24 @@ FR_API_INLINE frVector2 frVector2RightNormal(frVector2 v) {
 
 /* Rotates `v` through the `angle` about the origin of a coordinate plane. */
 FR_API_INLINE frVector2 frVector2Rotate(frVector2 v, float angle) {
-    const float _sin = sinf(angle);
-    const float _cos = cosf(angle);
+    float sin_ = sinf(angle);
+    float cos_ = cosf(angle);
 
-    return (frVector2) { .x = v.x * _cos - v.y * _sin,
-                         .y = v.x * _sin + v.y * _cos };
+    return (frVector2) { .x = v.x * cos_ - v.y * sin_,
+                         .y = v.x * sin_ + v.y * cos_ };
 }
 
 /* Rotates `v` through `tx` about the origin of a coordinate plane. */
 FR_API_INLINE frVector2 frVector2RotateTx(frVector2 v, frTransform tx) {
-    return (frVector2) { v.x * tx.rotation._cos - v.y * tx.rotation._sin,
-                         v.x * tx.rotation._sin + v.y * tx.rotation._cos };
+    return (frVector2) { v.x * tx.rotation.cos_ - v.y * tx.rotation.sin_,
+                         v.x * tx.rotation.sin_ + v.y * tx.rotation.cos_ };
 }
 
 /* Transforms `v` through `tx` about the origin of a coordinate plane. */
 FR_API_INLINE frVector2 frVector2Transform(frVector2 v, frTransform tx) {
     return (frVector2) {
-        tx.position.x + (v.x * tx.rotation._cos - v.y * tx.rotation._sin),
-        tx.position.y + (v.x * tx.rotation._sin + v.y * tx.rotation._cos)
+        tx.position.x + (v.x * tx.rotation.cos_ - v.y * tx.rotation.sin_),
+        tx.position.y + (v.x * tx.rotation.sin_ + v.y * tx.rotation.cos_)
     };
 }
 
@@ -652,8 +658,8 @@ frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector2 v3) {
            `v2`        `v3`
     */
 
-    const float lhs = (v2.y - v1.y) * (v3.x - v1.x);
-    const float rhs = (v3.y - v1.y) * (v2.x - v1.x);
+    float lhs = (v2.y - v1.y) * (v3.x - v1.x);
+    float rhs = (v3.y - v1.y) * (v2.x - v1.x);
 
     // NOTE: Compares the slopes of two line equations.
     return (lhs > rhs) - (lhs < rhs);

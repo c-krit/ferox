@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+    Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
     copy of this software and associated documentation files (the "Software"),
@@ -73,8 +73,8 @@ frBody *frCreateBody(frBodyType type, frVector2 position) {
 
     result->tx.position = position;
 
-    result->tx.rotation._sin = 0.0f;
-    result->tx.rotation._cos = 1.0f;
+    result->tx.rotation.sin_ = 0.0f;
+    result->tx.rotation.cos_ = 1.0f;
 
     result->mtn.gravityScale = 1.0f;
 
@@ -233,8 +233,8 @@ void frSetBodyAngle(frBody *b, float angle) {
         NOTE: These values must be cached in order to 
         avoid expensive computations as much as possible.
     */
-    b->tx.rotation._sin = sinf(b->tx.angle);
-    b->tx.rotation._cos = cosf(b->tx.angle);
+    b->tx.rotation.sin_ = sinf(b->tx.angle);
+    b->tx.rotation.cos_ = cosf(b->tx.angle);
 
     b->aabb = frGetShapeAABB(b->shape, b->tx);
 }
