@@ -36,12 +36,6 @@ typedef enum frWorldOpType_ {
     FR_OPT_REMOVE_BODY
 } frWorldOpType;
 
-/* A structure that represents a ring buffer for storing world operations. */
-typedef struct frWorldOpQueue_ {
-    frIndexedData *data;
-    int head, tail, size;
-} frWorldOpQueue;
-
 /* A structure that represents the key-value pair of the contact cache. */
 typedef struct frContactCacheEntry_ {
     frBodyPair key;
@@ -52,6 +46,7 @@ typedef struct frContactCacheEntry_ {
 struct frWorld_ {
     frVector2 gravity;
     frBody **bodies;
+    frRingBuffer *rbf;
     frSpatialHash *hash;
     frContactCacheEntry *cache;
     frCollisionHandler handler;
@@ -110,6 +105,7 @@ frWorld *frCreateWorld(frVector2 gravity, float cellSize) {
     frWorld *result = calloc(1, sizeof *result);
 
     result->gravity = gravity;
+    result->rbf = frCreateRingBuffer(FR_WORLD_MAX_OBJECT_COUNT);
     result->hash = frCreateSpatialHash(cellSize);
 
     arrsetcap(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
@@ -127,6 +123,7 @@ void frReleaseWorld(frWorld *w) {
     arrfree(w->bodies), hmfree(w->cache);
 
     frReleaseSpatialHash(w->hash);
+    frReleaseRingBuffer(w->rbf);
 
     free(w);
 }
@@ -146,24 +143,18 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         || arrlen(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
         return false;
 
-    // TODO: ...
-
-    return true;
+    return frAddValueToRingBuffer(w->rbf,
+                                  (frIndexedData) { .idx = FR_OPT_ADD_BODY,
+                                                    .data = b });
 }
 
 /* Removes a rigid `b`ody from `w`. */
 bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
-    for (int i = 0; i < arrlen(w->bodies); i++) {
-        if (w->bodies[i] == b) {
-            // TODO: ...
-
-            return true;
-        }
-    }
-
-    return false;
+    return frAddValueToRingBuffer(w->rbf,
+                                  (frIndexedData) { .idx = FR_OPT_REMOVE_BODY,
+                                                    .data = b });
 }
 
 /* Returns a rigid body with the given `index` from `w`. */
@@ -362,7 +353,30 @@ static bool frRaycastHashQueryCallback(frIndexedData arg) {
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w) {
-    // TODO: ...
+    frIndexedData value = { .idx = FR_OPT_UNKNOWN };
+
+    while (frRemoveValueFromRingBuffer(w->rbf, &value)) {
+        switch (value.idx) {
+            case FR_OPT_ADD_BODY:
+                arrput(w->bodies, value.data);
+
+                break;
+
+            case FR_OPT_REMOVE_BODY:
+                for (int i = 0; i < arrlen(w->bodies); i++) {
+                    if (w->bodies[i] == value.data) {
+                        arrdelswap(w->bodies, i);
+
+                        break;
+                    }
+                }
+
+                break;
+
+            default:
+                break;
+        }
+    }
 
     for (int i = 0; i < arrlen(w->bodies); i++)
         frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);

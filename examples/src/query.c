@@ -71,7 +71,7 @@ static void DeinitExample(void);
 static void DrawCursorBounds(void);
 static frAABB GetCursorBounds(void);
 
-static bool OnHashQuery(int index, void *ctx);
+static bool OnHashQuery(frIndexedData arg);
 
 /* Public Functions ======================================================== */
 
@@ -210,8 +210,8 @@ static frAABB GetCursorBounds(void) {
     };
 }
 
-static bool OnHashQuery(int index, void *ctx) {
-    frSetBodyUserData(bodies[index], (void *) &secondaryColor);
+static bool OnHashQuery(frIndexedData arg) {
+    frSetBodyUserData(bodies[arg.idx], (void *) &secondaryColor);
 
     return true;
 }

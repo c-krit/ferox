@@ -212,6 +212,11 @@ typedef struct frTransform_ {
     float angle;
 } frTransform;
 
+/* (From 'utils.c') ======================================================== */
+
+/* A structure that represents a ring buffer for storing indexed data. */
+typedef struct frRingBuffer_ frRingBuffer;
+
 /* (From 'world.c') ======================================================== */
 
 /* A structure that represents a pair of two rigid bodies. */
@@ -491,6 +496,20 @@ void frResolveCollision(frBody *b1,
 
 /* Returns the current time of the monotonic clock, in seconds. */
 float frGetCurrentTime(void);
+
+/* (From 'utils.c') ======================================================== */
+
+/* Creates a ring buffer with the size of `length`. */
+frRingBuffer *frCreateRingBuffer(size_t length);
+
+/* Releases the memory allocated for `rbf`. */
+void frReleaseRingBuffer(frRingBuffer *rbf);
+
+/* Adds a `value` to `rbf`. */
+bool frAddValueToRingBuffer(frRingBuffer *rbf, frIndexedData value);
+
+/* Removes a value from `rbf` and stores it to `value`. */
+bool frRemoveValueFromRingBuffer(frRingBuffer *rbf, frIndexedData *value);
 
 /* (From 'world.c') ======================================================== */
 

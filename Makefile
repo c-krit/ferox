@@ -52,6 +52,7 @@ OBJECTS = \
 	${SOURCE_PATH}/geometry.o     \
 	${SOURCE_PATH}/rigid-body.o   \
 	${SOURCE_PATH}/timer.o        \
+	${SOURCE_PATH}/utils.o        \
 	${SOURCE_PATH}/world.o
 
 TARGETS = ${LIBRARY_PATH}/lib${PROJECT_NAME}.a

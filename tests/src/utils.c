@@ -25,32 +25,50 @@
 #include "ferox.h"
 #include "greatest.h"
 
-/* 'Prelude' Functions ===================================================== */
+/* Macros ================================================================== */
 
-GREATEST_MAIN_DEFS();
+#define RING_BUFFER_LENGTH  (1 << 3)
 
-/* Public Function Prototypes ============================================== */
+/* Private Function Prototypes ============================================= */
 
-SUITE_EXTERN(broad_phase);
-SUITE_EXTERN(collision);
-SUITE_EXTERN(geometry);
-SUITE_EXTERN(rigid_body);
-SUITE_EXTERN(utils);
-SUITE_EXTERN(world);
+TEST utRingBufferOps(void);
 
 /* Public Functions ======================================================== */
 
-int main(int argc, char *argv[]) {
-    GREATEST_MAIN_BEGIN();
+SUITE(utils) {
+    RUN_TEST(utRingBufferOps);
+}
 
-    RUN_SUITE(broad_phase);
-    RUN_SUITE(collision);
-    RUN_SUITE(geometry);
-    RUN_SUITE(rigid_body);
-    RUN_SUITE(utils);
-    RUN_SUITE(world);
+/* Private Functions ======================================================= */
 
-    GREATEST_MAIN_END();
+TEST utRingBufferOps(void) {
+    frRingBuffer *rbf = frCreateRingBuffer(RING_BUFFER_LENGTH);
 
-    return 0;
+    {
+        frIndexedData value = { .idx = 0 };
+
+        for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
+            value.idx = i;
+
+            bool result = (i < (RING_BUFFER_LENGTH - 1));
+
+            ASSERT_EQ(result, frAddValueToRingBuffer(rbf, value));
+        }
+
+        ASSERT_EQ(false, frAddValueToRingBuffer(rbf, value));
+
+        for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
+            bool result = (i < (RING_BUFFER_LENGTH - 1));
+
+            ASSERT_EQ(result, frRemoveValueFromRingBuffer(rbf, &value));
+            
+            if (result == true) ASSERT_EQ(i, value.idx);
+        }
+
+        ASSERT_EQ(false, frRemoveValueFromRingBuffer(rbf, NULL));
+    }
+
+    frReleaseRingBuffer(rbf);
+
+    PASS();
 }

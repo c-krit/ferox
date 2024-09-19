@@ -41,7 +41,7 @@
 #define SCREEN_WIDTH      600
 #define SCREEN_HEIGHT     800
 
-#define CURSOR_COOLDOWN   0.85f
+#define CURSOR_COOLDOWN   1.0f
 
 #define BORDER_COUNT      4
 #define MELON_KIND_COUNT  4
@@ -116,7 +116,7 @@ int main(void) {
 
 static void InitExample(void) {
     world = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                  1.5f),
+                                                  1.25f),
                           CELL_SIZE);
 
     frSetWorldCollisionHandler(world,
@@ -129,7 +129,7 @@ static void InitExample(void) {
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = 1.05f * SCREEN_HEIGHT }),
         frCreateRectangle((frMaterial) { .density = 1.25f,
-                                         .friction = 0.5f,
+                                         .friction = 0.75f,
                                          .restitution = 0.05f },
                           frPixelsToUnits(1.0f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
@@ -139,7 +139,7 @@ static void InitExample(void) {
         frVector2PixelsToUnits((frVector2) { .x = 1.05f * SCREEN_WIDTH,
                                              .y = 0.5f * SCREEN_HEIGHT }),
         frCreateRectangle((frMaterial) { .density = 1.25f,
-                                         .friction = 0.5f,
+                                         .friction = 0.75f,
                                          .restitution = 0.05f },
                           frPixelsToUnits(0.1f * SCREEN_WIDTH),
                           frPixelsToUnits(1.0f * SCREEN_HEIGHT)));
@@ -149,7 +149,7 @@ static void InitExample(void) {
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = -0.05f * SCREEN_HEIGHT }),
         frCreateRectangle((frMaterial) { .density = 1.25f,
-                                         .friction = 0.5f,
+                                         .friction = 0.75f,
                                          .restitution = 0.05f },
                           frPixelsToUnits(1.0f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
@@ -159,7 +159,7 @@ static void InitExample(void) {
         frVector2PixelsToUnits((frVector2) { .x = -0.05f * SCREEN_WIDTH,
                                              .y = 0.5f * SCREEN_HEIGHT }),
         frCreateRectangle((frMaterial) { .density = 1.25f,
-                                         .friction = 0.5f,
+                                         .friction = 0.65f,
                                          .restitution = 0.05f },
                           frPixelsToUnits(0.1f * SCREEN_WIDTH),
                           frPixelsToUnits(1.0f * SCREEN_HEIGHT)));
@@ -170,9 +170,9 @@ static void InitExample(void) {
     for (int i = 0; i < MELON_KIND_COUNT; i++)
         melonShapes[i] = frCreateCircle((frMaterial) { .density = 0.25f
                                                                   / (i + 1),
-                                                       .friction = 0.5f,
+                                                       .friction = 0.75f,
                                                        .restitution = 0.03f },
-                                        0.75f + (0.1f * (i + 3)));
+                                        0.85f + (0.1f * (i + 3)));
 
     cursor = frCreateBodyFromShape(FR_BODY_KINEMATIC,
                                    frVector2PixelsToUnits((frVector2) {
@@ -212,7 +212,7 @@ static void UpdateExample(void) {
 
             frAddBodyToWorld(world, melon);
 
-            const int cursorIndex = GetRandomValue(0, MELON_KIND_COUNT - 1);
+            int cursorIndex = GetRandomValue(0, MELON_KIND_COUNT - 1);
 
             frSetBodyShape(cursor, melonShapes[cursorIndex]);
             frSetBodyUserData(cursor, (void *) &MELON_KINDS[cursorIndex]);
