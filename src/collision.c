@@ -351,6 +351,8 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
 
     if (maxIndex < 0) return false;
 
+    frVector2 deltaPosition = frVector2Subtract(tx2.position, tx1.position);
+
     /*
         NOTE: Is the center of the 'circle' collision shape 
         inside the 'polygon' collision shape?
@@ -359,9 +361,6 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
         if (collision != NULL) {
             collision->direction = frVector2Negate(
                 frVector2RotateTx(normals->data[maxIndex], polyTx));
-
-            frVector2 deltaPosition = frVector2Subtract(tx2.position,
-                                                        tx1.position);
 
             if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                 collision->direction = frVector2Negate(collision->direction);
@@ -401,19 +400,16 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
 
             float magnitudeSqr = frVector2MagnitudeSqr(direction);
 
-            if (magnitudeSqr > radius * radius) return false;
+            if (radius * radius < magnitudeSqr) return false;
 
             if (collision != NULL) {
                 float magnitude = sqrtf(magnitudeSqr);
 
-                collision->direction =
-                    (magnitude > 0.0f) ? frVector2ScalarMultiply(
-                        frVector2RotateTx(frVector2Negate(direction), polyTx),
-                        1.0f / magnitude)
-                                       : FR_API_STRUCT_ZERO(frVector2);
+                if (magnitude <= 0.0f) magnitude = FLT_EPSILON;
 
-                frVector2 deltaPosition = frVector2Subtract(tx2.position,
-                                                            tx1.position);
+                collision->direction = frVector2ScalarMultiply(
+                        frVector2RotateTx(frVector2Negate(direction), polyTx),
+                        1.0f / magnitude);
 
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                     collision->direction = frVector2Negate(
@@ -425,21 +421,18 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
                     frVector2ScalarMultiply(collision->direction, radius),
                     circleTx);
 
-                collision->contacts[0].depth = (magnitude > 0.0f)
-                                                   ? radius - magnitude
-                                                   : radius;
+                collision->contacts[0].depth = radius - magnitude;
 
                 collision->contacts[1] = collision->contacts[0];
 
                 collision->count = 1;
             }
         } else {
+            // TODO: ...
+
             if (collision != NULL) {
                 collision->direction = frVector2Negate(
                     frVector2RotateTx(normals->data[maxIndex], polyTx));
-
-                frVector2 deltaPosition = frVector2Subtract(tx2.position,
-                                                            tx1.position);
 
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                     collision->direction = frVector2Negate(
