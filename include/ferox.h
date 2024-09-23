@@ -227,7 +227,7 @@ typedef struct frBodyPair_ {
 /* A callback function type for a collision event. */
 typedef void (*frCollisionEventFunc)(frBodyPair key, frCollision *value);
 
-/* A structure that represents the collision event callback functions. */
+/* A structure that represents the callback functions for collision events. */
 typedef struct frCollisionHandler_ {
     frCollisionEventFunc preStep, postStep;
 } frCollisionHandler;
@@ -531,11 +531,11 @@ bool frAddBodyToWorld(frWorld *w, frBody *b);
 /* Removes a rigid `b`ody from `w`. */
 bool frRemoveBodyFromWorld(frWorld *w, frBody *b);
 
-/* Returns a rigid body with the given `index` from `w`. */
-frBody *frGetBodyFromWorld(const frWorld *w, int index);
+/* Returns a rigid body at the given `index` in `w`. */
+frBody *frGetBodyInWorld(const frWorld *w, int index);
 
 /* Returns the number of rigid bodies in `w`. */
-int frGetBodyCountForWorld(const frWorld *w);
+int frGetBodyCountInWorld(const frWorld *w);
 
 /* Returns the gravity acceleration vector of `w`. */
 frVector2 frGetWorldGravity(const frWorld *w);

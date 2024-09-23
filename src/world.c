@@ -157,15 +157,15 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
                                                     .data = b });
 }
 
-/* Returns a rigid body with the given `index` from `w`. */
-frBody *frGetBodyFromWorld(const frWorld *w, int index) {
+/* Returns a rigid body at the given `index` in `w`. */
+frBody *frGetBodyInWorld(const frWorld *w, int index) {
     if (w == NULL || index < 0 || index >= arrlen(w->bodies)) return NULL;
 
     return w->bodies[index];
 }
 
 /* Returns the number of rigid bodies in `w`. */
-int frGetBodyCountForWorld(const frWorld *w) {
+int frGetBodyCountInWorld(const frWorld *w) {
     return (w != NULL) ? arrlen(w->bodies) : 0;
 }
 

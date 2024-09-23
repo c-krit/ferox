@@ -184,10 +184,10 @@ static void UpdateExample(void) {
                    0.25f,
                    ColorAlpha(DARKGRAY, 0.75f));
 
-        const int bodyCount = frGetBodyCountForWorld(world);
+        const int bodyCount = frGetBodyCountInWorld(world);
 
         for (int i = 1; i < bodyCount; i++)
-            frDrawBodyLines(frGetBodyFromWorld(world, i),
+            frDrawBodyLines(frGetBodyInWorld(world, i),
                             2.0f,
                             ColorAlpha(LIGHTGRAY, 0.95f));
 

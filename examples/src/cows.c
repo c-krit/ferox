@@ -216,10 +216,10 @@ static void UpdateExample(void) {
 
     spawnCounter += GetFrameTime();
 
-    const int bodyCount = frGetBodyCountForWorld(world);
+    const int bodyCount = frGetBodyCountInWorld(world);
 
     for (int i = 0; i < bodyCount; i++) {
-        frBody *body = frGetBodyFromWorld(world, i);
+        frBody *body = frGetBodyInWorld(world, i);
 
         const EntityData *bodyData = frGetBodyUserData(body);
 
@@ -262,10 +262,10 @@ static void UpdateExample(void) {
                    0.25f,
                    ColorAlpha(DARKGRAY, 0.75f));
 
-        const int bodyCount = frGetBodyCountForWorld(world);
+        const int bodyCount = frGetBodyCountInWorld(world);
 
         for (int i = 0; i < bodyCount; i++) {
-            frBody *body = frGetBodyFromWorld(world, i);
+            frBody *body = frGetBodyInWorld(world, i);
 
             const EntityData *bodyData = frGetBodyUserData(body);
 
@@ -304,7 +304,7 @@ static void UpdateExample(void) {
 
         DrawTextEx(font,
                    TextFormat("%d/%d bodies",
-                              frGetBodyCountForWorld(world),
+                              frGetBodyCountInWorld(world),
                               FR_WORLD_MAX_OBJECT_COUNT),
                    (Vector2) { .x = 8.0f, .y = 32.0f },
                    font.baseSize,

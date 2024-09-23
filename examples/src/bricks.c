@@ -254,9 +254,9 @@ static void UpdateExample(void) {
             frDrawBodyLines(platforms[i], 1.5f, BROWN);
 
         for (int i = BORDER_COUNT + PLATFORM_COUNT;
-             i < frGetBodyCountForWorld(world);
+             i < frGetBodyCountInWorld(world);
              i++)
-            frDrawBodyLines(frGetBodyFromWorld(world, i), 1.0f, LIGHTGRAY);
+            frDrawBodyLines(frGetBodyInWorld(world, i), 1.0f, LIGHTGRAY);
 
         frDrawBodyLines(cursor, 1.0f, WHITE);
 
@@ -264,7 +264,7 @@ static void UpdateExample(void) {
 
         DrawTextEx(font,
                    TextFormat("%d/%d bodies",
-                              frGetBodyCountForWorld(world),
+                              frGetBodyCountInWorld(world),
                               FR_WORLD_MAX_OBJECT_COUNT),
                    (Vector2) { .x = 8.0f, .y = 32.0f },
                    font.baseSize,
