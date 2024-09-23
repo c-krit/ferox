@@ -51,11 +51,8 @@ CFLAGS += -Wno-limited-postlink-optimizations
 
 # ============================================================================>
 
-all rebuild:
+all clean rebuild:
 	@${MAKE} TARGET_SUFFIX=${TARGET_SUFFIX} CC=${CC} CFLAGS="${CFLAGS}" \
 	LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" WEBFLAGS="${WEBFLAGS}" $@
 
 # ============================================================================>
-
-clean:
-	@${MAKE} $@

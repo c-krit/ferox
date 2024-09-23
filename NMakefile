@@ -83,3 +83,5 @@ clean:
 	@echo $(LOG_PREFIX) Cleaning up. && echo;
 	@if exist $(LIBRARY_PATH)\*.lib del /Q /S $(LIBRARY_PATH)\*.lib > nul 2>&1
 	@if exist $(SOURCE_PATH)\*.obj del /Q /S $(SOURCE_PATH)\*.obj > nul 2>&1
+
+# ============================================================================>

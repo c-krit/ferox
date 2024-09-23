@@ -339,7 +339,8 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
         NOTE: This will find the edge of the 'polygon' collision shape
         closest to the center of the 'circle' collision shape.
     */
-    for (int i = 0; i < vertices->count; i++) {
+    for (int j = vertices->count - 1, i = 0; i < vertices->count;
+             j = i, i++) {
         float dot = frVector2Dot(normals->data[i],
                                  frVector2Subtract(txCenter,
                                                    vertices->data[i]));
@@ -395,8 +396,8 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
             NOTE: This means the center of the 'circle' collision shape
             does not lie on the line segment from `v1` to `v2`.
         */
-        if (v1Dot <= 0.0f || v2Dot <= 0.0f) {
-            frVector2 direction = (v1Dot <= 0.0f) ? v1ToCenter : v2ToCenter;
+        if (v1Dot < 0.0f || v2Dot < 0.0f) {
+            frVector2 direction = (v1Dot < 0.0f) ? v1ToCenter : v2ToCenter;
 
             float magnitudeSqr = frVector2MagnitudeSqr(direction);
 

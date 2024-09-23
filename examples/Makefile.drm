@@ -46,11 +46,8 @@ LDLIBS = -lferox -lraylib -latomic -ldl -ldrm -lEGL -lgbm -lGLESv2 -lm \
 
 # ============================================================================>
 
-all rebuild:
+all clean rebuild:
 	@${MAKE} CC=${CC} CFLAGS="${CFLAGS}" \
 		LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" $@
 
 # ============================================================================>
-
-clean:
-	@${MAKE} $@

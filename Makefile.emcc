@@ -37,3 +37,5 @@ AR = emar
 
 all clean install rebuild uninstall:
 	@${MAKE} CC=${CC} AR=${AR} $@
+
+# ============================================================================>

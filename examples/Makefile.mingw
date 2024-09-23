@@ -46,11 +46,8 @@ LDLIBS = -lferox -lraylib -lopengl32 -lgdi32 -lwinmm -lpthread
 
 # ============================================================================>
 
-all rebuild:
+all clean rebuild:
 	@${MAKE} TARGET_SUFFIX=${TARGET_SUFFIX} CC=${CC} CFLAGS="${CFLAGS}" \
 	LDFLAGS="${LDFLAGS}" LDLIBS="${LDLIBS}" $@
 
 # ============================================================================>
-
-clean:
-	@${MAKE} $@

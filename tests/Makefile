@@ -26,7 +26,7 @@
 
 # ============================================================================>
 
-.PHONY: all clean
+.PHONY: all clean rebuild
 .SUFFIXES: .c .out
 
 # ============================================================================>
@@ -57,7 +57,9 @@ OBJECTS = \
 	${SOURCE_PATH}/utils.o        \
 	${SOURCE_PATH}/world.o
 
-TARGETS = ${BINARY_PATH}/ferox-tests.out
+TARGET_SUFFIX ?= out
+
+TARGETS = ${BINARY_PATH}/ferox-tests.${TARGET_SUFFIX}
 
 # ============================================================================>
 
@@ -88,7 +90,14 @@ ${TARGETS}: ${OBJECTS}
 post-build:
 	@printf "${LOG_PREFIX} Build complete.\n"
 
+# ============================================================================>
+
+rebuild: clean all
+
+# ============================================================================>
+
 clean:
 	@printf "${LOG_PREFIX} Cleaning up.\n"
-	@rm -f ${BINARY_PATH}/*.out
-	@rm -f ${SOURCE_PATH}/*.o
+	@rm -f ${BINARY_PATH}/*.${TARGET_SUFFIX} ${SOURCE_PATH}/*.o
+
+# ============================================================================>

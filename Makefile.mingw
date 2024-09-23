@@ -37,3 +37,5 @@ AR = x86_64-w64-mingw32-ar
 
 all clean install rebuild uninstall:
 	@${MAKE} CC=${CC} AR=${AR} $@
+
+# ============================================================================>

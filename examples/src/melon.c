@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2021-2023 Jaedeok Kim <jdeokkim@protonmail.com>
+    Copyright (c) 2021-2024 Jaedeok Kim <jdeokkim@protonmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a 
     copy of this software and associated documentation files (the "Software"),
@@ -191,7 +191,7 @@ static void UpdateExample(void) {
 
         cursorPosition.x = frPixelsToUnits((GetMousePosition()).x);
 
-        float cursorRadius = 0.18f * (cursorKind->index + 3);
+        float cursorRadius = 0.1f + frGetCircleRadius(frGetBodyShape(cursor));
 
         if (cursorPosition.x < cursorRadius) cursorPosition.x = cursorRadius;
 
