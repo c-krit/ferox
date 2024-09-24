@@ -157,6 +157,16 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
                                                     .data = b });
 }
 
+/* Checks if the given `b`ody is in `w`. */
+bool frIsBodyInWorld(const frWorld *w, frBody *b) {
+    if (w == NULL || b == NULL) return false;
+
+    for (int i = 0; i < arrlen(w->bodies); i++)
+        if (w->bodies[i] == b) return true;
+
+    return false;
+}
+
 /* Returns a rigid body at the given `index` in `w`. */
 frBody *frGetBodyInWorld(const frWorld *w, int index) {
     if (w == NULL || index < 0 || index >= arrlen(w->bodies)) return NULL;

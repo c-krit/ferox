@@ -75,7 +75,7 @@ extern "C" {
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
 
 /* Defines the iteration count for the constraint solver. */
-#define FR_WORLD_ITERATION_COUNT      12
+#define FR_WORLD_ITERATION_COUNT      10
 
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     2048
@@ -530,6 +530,9 @@ bool frAddBodyToWorld(frWorld *w, frBody *b);
 
 /* Removes a rigid `b`ody from `w`. */
 bool frRemoveBodyFromWorld(frWorld *w, frBody *b);
+
+/* Checks if the given `b`ody is in `w`. */
+bool frIsBodyInWorld(const frWorld *w, frBody *b);
 
 /* Returns a rigid body at the given `index` in `w`. */
 frBody *frGetBodyInWorld(const frWorld *w, int index);
