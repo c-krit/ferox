@@ -34,7 +34,6 @@ extern "C" {
 
 #include <float.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdlib.h>
 
 /* Macros ================================================================== */
@@ -124,19 +123,18 @@ typedef bool (*frHashQueryFunc)(frIndexedData arg);
 
 /* A structure that represents the contact points of two colliding bodies. */
 typedef struct frCollision_ {
-    float friction;
-    float restitution;
-    frVector2 direction;
+    int count;
     struct {
-        uint32_t id;
-        frVector2 point;
+        int id;
         float depth;
+        frVector2 point;
         struct {
             float normalMass, normalScalar;
             float tangentMass, tangentScalar;
         } cache;
     } contacts[2];
-    int count;
+    frVector2 direction;
+    float friction, restitution;
 } frCollision;
 
 /* A structure that represents a ray. */
@@ -198,7 +196,7 @@ typedef enum frBodyFlag_ {
 } frBodyFlag;
 
 /* A data type that represents the property flags of a rigid body. */
-typedef uint_fast8_t frBodyFlags;
+typedef unsigned int frBodyFlags;
 
 /*
     A structure that represents the position of an object in meters,

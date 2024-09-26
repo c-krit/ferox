@@ -532,7 +532,7 @@ static bool frComputeCollisionPolys(const frShape *s1,
         collision->direction = direction;
 
         // TODO: ...
-        uint32_t bitMask = (refEdgeFlipped << 16) | (refEdge.indexes[0] << 8);
+        unsigned int bitMask = (refEdgeFlipped << 16) | (refEdge.indexes[0] << 8);
 
         collision->contacts[0].id = bitMask | incEdge.indexes[0];
         collision->contacts[1].id = bitMask | incEdge.indexes[1];

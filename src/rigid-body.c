@@ -30,20 +30,20 @@
 typedef struct frMotionData_ {
     float mass, inverseMass;
     float inertia, inverseInertia;
-    float gravityScale;
     frVector2 velocity;
     float angularVelocity;
+    float gravityScale;
     frVector2 force;
     float torque;
 } frMotionData;
 
 /* A structure that represents a rigid body. */
 struct frBody_ {
+    frMotionData mtn;
+    frTransform tx;
+    frShape *shape;
     frBodyType type;
     frBodyFlags flags;
-    frShape *shape;
-    frTransform tx;
-    frMotionData mtn;
     frAABB aabb;
     void *ctx;
 };

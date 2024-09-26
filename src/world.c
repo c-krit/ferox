@@ -293,17 +293,17 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
 static bool frPreStepHashQueryCallback(frIndexedData arg) {
     frPreStepHashQueryCtx *queryCtx = arg.data;
 
-    if (arg.idx <= queryCtx->bodyIndex) return false;
+    int firstIndex = queryCtx->bodyIndex, secondIndex = arg.idx;
 
-    frBody *b1 = queryCtx->world->bodies[queryCtx->bodyIndex];
-    frBody *b2 = queryCtx->world->bodies[arg.idx];
+    if (firstIndex >= secondIndex) return false;
+
+    frBody *b1 = queryCtx->world->bodies[firstIndex];
+    frBody *b2 = queryCtx->world->bodies[secondIndex];
 
     if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
         return false;
 
     frBodyPair key = { .first = b1, .second = b2 };
-
-    frShape *s1 = frGetBodyShape(b1), *s2 = frGetBodyShape(b2);
 
     frCollision collision = { .count = 0 };
 
@@ -319,6 +319,8 @@ static bool frPreStepHashQueryCallback(frIndexedData arg) {
     }
 
     frContactCacheEntry *entry = hmgetp_null(queryCtx->world->cache, key);
+
+    const frShape *s1 = frGetBodyShape(b1), *s2 = frGetBodyShape(b2);
 
     if (entry != NULL) {
         collision.friction = entry->value.friction;
@@ -363,30 +365,7 @@ static bool frRaycastHashQueryCallback(frIndexedData arg) {
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w) {
-    frIndexedData value = { .idx = FR_OPT_UNKNOWN };
-
-    while (frRemoveValueFromRingBuffer(w->rbf, &value)) {
-        switch (value.idx) {
-            case FR_OPT_ADD_BODY:
-                arrput(w->bodies, value.data);
-
-                break;
-
-            case FR_OPT_REMOVE_BODY:
-                for (int i = 0; i < arrlen(w->bodies); i++) {
-                    if (w->bodies[i] == value.data) {
-                        arrdelswap(w->bodies, i);
-
-                        break;
-                    }
-                }
-
-                break;
-
-            default:
-                break;
-        }
-    }
+    /* TODO: ... */
 
     for (int i = 0; i < arrlen(w->bodies); i++)
         frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
@@ -404,6 +383,30 @@ static void frPreStepWorld(frWorld *w) {
     then clears the spatial hash of `w`. 
 */
 static void frPostStepWorld(frWorld *w) {
+    frIndexedData value = { .idx = FR_OPT_UNKNOWN };
+
+    while (frRemoveValueFromRingBuffer(w->rbf, &value)) {
+        switch (value.idx) {
+            case FR_OPT_ADD_BODY:
+                arrput(w->bodies, value.data);
+
+                break;
+
+            case FR_OPT_REMOVE_BODY:
+                for (int i = 0; i < arrlen(w->bodies); i++)
+                    if (w->bodies[i] == value.data) {
+                        arrdelswap(w->bodies, i);
+
+                        break;
+                    }
+
+                break;
+
+            default:
+                break;
+        }
+    }
+
     for (int i = 0; i < arrlen(w->bodies); i++)
         frClearBodyForces(w->bodies[i]);
 
