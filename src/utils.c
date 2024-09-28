@@ -30,7 +30,7 @@
 
 /* A structure that represents a ring buffer for storing indexed data. */
 struct frRingBuffer_ {
-    frIndexedData *buffer;
+    frContextNode *buffer;
     int head, tail, length;
 };
 
@@ -61,23 +61,23 @@ void frReleaseRingBuffer(frRingBuffer *rbf) {
     if (rbf != NULL) free(rbf->buffer), free(rbf);
 }
 
-/* Adds a `value` to `rbf`. */
-bool frAddValueToRingBuffer(frRingBuffer *rbf, frIndexedData value) {
+/* Adds a `node` to `rbf`. */
+bool frAddNodeToRingBuffer(frRingBuffer *rbf, frContextNode node) {
     if (rbf == NULL || ((rbf->head + 1) & (rbf->length - 1)) == rbf->tail)
         return false;
 
-    rbf->buffer[rbf->head] = value;
+    rbf->buffer[rbf->head] = node;
 
     rbf->head = (rbf->head + 1) & (rbf->length - 1);
 
     return true;
 }
 
-/* Removes a value from `rbf` and stores it to `value`. */
-bool frRemoveValueFromRingBuffer(frRingBuffer *rbf, frIndexedData *value) {
+/* Removes a node from `rbf` and stores it to `node`. */
+bool frRemoveNodeFromRingBuffer(frRingBuffer *rbf, frContextNode *node) {
     if (rbf == NULL || (rbf->head == rbf->tail)) return false;
 
-    if (value != NULL) *value = rbf->buffer[rbf->tail];
+    if (node != NULL) *node = rbf->buffer[rbf->tail];
 
     rbf->tail = (rbf->tail + 1) & (rbf->length - 1);
 

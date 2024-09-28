@@ -44,13 +44,13 @@ typedef struct frContactCacheEntry_ {
 
 /* A structure that represents a simulation container. */
 struct frWorld_ {
-    frVector2 gravity;
     frBody **bodies;
     frRingBuffer *rbf;
     frSpatialHash *hash;
     frContactCacheEntry *cache;
-    frCollisionHandler handler;
     float accumulator, timestamp;
+    frCollisionHandler handler;
+    frVector2 gravity;
 };
 
 /* 
@@ -78,13 +78,13 @@ typedef struct frRaycastHashQueryCtx_ {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static bool frPreStepHashQueryCallback(frIndexedData arg);
+static bool frPreStepHashQueryCallback(frContextNode ctx);
 
 /* 
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(frIndexedData arg);
+static bool frRaycastHashQueryCallback(frContextNode ctx);
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w);
@@ -143,8 +143,8 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         || arrlen(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
         return false;
 
-    return frAddValueToRingBuffer(w->rbf,
-                                  (frIndexedData) { .idx = FR_OPT_ADD_BODY,
+    return frAddNodeToRingBuffer(w->rbf,
+                                  (frContextNode) { .id = FR_OPT_ADD_BODY,
                                                     .data = b });
 }
 
@@ -152,8 +152,8 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
 bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
-    return frAddValueToRingBuffer(w->rbf,
-                                  (frIndexedData) { .idx = FR_OPT_REMOVE_BODY,
+    return frAddNodeToRingBuffer(w->rbf,
+                                  (frContextNode) { .id = FR_OPT_REMOVE_BODY,
                                                     .data = b });
 }
 
@@ -211,6 +211,21 @@ void frStepWorld(frWorld *w, float dt) {
         frApplyGravityToBody(w->bodies[i], w->gravity);
 
         frIntegrateForBodyVelocity(w->bodies[i], dt);
+    }
+
+    int entryCount = hmlen(w->cache);
+
+    for (int j = 0; j < entryCount; j++) {
+        frBodyPair key = w->cache[j].key;
+
+        const frCollision *value = &w->cache[j].value;
+
+        for (int k = 0; k < value->count; k++)
+            if (value->contacts[k].timestamp < w->timestamp) {
+                hmdel(w->cache, key);
+
+                break;
+            }
     }
 
     for (int j = 0; j < hmlen(w->cache); j++)
@@ -290,15 +305,17 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static bool frPreStepHashQueryCallback(frIndexedData arg) {
-    frPreStepHashQueryCtx *queryCtx = arg.data;
+static bool frPreStepHashQueryCallback(frContextNode ctx) {
+    frPreStepHashQueryCtx *queryCtx = ctx.data;
 
-    int firstIndex = queryCtx->bodyIndex, secondIndex = arg.idx;
+    int firstIndex = queryCtx->bodyIndex, secondIndex = ctx.id;
 
     if (firstIndex >= secondIndex) return false;
 
-    frBody *b1 = queryCtx->world->bodies[firstIndex];
-    frBody *b2 = queryCtx->world->bodies[secondIndex];
+    frWorld *world = queryCtx->world;
+
+    frBody *b1 = world->bodies[firstIndex];
+    frBody *b2 = world->bodies[secondIndex];
 
     if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
         return false;
@@ -310,17 +327,20 @@ static bool frPreStepHashQueryCallback(frIndexedData arg) {
     if (!frComputeCollision(b1, b2, &collision)) {
         /*
             NOTE: `hmdel()` returns `0` if `key` is not 
-            in `queryCtx->world->cache`!
+            in `world->cache`!
         */
 
-        hmdel(queryCtx->world->cache, key);
+        hmdel(world->cache, key);
 
         return false;
     }
 
-    frContactCacheEntry *entry = hmgetp_null(queryCtx->world->cache, key);
+    frContactCacheEntry *entry = hmgetp_null(world->cache, key);
 
     const frShape *s1 = frGetBodyShape(b1), *s2 = frGetBodyShape(b2);
+
+    for (int i = 0; i < collision.count; i++)
+        collision.contacts[i].timestamp = world->timestamp;
 
     if (entry != NULL) {
         collision.friction = entry->value.friction;
@@ -348,12 +368,12 @@ static bool frPreStepHashQueryCallback(frIndexedData arg) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(frIndexedData arg) {
-    frRaycastHashQueryCtx *queryCtx = arg.data;
+static bool frRaycastHashQueryCallback(frContextNode ctx) {
+    frRaycastHashQueryCtx *queryCtx = ctx.data;
 
     frRaycastHit raycastHit = { .distance = 0.0f };
 
-    if (!frComputeRaycast(queryCtx->world->bodies[arg.idx],
+    if (!frComputeRaycast(queryCtx->world->bodies[ctx.id],
                           queryCtx->ray,
                           &raycastHit))
         return false;
@@ -365,8 +385,6 @@ static bool frRaycastHashQueryCallback(frIndexedData arg) {
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w) {
-    /* TODO: ... */
-
     for (int i = 0; i < arrlen(w->bodies); i++)
         frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
 
@@ -383,18 +401,18 @@ static void frPreStepWorld(frWorld *w) {
     then clears the spatial hash of `w`. 
 */
 static void frPostStepWorld(frWorld *w) {
-    frIndexedData value = { .idx = FR_OPT_UNKNOWN };
+    frContextNode node = { .id = FR_OPT_UNKNOWN };
 
-    while (frRemoveValueFromRingBuffer(w->rbf, &value)) {
-        switch (value.idx) {
+    while (frRemoveNodeFromRingBuffer(w->rbf, &node)) {
+        switch (node.id) {
             case FR_OPT_ADD_BODY:
-                arrput(w->bodies, value.data);
+                arrput(w->bodies, node.data);
 
                 break;
 
             case FR_OPT_REMOVE_BODY:
                 for (int i = 0; i < arrlen(w->bodies); i++)
-                    if (w->bodies[i] == value.data) {
+                    if (w->bodies[i] == node.data) {
                         arrdelswap(w->bodies, i);
 
                         break;

@@ -74,7 +74,7 @@ extern "C" {
 #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
 
 /* Defines the iteration count for the constraint solver. */
-#define FR_WORLD_ITERATION_COUNT      10
+#define FR_WORLD_ITERATION_COUNT      12
 
 /* Defines the maximum number of objects in a world. */
 #define FR_WORLD_MAX_OBJECT_COUNT     2048
@@ -93,12 +93,6 @@ typedef struct frAABB_ {
     float x, y, width, height;
 } frAABB;
 
-/* A structure that represents arbitrary data with an index. */
-typedef struct frIndexedData_ {
-    int idx;
-    void *data;
-} frIndexedData;
-
 /* 
     A structure that represents a collision shape, 
     which can be attached to a rigid body.
@@ -111,13 +105,19 @@ typedef struct frBody_ frBody;
 /* A structure that represents a simulation container. */
 typedef struct frWorld_ frWorld;
 
+/* A structure that represents arbitrary data with an identifier. */
+typedef struct frContextNode_ {
+    int id;
+    void *data;
+} frContextNode;
+
 /* (From 'broad-phase.c') ================================================== */
 
 /* A structure that represents a spatial hash. */
 typedef struct frSpatialHash_ frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
-typedef bool (*frHashQueryFunc)(frIndexedData arg);
+typedef bool (*frHashQueryFunc)(frContextNode ctx);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -127,6 +127,7 @@ typedef struct frCollision_ {
     struct {
         int id;
         float depth;
+        float timestamp;
         frVector2 point;
         struct {
             float normalMass, normalScalar;
@@ -503,11 +504,11 @@ frRingBuffer *frCreateRingBuffer(size_t length);
 /* Releases the memory allocated for `rbf`. */
 void frReleaseRingBuffer(frRingBuffer *rbf);
 
-/* Adds a `value` to `rbf`. */
-bool frAddValueToRingBuffer(frRingBuffer *rbf, frIndexedData value);
+/* Adds a `node` to `rbf`. */
+bool frAddNodeToRingBuffer(frRingBuffer *rbf, frContextNode node);
 
-/* Removes a value from `rbf` and stores it to `value`. */
-bool frRemoveValueFromRingBuffer(frRingBuffer *rbf, frIndexedData *value);
+/* Removes a node from `rbf` and stores it to `node`. */
+bool frRemoveNodeFromRingBuffer(frRingBuffer *rbf, frContextNode *node);
 
 /* (From 'world.c') ======================================================== */
 

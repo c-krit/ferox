@@ -45,27 +45,27 @@ TEST utRingBufferOps(void) {
     frRingBuffer *rbf = frCreateRingBuffer(RING_BUFFER_LENGTH);
 
     {
-        frIndexedData value = { .idx = 0 };
+        frContextNode node = { .id = 0 };
 
         for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
-            value.idx = i;
+            node.id = i;
 
             bool result = (i < (RING_BUFFER_LENGTH - 1));
 
-            ASSERT_EQ(result, frAddValueToRingBuffer(rbf, value));
+            ASSERT_EQ(result, frAddNodeToRingBuffer(rbf, node));
         }
 
-        ASSERT_EQ(false, frAddValueToRingBuffer(rbf, value));
+        ASSERT_EQ(false, frAddNodeToRingBuffer(rbf, node));
 
         for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
             bool result = (i < (RING_BUFFER_LENGTH - 1));
 
-            ASSERT_EQ(result, frRemoveValueFromRingBuffer(rbf, &value));
+            ASSERT_EQ(result, frRemoveNodeFromRingBuffer(rbf, &node));
             
-            if (result == true) ASSERT_EQ(i, value.idx);
+            if (result == true) ASSERT_EQ(i, node.id);
         }
 
-        ASSERT_EQ(false, frRemoveValueFromRingBuffer(rbf, NULL));
+        ASSERT_EQ(false, frRemoveNodeFromRingBuffer(rbf, NULL));
     }
 
     frReleaseRingBuffer(rbf);
