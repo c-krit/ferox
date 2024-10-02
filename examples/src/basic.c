@@ -50,8 +50,8 @@
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float BOX_SIZE = 40.0f, CELL_SIZE = 2.0f,
-                   DELTA_TIME = 1.0f / TARGET_FPS;
+static const float BOX_WIDTH = 40.0f, BOX_HEIGHT = 40.0f;
+static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / (TARGET_FPS << 1);
 
 /* Private Variables ======================================================= */
 
@@ -96,31 +96,31 @@ int main(void) {
 
 static void InitExample(void) {
     world = frCreateWorld(frVector2ScalarMultiply(FR_WORLD_DEFAULT_GRAVITY,
-                                                  2.0f),
+                                                  1.0f),
                           CELL_SIZE);
 
     ground = frCreateBodyFromShape(
         FR_BODY_STATIC,
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = 0.85f * SCREEN_HEIGHT }),
-        frCreateRectangle((frMaterial) { .density = 1.25f, .friction = 0.5f },
+        frCreateRectangle((frMaterial) { .density = 1.25f, .friction = 0.75f },
                           frPixelsToUnits(0.75f * SCREEN_WIDTH),
                           frPixelsToUnits(0.1f * SCREEN_HEIGHT)));
 
     frAddBodyToWorld(world, ground);
 
     boxShape = frCreateRectangle((frMaterial) { .density = 1.0f,
-                                                .friction = 0.35f },
-                                 frPixelsToUnits(BOX_SIZE),
-                                 frPixelsToUnits(BOX_SIZE));
+                                                .friction = 0.75f },
+                                 frPixelsToUnits(BOX_WIDTH),
+                                 frPixelsToUnits(BOX_HEIGHT));
 
     for (int i = 0; i < BOX_COUNT; i++) {
-        boxes[i] = frCreateBodyFromShape(FR_BODY_DYNAMIC,
-                                         frVector2PixelsToUnits((frVector2) {
-                                             .x = 0.5f * SCREEN_WIDTH,
-                                             .y = (0.75f * SCREEN_HEIGHT)
-                                                  - (i * BOX_SIZE) }),
-                                         boxShape);
+        boxes[i] = frCreateBodyFromShape(
+            FR_BODY_DYNAMIC,
+            frVector2PixelsToUnits((frVector2) {
+                .x = 0.5f * SCREEN_WIDTH,
+                .y = (0.74f * SCREEN_HEIGHT) - (i * (BOX_HEIGHT + 1.0f)) }),
+            boxShape);
 
         frAddBodyToWorld(world, boxes[i]);
     }

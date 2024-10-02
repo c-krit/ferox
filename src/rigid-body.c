@@ -347,7 +347,7 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
         return;
     }
 
-    frVector2 ctxTangent = { .x = ctx->direction.y, .y = -ctx->direction.x };
+    frVector2 ctxTangent = frVector2RightNormal(ctx->direction);
 
     for (int i = 0; i < ctx->count; i++) {
         frVector2 contactPoint = ctx->contacts[i].point;
@@ -368,6 +368,9 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
 
         ctx->contacts[i].cache.normalMass = 1.0f / normalMass;
 
+        frVector2 accNormalImpulse = frVector2ScalarMultiply(
+            ctx->direction, ctx->contacts[i].cache.normalScalar);
+
         relPositionCross1 = frVector2Cross(relPosition1, ctxTangent);
         relPositionCross2 = frVector2Cross(relPosition2, ctxTangent);
 
@@ -379,7 +382,29 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
 
         ctx->contacts[i].cache.tangentMass = 1.0f / tangentMass;
 
-        /* TODO: ... */
+        frVector2 accTangentImpulse = frVector2ScalarMultiply(
+            ctxTangent, ctx->contacts[i].cache.tangentScalar);
+
+        {
+            frVector2 accImpulse = frVector2Add(accNormalImpulse,
+                                                accTangentImpulse);
+
+            b1->mtn.velocity = frVector2Subtract(
+                b1->mtn.velocity,
+                frVector2ScalarMultiply(accImpulse, b1->mtn.inverseMass));
+
+            b1->mtn.angularVelocity -= b1->mtn.inverseInertia
+                                       * frVector2Cross(relPosition1,
+                                                        accImpulse);
+
+            b2->mtn.velocity = frVector2Add(
+                b2->mtn.velocity,
+                frVector2ScalarMultiply(accImpulse, b2->mtn.inverseMass));
+
+            b2->mtn.angularVelocity += b2->mtn.inverseInertia
+                                       * frVector2Cross(relPosition2,
+                                                        accImpulse);
+        }
     }
 }
 
@@ -425,7 +450,7 @@ void frResolveCollision(frBody *b1,
         || inverseDt <= 0.0f)
         return;
 
-    frVector2 ctxTangent = { .x = ctx->direction.y, .y = -ctx->direction.x };
+    frVector2 ctxTangent = frVector2RightNormal(ctx->direction);
 
     for (int i = 0; i < ctx->count; i++) {
         frVector2 contactPoint = ctx->contacts[i].point;
@@ -435,8 +460,8 @@ void frResolveCollision(frBody *b1,
         frVector2 relPosition2 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b2));
 
-        frVector2 relNormal1 = { .x = -relPosition1.y, .y = relPosition1.x };
-        frVector2 relNormal2 = { .x = -relPosition2.y, .y = relPosition2.x };
+        frVector2 relNormal1 = frVector2LeftNormal(relPosition1);
+        frVector2 relNormal2 = frVector2LeftNormal(relPosition2);
 
         frVector2 relVelocity = frVector2Subtract(
             frVector2Add(b2->mtn.velocity,
@@ -458,32 +483,18 @@ void frResolveCollision(frBody *b1,
                              * ctx->contacts[i].cache.normalMass;
 
         {
-            if (normalScalar < 0.0f) normalScalar = 0.0f;
-            
-            // TODO: ...
-            ctx->contacts[i].cache.normalScalar = normalScalar;
+            float oldNormalScalar = ctx->contacts[i].cache.normalScalar;
+
+            ctx->contacts[i].cache.normalScalar = fmaxf(0.0f,
+                                                        oldNormalScalar
+                                                            + normalScalar);
+
+            normalScalar = ctx->contacts[i].cache.normalScalar
+                           - oldNormalScalar;
         }
 
         frVector2 normalImpulse = frVector2ScalarMultiply(ctx->direction,
                                                           normalScalar);
-
-        {
-            b1->mtn.velocity = frVector2Subtract(
-                b1->mtn.velocity,
-                frVector2ScalarMultiply(normalImpulse, b1->mtn.inverseMass));
-
-            b1->mtn.angularVelocity -= b1->mtn.inverseInertia
-                                       * frVector2Cross(relPosition1,
-                                                        normalImpulse);
-
-            b2->mtn.velocity = frVector2Add(
-                b2->mtn.velocity,
-                frVector2ScalarMultiply(normalImpulse, b2->mtn.inverseMass));
-
-            b2->mtn.angularVelocity += b2->mtn.inverseInertia
-                                       * frVector2Cross(relPosition2,
-                                                        normalImpulse);
-        }
 
         relVelocity = frVector2Subtract(
             frVector2Add(b2->mtn.velocity,
@@ -497,34 +508,41 @@ void frResolveCollision(frBody *b1,
                               * ctx->contacts[i].cache.tangentMass;
 
         {
-            float maxTangentScalar = fabsf(ctx->friction * normalScalar);
+            float maxTangentScalar = fabsf(
+                ctx->friction * ctx->contacts[i].cache.normalScalar);
 
-            tangentScalar = fminf(fmaxf(tangentScalar, -maxTangentScalar),
-                                  maxTangentScalar);
+            float oldTangentScalar = ctx->contacts[i].cache.tangentScalar;
 
-            // TODO: ...
-            ctx->contacts[i].cache.tangentScalar = tangentScalar;
+            ctx->contacts[i].cache.tangentScalar = fminf(
+                fmaxf(oldTangentScalar + tangentScalar, -maxTangentScalar),
+                maxTangentScalar);
+
+            tangentScalar = ctx->contacts[i].cache.tangentScalar
+                            - oldTangentScalar;
         }
 
         frVector2 tangentImpulse = frVector2ScalarMultiply(ctxTangent,
                                                            tangentScalar);
 
         {
+            frVector2 totalImpulse = frVector2Add(normalImpulse,
+                                                  tangentImpulse);
+
             b1->mtn.velocity = frVector2Subtract(
                 b1->mtn.velocity,
-                frVector2ScalarMultiply(tangentImpulse, b1->mtn.inverseMass));
+                frVector2ScalarMultiply(totalImpulse, b1->mtn.inverseMass));
 
             b1->mtn.angularVelocity -= b1->mtn.inverseInertia
                                        * frVector2Cross(relPosition1,
-                                                        tangentImpulse);
+                                                        totalImpulse);
 
             b2->mtn.velocity = frVector2Add(
                 b2->mtn.velocity,
-                frVector2ScalarMultiply(tangentImpulse, b2->mtn.inverseMass));
+                frVector2ScalarMultiply(totalImpulse, b2->mtn.inverseMass));
 
             b2->mtn.angularVelocity += b2->mtn.inverseInertia
                                        * frVector2Cross(relPosition2,
-                                                        tangentImpulse);
+                                                        totalImpulse);
         }
     }
 }

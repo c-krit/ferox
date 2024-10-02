@@ -121,20 +121,26 @@ typedef bool (*frHashQueryFunc)(frContextNode ctx);
 
 /* (From 'collision.c') ==================================================== */
 
-/* A structure that represents the contact points of two colliding bodies. */
+/* A structure that represents a contact point. */
+typedef struct frContact_ {
+    int id;
+    float depth;
+    float timestamp;
+    frVector2 point;
+    struct {
+        float normalMass, normalScalar;
+        float tangentMass, tangentScalar;
+    } cache;
+} frContact;
+
+/* 
+    A structure that represents the contact points 
+    between two colliding bodies. 
+*/
 typedef struct frCollision_ {
     int count;
-    struct {
-        int id;
-        float depth;
-        float timestamp;
-        frVector2 point;
-        struct {
-            float normalMass, normalScalar;
-            float tangentMass, tangentScalar;
-        } cache;
-    } contacts[2];
     frVector2 direction;
+    frContact contacts[2];
     float friction, restitution;
 } frCollision;
 

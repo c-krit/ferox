@@ -346,7 +346,31 @@ static bool frPreStepHashQueryCallback(frContextNode ctx) {
         collision.friction = entry->value.friction;
         collision.restitution = entry->value.restitution;
 
-        /* TODO: ... */
+        for (int i = 0; i < collision.count; i++) {
+            int newContactIndex = i, oldContactIndex = -1;
+
+            for (int j = 0; j < entry->value.count; j++) {
+                int newContactId = collision.contacts[newContactIndex].id;
+                int oldContactId = entry->value.contacts[j].id;
+
+                if (newContactId == oldContactId) {
+                    oldContactIndex = j;
+
+                    break;
+                }
+            }
+
+            if (oldContactIndex < 0) continue;
+
+            frContact *newContact = &(collision.contacts[newContactIndex]);
+            frContact *oldContact = &(entry->value.contacts[oldContactIndex]);
+
+            float oldNormalScalar = oldContact->cache.normalScalar;
+            float oldTangentScalar = oldContact->cache.tangentScalar;
+
+            newContact->cache.normalScalar = oldNormalScalar;
+            newContact->cache.tangentScalar = oldTangentScalar;
+        }
     } else {
         collision.friction = 0.5f
                              * (frGetShapeFriction(s1)
