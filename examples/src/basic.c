@@ -41,6 +41,8 @@
 #define SCREEN_WIDTH   800
 #define SCREEN_HEIGHT  600
 
+#define BOX_COUNT      10
+
 // clang-format on
 
 /* Constants =============================================================== */
@@ -48,13 +50,16 @@
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float BOX_SIZE = 40.0f, CELL_SIZE = 2.0f,
+                   DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
 static frWorld *world;
 
-static frBody *box, *ground;
+static frShape *boxShape, *groundShape;
+
+static frBody *boxes[BOX_COUNT], *ground;
 
 /* Private Function Prototypes ============================================= */
 
@@ -104,17 +109,21 @@ static void InitExample(void) {
 
     frAddBodyToWorld(world, ground);
 
-    box = frCreateBodyFromShape(
-        FR_BODY_DYNAMIC,
-        frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
-                                             .y = 0.35f * SCREEN_HEIGHT }),
-        frCreateRectangle((frMaterial) { .density = 1.0f, .friction = 0.35f },
-                          frPixelsToUnits(45.0f),
-                          frPixelsToUnits(45.0f)));
+    boxShape = frCreateRectangle((frMaterial) { .density = 1.0f,
+                                                .friction = 0.35f },
+                                 frPixelsToUnits(BOX_SIZE),
+                                 frPixelsToUnits(BOX_SIZE));
 
-    // frSetBodyAngle(box, DEG2RAD * 25.0f);
+    for (int i = 0; i < BOX_COUNT; i++) {
+        boxes[i] = frCreateBodyFromShape(FR_BODY_DYNAMIC,
+                                         frVector2PixelsToUnits((frVector2) {
+                                             .x = 0.5f * SCREEN_WIDTH,
+                                             .y = (0.75f * SCREEN_HEIGHT)
+                                                  - (i * BOX_SIZE) }),
+                                         boxShape);
 
-    frAddBodyToWorld(world, box);
+        frAddBodyToWorld(world, boxes[i]);
+    }
 }
 
 static void UpdateExample(void) {
@@ -132,8 +141,8 @@ static void UpdateExample(void) {
 
         frDrawBodyLines(ground, 1.0f, GRAY);
 
-        frDrawBodyLines(box, 1.0f, ColorAlpha(RED, 0.85f));
-        // frDrawBodyAABB(box, 1.0f, ColorAlpha(GREEN, 0.25f));
+        for (int i = 0; i < BOX_COUNT; i++)
+            frDrawBodyLines(boxes[i], 1.0f, ColorAlpha(RED, 0.85f));
 
         DrawFPS(8, 8);
 
@@ -142,8 +151,7 @@ static void UpdateExample(void) {
 }
 
 static void DeinitExample(void) {
-    frReleaseShape(frGetBodyShape(ground));
-    frReleaseShape(frGetBodyShape(box));
+    frReleaseShape(groundShape), frReleaseShape(boxShape);
 
     frReleaseWorld(world);
 }
