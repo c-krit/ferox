@@ -41,8 +41,8 @@
 #define SCREEN_WIDTH           1280
 #define SCREEN_HEIGHT          800
 
-#define LOGO_WIDTH_IN_PIECES   40
-#define LOGO_HEIGHT_IN_PIECES  40
+#define LOGO_WIDTH_IN_PIECES   44
+#define LOGO_HEIGHT_IN_PIECES  44
 
 // clang-format on
 
@@ -58,7 +58,7 @@ typedef struct _Piece {
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const char *RAYLIB_TEXTURE_PATH = "../res/images/raylib-40.png";
+static const char *RAYLIB_TEXTURE_PATH = "../res/images/raylib-44.png";
 
 static const float CELL_SIZE = 0.75f, DELTA_TIME = 1.0f / TARGET_FPS;
 
@@ -92,7 +92,7 @@ int main(void) {
 #ifdef PLATFORM_WEB
     emscripten_set_main_loop(UpdateExample, 0, 1);
 #else
-    // SetTargetFPS(TARGET_FPS);
+    SetTargetFPS(TARGET_FPS);
 
     while (!WindowShouldClose())
         UpdateExample();
