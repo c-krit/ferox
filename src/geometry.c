@@ -153,7 +153,7 @@ float frGetShapeInertia(const frShape *s) {
     if (s == NULL || s->material.density <= 0.0f) return 0.0f;
 
     if (s->type == FR_SHAPE_CIRCLE) {
-        const float radius = s->data.circle.radius;
+        float radius = s->data.circle.radius;
 
         return 0.5f * frGetShapeMass(s) * (radius * radius);
     } else if (s->type == FR_SHAPE_POLYGON) {

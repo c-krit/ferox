@@ -201,7 +201,7 @@ void frStepWorld(frWorld *w, float dt) {
     frPreStepWorld(w);
 
     for (int j = 0; j < hmlen(w->cache); j++) {
-        frCollision *collision = &(w->cache[j].value);
+        frCollision *collision = &w->cache[j].value;
 
         if (w->handler.preStep != NULL && collision->count > 0)
             w->handler.preStep(w->cache[j].key, collision);
@@ -218,7 +218,7 @@ void frStepWorld(frWorld *w, float dt) {
     for (int j = 0; j < entryCount; j++) {
         frBodyPair key = w->cache[j].key;
 
-        const frCollision *value = &(w->cache[j].value);
+        const frCollision *value = &w->cache[j].value;
 
         for (int k = 0; k < value->count; k++)
             if (value->contacts[k].timestamp < w->timestamp) {
@@ -233,7 +233,7 @@ void frStepWorld(frWorld *w, float dt) {
                                    w->cache[j].key.second,
                                    &w->cache[j].value);
 
-    const float inverseDt = 1.0f / dt;
+    float inverseDt = 1.0f / dt;
 
     for (int i = 0; i < FR_WORLD_ITERATION_COUNT; i++)
         for (int j = 0; j < hmlen(w->cache); j++)
@@ -362,8 +362,8 @@ static bool frPreStepHashQueryCallback(frContextNode ctx) {
 
             if (oldContactIndex < 0) continue;
 
-            frContact *newContact = &(collision.contacts[newContactIndex]);
-            frContact *oldContact = &(entry->value.contacts[oldContactIndex]);
+            frContact *newContact = &collision.contacts[newContactIndex];
+            frContact *oldContact = &entry->value.contacts[oldContactIndex];
 
             float oldNormalScalar = oldContact->cache.normalScalar;
             float oldTangentScalar = oldContact->cache.tangentScalar;

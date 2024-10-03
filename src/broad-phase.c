@@ -113,7 +113,7 @@ void frInsertIntoSpatialHash(frSpatialHash *sh, frAABB key, int value) {
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
-            const frSpatialHashKey key = { .x = x, .y = y };
+            frSpatialHashKey key = { .x = x, .y = y };
 
             frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
@@ -148,7 +148,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
-            const frSpatialHashKey key = { .x = x, .y = y };
+            frSpatialHashKey key = { .x = x, .y = y };
 
             frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
