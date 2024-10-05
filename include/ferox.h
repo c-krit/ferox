@@ -58,26 +58,40 @@ extern "C" {
 
 // clang-format off
 
-/* Defines the maximum number of vertices for a convex polygon. */
-#define FR_GEOMETRY_MAX_VERTEX_COUNT  8
+#ifndef FR_GEOMETRY_MAX_VERTEX_COUNT
+    /* Defines the maximum number of vertices for a convex polygon. */
+    #define FR_GEOMETRY_MAX_VERTEX_COUNT  8
+#endif
 
-/* Defines how many pixels represent a unit of length (meter). */
-#define FR_GEOMETRY_PIXELS_PER_UNIT   32.0f
+#ifndef FR_GEOMETRY_PIXELS_PER_UNIT
+    /* Defines how many pixels represent a unit of length (meter). */
+    #define FR_GEOMETRY_PIXELS_PER_UNIT   32.0f
+#endif
 
-/* Defines the 'bias factor' for the Baumgarte stabilization scheme. */
-#define FR_WORLD_BAUMGARTE_FACTOR     0.2f
+#ifndef FR_WORLD_BAUMGARTE_FACTOR
+    /* Defines the 'bias factor' for the Baumgarte stabilization scheme. */
+    #define FR_WORLD_BAUMGARTE_FACTOR     0.2f
+#endif
 
-/* Defines the 'slop' for the Baumgarte stabilization scheme. */
-#define FR_WORLD_BAUMGARTE_SLOP       0.01f
+#ifndef FR_WORLD_BAUMGARTE_SLOP
+    /* Defines the 'slop' for the Baumgarte stabilization scheme. */
+    #define FR_WORLD_BAUMGARTE_SLOP       0.01f
+#endif
 
-/* Defines the default gravity acceleration vector for a world. */
-#define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
+#ifndef FR_WORLD_DEFAULT_GRAVITY
+    /* Defines the default gravity acceleration vector for a world. */
+    #define FR_WORLD_DEFAULT_GRAVITY      ((frVector2) { .y = 9.8f })
+#endif
 
-/* Defines the iteration count for the constraint solver. */
-#define FR_WORLD_ITERATION_COUNT      10
+#ifndef FR_WORLD_ITERATION_COUNT
+    /* Defines the iteration count for the constraint solver. */
+    #define FR_WORLD_ITERATION_COUNT      10
+#endif
 
-/* Defines the maximum number of objects in a world. */
-#define FR_WORLD_MAX_OBJECT_COUNT     2048
+#ifndef FR_WORLD_MAX_OBJECT_COUNT
+    /* Defines the maximum number of objects in a world. */
+    #define FR_WORLD_MAX_OBJECT_COUNT     2048
+#endif
 
 // clang-format on
 
