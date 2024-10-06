@@ -122,7 +122,7 @@ typedef struct frWorld_ frWorld;
 /* A structure that represents arbitrary data with an identifier. */
 typedef struct frContextNode_ {
     int id;
-    void *data;
+    void *ctx;
 } frContextNode;
 
 /* (From 'broad-phase.c') ================================================== */
@@ -131,7 +131,7 @@ typedef struct frContextNode_ {
 typedef struct frSpatialHash_ frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
-typedef bool (*frHashQueryFunc)(frContextNode ctx);
+typedef bool (*frHashQueryFunc)(frContextNode node);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -252,7 +252,7 @@ typedef struct frCollisionHandler_ {
 } frCollisionHandler;
 
 /* A callback function type for `frComputeRaycastForWorld()`. */
-typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit);
+typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit, frContextNode node);
 
 /* Public Function Prototypes ============================================== */
 
@@ -581,7 +581,10 @@ void frUpdateWorld(frWorld *w, float dt);
     Casts a `ray` against all objects in `w`, 
     then calls `func` for each object that collides with `ray`. 
 */
-void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func);
+void frComputeWorldRaycast(frWorld *w,
+                           frRay ray,
+                           frRaycastQueryFunc func,
+                           void *ctx);
 
 /* Inline Functions ======================================================== */
 

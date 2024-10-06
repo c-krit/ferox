@@ -119,7 +119,7 @@ static void InitExample(void) {
         pieceWidth = raylibTexture.width / LOGO_WIDTH_IN_PIECES;
         pieceHeight = raylibTexture.height / LOGO_HEIGHT_IN_PIECES;
 
-        halfPieceWidth = 0.5f * pieceWidth,
+        halfPieceWidth = 0.5f * pieceWidth;
         halfPieceHeight = 0.5f * pieceHeight;
 
         frShape *pieceShape = frCreateRectangle(

@@ -66,7 +66,7 @@ static void DeinitExample(void);
 
 static void DrawCursor(void);
 
-static void OnRaycastQuery(frRaycastHit raycastHit);
+static void OnRaycastQuery(frRaycastHit raycastHit, frContextNode node);
 
 /* Public Functions ======================================================== */
 
@@ -191,7 +191,9 @@ static void UpdateExample(void) {
                             2.0f,
                             ColorAlpha(LIGHTGRAY, 0.95f));
 
-        frComputeRaycastForWorld(world, ray, OnRaycastQuery);
+        Color ringColor = ColorAlpha(YELLOW, 0.85f);
+
+        frComputeWorldRaycast(world, ray, OnRaycastQuery, &ringColor);
 
         frDrawBodyLines(player, 2.0f, ColorAlpha(GREEN, 0.85f));
 
@@ -226,11 +228,13 @@ static void DrawCursor(void) {
                WHITE);
 }
 
-static void OnRaycastQuery(frRaycastHit raycastHit) {
-    frDrawBodyAABB(raycastHit.body, 1.0f, YELLOW);
+static void OnRaycastQuery(frRaycastHit raycastHit, frContextNode node) {
+    const Color *ringColor = node.ctx;
+
+    frDrawBodyAABB(raycastHit.body, 1.0f, *ringColor);
 
     Vector2 center = { .x = frUnitsToPixels(raycastHit.point.x),
                        .y = frUnitsToPixels(raycastHit.point.y) };
 
-    DrawRing(center, 6.0f, 8.0f, 0.0f, 360.0f, 16, YELLOW);
+    DrawRing(center, 6.0f, 8.0f, 0.0f, 360.0f, 16, *ringColor);
 }

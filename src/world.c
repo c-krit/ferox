@@ -67,9 +67,10 @@ typedef struct frPreStepHashQueryCtx_ {
     for `frRaycastHashQueryCallback()`.
 */
 typedef struct frRaycastHashQueryCtx_ {
-    frRay ray;
-    frWorld *world;
     frRaycastQueryFunc func;
+    frWorld *world;
+    frRay ray;
+    void *ctx;
 } frRaycastHashQueryCtx;
 
 /* Private Function Prototypes ============================================= */
@@ -144,8 +145,8 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         return false;
 
     return frAddNodeToRingBuffer(w->rbf,
-                                  (frContextNode) { .id = FR_OPT_ADD_BODY,
-                                                    .data = b });
+                                 (frContextNode) { .id = FR_OPT_ADD_BODY,
+                                                   .ctx = b });
 }
 
 /* Removes a rigid `b`ody from `w`. */
@@ -153,8 +154,8 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
     return frAddNodeToRingBuffer(w->rbf,
-                                  (frContextNode) { .id = FR_OPT_REMOVE_BODY,
-                                                    .data = b });
+                                 (frContextNode) { .id = FR_OPT_REMOVE_BODY,
+                                                   .ctx = b });
 }
 
 /* Checks if the given `b`ody is in `w`. */
@@ -275,7 +276,10 @@ void frUpdateWorld(frWorld *w, float dt) {
     Casts a `ray` against all objects in `w`, 
     then calls `func` for each object that collides with `ray`. 
 */
-void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
+void frComputeWorldRaycast(frWorld *w,
+                           frRay ray,
+                           frRaycastQueryFunc func,
+                           void *ctx) {
     if (w == NULL || func == NULL) return;
 
     frClearSpatialHash(w->hash);
@@ -296,7 +300,7 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
                                   .height = fabsf(maxVertex.y - minVertex.y) },
                        frRaycastHashQueryCallback,
                        &(frRaycastHashQueryCtx) {
-                           .ray = ray, .world = w, .func = func });
+                           .ctx = ctx, .ray = ray, .world = w, .func = func });
 }
 
 /* Private Functions ======================================================= */
@@ -305,10 +309,10 @@ void frComputeRaycastForWorld(frWorld *w, frRay ray, frRaycastQueryFunc func) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static bool frPreStepHashQueryCallback(frContextNode ctx) {
-    frPreStepHashQueryCtx *queryCtx = ctx.data;
+static bool frPreStepHashQueryCallback(frContextNode node) {
+    frPreStepHashQueryCtx *queryCtx = node.ctx;
 
-    int firstIndex = queryCtx->bodyIndex, secondIndex = ctx.id;
+    int firstIndex = queryCtx->bodyIndex, secondIndex = node.id;
 
     if (firstIndex >= secondIndex) return false;
 
@@ -392,17 +396,18 @@ static bool frPreStepHashQueryCallback(frContextNode ctx) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(frContextNode ctx) {
-    frRaycastHashQueryCtx *queryCtx = ctx.data;
+static bool frRaycastHashQueryCallback(frContextNode node) {
+    frRaycastHashQueryCtx *queryCtx = node.ctx;
 
     frRaycastHit raycastHit = { .distance = 0.0f };
 
-    if (!frComputeRaycast(queryCtx->world->bodies[ctx.id],
+    if (!frComputeRaycast(queryCtx->world->bodies[node.id],
                           queryCtx->ray,
                           &raycastHit))
         return false;
 
-    queryCtx->func(raycastHit);
+    queryCtx->func(raycastHit,
+                   (frContextNode) { .id = node.id, .ctx = queryCtx->ctx });
 
     return true;
 }
@@ -430,13 +435,13 @@ static void frPostStepWorld(frWorld *w) {
     while (frRemoveNodeFromRingBuffer(w->rbf, &node)) {
         switch (node.id) {
             case FR_OPT_ADD_BODY:
-                arrput(w->bodies, node.data);
+                arrput(w->bodies, node.ctx);
 
                 break;
 
             case FR_OPT_REMOVE_BODY:
                 for (int i = 0; i < arrlen(w->bodies); i++)
-                    if (w->bodies[i] == node.data) {
+                    if (w->bodies[i] == node.ctx) {
                         arrdelswap(w->bodies, i);
 
                         break;

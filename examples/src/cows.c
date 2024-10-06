@@ -56,7 +56,7 @@ typedef enum _EntityType {
     ENTITY_COUNT_
 } EntityType;
 
-typedef struct _EntityData {
+typedef struct EntityData_ {
     EntityType type;
     float attackSpeed;
     float movementSpeed;

@@ -50,7 +50,7 @@
 
 /* Typedefs ================================================================ */
 
-typedef struct _MelonKind {
+typedef struct MelonKind_ {
     int index;
     Color color;
 } MelonKind;

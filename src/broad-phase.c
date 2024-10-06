@@ -184,7 +184,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
         will be called with the user data pointer `ctx`.
     */
     for (int i = 0; i < arrlen(sh->queryResult); i++)
-        func((frContextNode) { .id = sh->queryResult[i], .data = ctx });
+        func((frContextNode) { .id = sh->queryResult[i], .ctx = ctx });
 }
 
 /* Private Functions ======================================================= */
