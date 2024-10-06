@@ -18,7 +18,7 @@ A lightweight 2D physics engine written in C, for educational purposes.
 ## Features
 
 <div align="center">
-  <video src="https://github.com/c-krit/ferox/assets/28700668/1729231e-6458-4fab-aa31-ce307c28f52b" />
+  <video src="https://github.com/user-attachments/assets/b8a8da2e-283b-4208-820b-914429b51e08" />
 </div>
 
 > *NOTE: This project was made for educational purposes (mainly for me to learn how a physics engine works), and therefore it is not recommended to use this library in production. Consider using other 2D physics engines with better performance such as [Box2D](https://github.com/erincatto/box2d) and [Chipmunk2D](https://github.com/slembcke/Chipmunk2D).*
