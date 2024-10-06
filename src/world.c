@@ -279,7 +279,7 @@ void frUpdateWorld(frWorld *w, float dt) {
 void frComputeWorldRaycast(frWorld *w,
                            frRay ray,
                            frRaycastQueryFunc func,
-                           void *ctx) {
+                           void *userData) {
     if (w == NULL || func == NULL) return;
 
     frClearSpatialHash(w->hash);
@@ -299,8 +299,10 @@ void frComputeWorldRaycast(frWorld *w,
                                   .width = fabsf(maxVertex.x - minVertex.x),
                                   .height = fabsf(maxVertex.y - minVertex.y) },
                        frRaycastHashQueryCallback,
-                       &(frRaycastHashQueryCtx) {
-                           .ctx = ctx, .ray = ray, .world = w, .func = func });
+                       &(frRaycastHashQueryCtx) { .ctx = userData,
+                                                  .ray = ray,
+                                                  .world = w,
+                                                  .func = func });
 }
 
 /* Private Functions ======================================================= */
@@ -309,10 +311,10 @@ void frComputeWorldRaycast(frWorld *w,
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frPreStepWorld()`. 
 */
-static bool frPreStepHashQueryCallback(frContextNode node) {
-    frPreStepHashQueryCtx *queryCtx = node.ctx;
+static bool frPreStepHashQueryCallback(frContextNode queryResult) {
+    frPreStepHashQueryCtx *queryCtx = queryResult.ctx;
 
-    int firstIndex = queryCtx->bodyIndex, secondIndex = node.id;
+    int firstIndex = queryCtx->bodyIndex, secondIndex = queryResult.id;
 
     if (firstIndex >= secondIndex) return false;
 
@@ -396,18 +398,19 @@ static bool frPreStepHashQueryCallback(frContextNode node) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(frContextNode node) {
-    frRaycastHashQueryCtx *queryCtx = node.ctx;
+static bool frRaycastHashQueryCallback(frContextNode queryResult) {
+    frRaycastHashQueryCtx *queryCtx = queryResult.ctx;
 
     frRaycastHit raycastHit = { .distance = 0.0f };
 
-    if (!frComputeRaycast(queryCtx->world->bodies[node.id],
+    if (!frComputeRaycast(queryCtx->world->bodies[queryResult.id],
                           queryCtx->ray,
                           &raycastHit))
         return false;
 
     queryCtx->func(raycastHit,
-                   (frContextNode) { .id = node.id, .ctx = queryCtx->ctx });
+                   (frContextNode) { .id = queryResult.id,
+                                     .ctx = queryCtx->ctx });
 
     return true;
 }

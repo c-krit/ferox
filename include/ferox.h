@@ -131,7 +131,7 @@ typedef struct frContextNode_ {
 typedef struct frSpatialHash_ frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
-typedef bool (*frHashQueryFunc)(frContextNode node);
+typedef bool (*frHashQueryFunc)(frContextNode queryResult);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -252,7 +252,8 @@ typedef struct frCollisionHandler_ {
 } frCollisionHandler;
 
 /* A callback function type for `frComputeRaycastForWorld()`. */
-typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit, frContextNode node);
+typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit,
+                                   frContextNode queryResult);
 
 /* Public Function Prototypes ============================================== */
 
@@ -277,7 +278,7 @@ void frInsertIntoSpatialHash(frSpatialHash *sh, frAABB key, int value);
 void frQuerySpatialHash(frSpatialHash *sh,
                         frAABB aabb,
                         frHashQueryFunc func,
-                        void *ctx);
+                        void *userData);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -471,8 +472,8 @@ void frSetBodyVelocity(frBody *b, frVector2 v);
 /* Sets the `angularVelocity` of `b`. */
 void frSetBodyAngularVelocity(frBody *b, float angularVelocity);
 
-/* Sets the user data of `b` to `ctx`. */
-void frSetBodyUserData(frBody *b, void *ctx);
+/* Sets the user data of `b` to `userData`. */
+void frSetBodyUserData(frBody *b, void *userData);
 
 /* Checks if the given `point` lies inside `b`. */
 bool frBodyContainsPoint(const frBody *b, frVector2 point);
@@ -490,7 +491,7 @@ void frApplyGravityToBody(frBody *b, frVector2 g);
 void frApplyImpulseToBody(frBody *b, frVector2 point, frVector2 impulse);
 
 /* Applies accumulated impulses to `b1` and `b2`. */
-void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx);
+void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *collision);
 
 /* 
     Calculates the acceleration of `b` from the accumulated forces,
@@ -508,7 +509,7 @@ void frIntegrateForBodyPosition(frBody *b, float dt);
 /* Resolves the collision between `b1` and `b2`. */
 void frResolveCollision(frBody *b1,
                         frBody *b2,
-                        frCollision *ctx,
+                        frCollision *collision,
                         float inverseDt);
 
 /* (From 'timer.c') ======================================================== */
@@ -584,7 +585,7 @@ void frUpdateWorld(frWorld *w, float dt);
 void frComputeWorldRaycast(frWorld *w,
                            frRay ray,
                            frRaycastQueryFunc func,
-                           void *ctx);
+                           void *userData);
 
 /* Inline Functions ======================================================== */
 

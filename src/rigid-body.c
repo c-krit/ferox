@@ -255,8 +255,8 @@ void frSetBodyAngularVelocity(frBody *b, float angularVelocity) {
 }
 
 /* Sets the user data of `b` to `ctx`. */
-void frSetBodyUserData(frBody *b, void *ctx) {
-    if (b != NULL) b->ctx = ctx;
+void frSetBodyUserData(frBody *b, void *userData) {
+    if (b != NULL) b->ctx = userData;
 }
 
 /* Checks if the given `point` lies inside `b`. */
@@ -332,8 +332,10 @@ void frApplyImpulseToBody(frBody *b, frVector2 point, frVector2 impulse) {
 }
 
 /* Applies accumulated impulses to `b1` and `b2`. */
-void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
-    if (b1 == NULL || b2 == NULL || ctx == NULL) return;
+void frApplyAccumulatedImpulses(frBody *b1,
+                                frBody *b2,
+                                frCollision *collision) {
+    if (b1 == NULL || b2 == NULL || collision == NULL) return;
 
     if (b1->mtn.inverseMass + b2->mtn.inverseMass <= 0.0f) {
         if (frGetBodyType(b1) == FR_BODY_STATIC)
@@ -347,18 +349,20 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
         return;
     }
 
-    frVector2 ctxTangent = frVector2RightNormal(ctx->direction);
+    frVector2 ctxTangent = frVector2RightNormal(collision->direction);
 
-    for (int i = 0; i < ctx->count; i++) {
-        frVector2 contactPoint = ctx->contacts[i].point;
+    for (int i = 0; i < collision->count; i++) {
+        frVector2 contactPoint = collision->contacts[i].point;
 
         frVector2 relPosition1 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b1));
         frVector2 relPosition2 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b2));
 
-        float relPositionCross1 = frVector2Cross(relPosition1, ctx->direction);
-        float relPositionCross2 = frVector2Cross(relPosition2, ctx->direction);
+        float relPositionCross1 = frVector2Cross(relPosition1,
+                                                 collision->direction);
+        float relPositionCross2 = frVector2Cross(relPosition2,
+                                                 collision->direction);
 
         float normalMass = (b1->mtn.inverseMass + b2->mtn.inverseMass)
                            + b1->mtn.inverseInertia
@@ -366,10 +370,10 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
                            + b2->mtn.inverseInertia
                                  * (relPositionCross2 * relPositionCross2);
 
-        ctx->contacts[i].cache.normalMass = 1.0f / normalMass;
+        collision->contacts[i].cache.normalMass = 1.0f / normalMass;
 
         frVector2 accNormalImpulse = frVector2ScalarMultiply(
-            ctx->direction, ctx->contacts[i].cache.normalScalar);
+            collision->direction, collision->contacts[i].cache.normalScalar);
 
         relPositionCross1 = frVector2Cross(relPosition1, ctxTangent);
         relPositionCross2 = frVector2Cross(relPosition2, ctxTangent);
@@ -380,10 +384,10 @@ void frApplyAccumulatedImpulses(frBody *b1, frBody *b2, frCollision *ctx) {
                             + b2->mtn.inverseInertia
                                   * (relPositionCross2 * relPositionCross2);
 
-        ctx->contacts[i].cache.tangentMass = 1.0f / tangentMass;
+        collision->contacts[i].cache.tangentMass = 1.0f / tangentMass;
 
         frVector2 accTangentImpulse = frVector2ScalarMultiply(
-            ctxTangent, ctx->contacts[i].cache.tangentScalar);
+            ctxTangent, collision->contacts[i].cache.tangentScalar);
 
         {
             frVector2 accImpulse = frVector2Add(accNormalImpulse,
@@ -443,17 +447,17 @@ void frIntegrateForBodyPosition(frBody *b, float dt) {
 /* Resolves the collision between `b1` and `b2`. */
 void frResolveCollision(frBody *b1,
                         frBody *b2,
-                        frCollision *ctx,
+                        frCollision *collision,
                         float inverseDt) {
     if (b1 == NULL || b2 == NULL
-        || b1->mtn.inverseMass + b2->mtn.inverseMass <= 0.0f || ctx == NULL
-        || inverseDt <= 0.0f)
+        || b1->mtn.inverseMass + b2->mtn.inverseMass <= 0.0f
+        || collision == NULL || inverseDt <= 0.0f)
         return;
 
-    frVector2 ctxTangent = frVector2RightNormal(ctx->direction);
+    frVector2 ctxTangent = frVector2RightNormal(collision->direction);
 
-    for (int i = 0; i < ctx->count; i++) {
-        frVector2 contactPoint = ctx->contacts[i].point;
+    for (int i = 0; i < collision->count; i++) {
+        frVector2 contactPoint = collision->contacts[i].point;
 
         frVector2 relPosition1 = frVector2Subtract(contactPoint,
                                                    frGetBodyPosition(b1));
@@ -471,29 +475,29 @@ void frResolveCollision(frBody *b1,
                          frVector2ScalarMultiply(relNormal1,
                                                  b1->mtn.angularVelocity)));
 
-        float relVelocityDot = frVector2Dot(relVelocity, ctx->direction);
+        float relVelocityDot = frVector2Dot(relVelocity, collision->direction);
 
         float biasScalar = -(FR_WORLD_BAUMGARTE_FACTOR * inverseDt)
                            * fminf(0.0f,
-                                   -ctx->contacts[i].depth
+                                   -collision->contacts[i].depth
                                        + FR_WORLD_BAUMGARTE_SLOP);
 
-        float normalScalar = ((-(1.0f + ctx->restitution) * relVelocityDot)
+        float normalScalar = ((-(1.0f + collision->restitution)
+                               * relVelocityDot)
                               + biasScalar)
-                             * ctx->contacts[i].cache.normalMass;
+                             * collision->contacts[i].cache.normalMass;
 
         {
-            float oldNormalScalar = ctx->contacts[i].cache.normalScalar;
+            float oldNormalScalar = collision->contacts[i].cache.normalScalar;
 
-            ctx->contacts[i].cache.normalScalar = fmaxf(0.0f,
-                                                        oldNormalScalar
-                                                            + normalScalar);
+            collision->contacts[i].cache.normalScalar =
+                fmaxf(0.0f, oldNormalScalar + normalScalar);
 
-            normalScalar = ctx->contacts[i].cache.normalScalar
+            normalScalar = collision->contacts[i].cache.normalScalar
                            - oldNormalScalar;
         }
 
-        frVector2 normalImpulse = frVector2ScalarMultiply(ctx->direction,
+        frVector2 normalImpulse = frVector2ScalarMultiply(collision->direction,
                                                           normalScalar);
 
         relVelocity = frVector2Subtract(
@@ -505,19 +509,20 @@ void frResolveCollision(frBody *b1,
                                                  b1->mtn.angularVelocity)));
 
         float tangentScalar = -frVector2Dot(relVelocity, ctxTangent)
-                              * ctx->contacts[i].cache.tangentMass;
+                              * collision->contacts[i].cache.tangentMass;
 
         {
             float maxTangentScalar = fabsf(
-                ctx->friction * ctx->contacts[i].cache.normalScalar);
+                collision->friction
+                * collision->contacts[i].cache.normalScalar);
 
-            float oldTangentScalar = ctx->contacts[i].cache.tangentScalar;
+            float oldTangentScalar = collision->contacts[i].cache.tangentScalar;
 
-            ctx->contacts[i].cache.tangentScalar = fminf(
+            collision->contacts[i].cache.tangentScalar = fminf(
                 fmaxf(oldTangentScalar + tangentScalar, -maxTangentScalar),
                 maxTangentScalar);
 
-            tangentScalar = ctx->contacts[i].cache.tangentScalar
+            tangentScalar = collision->contacts[i].cache.tangentScalar
                             - oldTangentScalar;
         }
 

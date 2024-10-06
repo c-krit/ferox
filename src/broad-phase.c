@@ -133,7 +133,7 @@ void frInsertIntoSpatialHash(frSpatialHash *sh, frAABB key, int value) {
 void frQuerySpatialHash(frSpatialHash *sh,
                         frAABB aabb,
                         frHashQueryFunc func,
-                        void *ctx) {
+                        void *userData) {
     if (sh == NULL) return;
 
     float inverseCellSize = sh->inverseCellSize;
@@ -184,7 +184,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
         will be called with the user data pointer `ctx`.
     */
     for (int i = 0; i < arrlen(sh->queryResult); i++)
-        func((frContextNode) { .id = sh->queryResult[i], .ctx = ctx });
+        func((frContextNode) { .id = sh->queryResult[i], .ctx = userData });
 }
 
 /* Private Functions ======================================================= */
