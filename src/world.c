@@ -398,19 +398,17 @@ static bool frPreStepHashQueryCallback(frContextNode queryResult) {
     A callback function for `frQuerySpatialHash()` 
     that will be called during `frComputeRaycastForWorld()`.
 */
-static bool frRaycastHashQueryCallback(frContextNode queryResult) {
-    frRaycastHashQueryCtx *queryCtx = queryResult.ctx;
+static bool frRaycastHashQueryCallback(frContextNode ctxNode) {
+    frRaycastHashQueryCtx *queryCtx = ctxNode.ctx;
 
     frRaycastHit raycastHit = { .distance = 0.0f };
 
-    if (!frComputeRaycast(queryCtx->world->bodies[queryResult.id],
+    if (!frComputeRaycast(queryCtx->world->bodies[ctxNode.id],
                           queryCtx->ray,
                           &raycastHit))
         return false;
 
-    queryCtx->func(raycastHit,
-                   (frContextNode) { .id = queryResult.id,
-                                     .ctx = queryCtx->ctx });
+    queryCtx->func(raycastHit, queryCtx->ctx);
 
     return true;
 }

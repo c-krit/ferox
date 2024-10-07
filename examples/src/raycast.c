@@ -66,7 +66,7 @@ static void DeinitExample(void);
 
 static void DrawCursor(void);
 
-static void OnRaycastQuery(frRaycastHit raycastHit, frContextNode queryResult);
+static void OnRaycastQuery(frRaycastHit raycastHit, void *ctx);
 
 /* Public Functions ======================================================== */
 
@@ -228,8 +228,8 @@ static void DrawCursor(void) {
                WHITE);
 }
 
-static void OnRaycastQuery(frRaycastHit raycastHit, frContextNode queryResult) {
-    const Color *ringColor = queryResult.ctx;
+static void OnRaycastQuery(frRaycastHit raycastHit, void *ctx) {
+    const Color *ringColor = (Color *) ctx;
 
     frDrawBodyAABB(raycastHit.body, 1.0f, *ringColor);
 

@@ -131,7 +131,7 @@ typedef struct frContextNode_ {
 typedef struct frSpatialHash_ frSpatialHash;
 
 /* A callback function type for `frQuerySpatialHash()`. */
-typedef bool (*frHashQueryFunc)(frContextNode queryResult);
+typedef bool (*frHashQueryFunc)(frContextNode ctxNode);
 
 /* (From 'collision.c') ==================================================== */
 
@@ -252,8 +252,7 @@ typedef struct frCollisionHandler_ {
 } frCollisionHandler;
 
 /* A callback function type for `frComputeRaycastForWorld()`. */
-typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit,
-                                   frContextNode queryResult);
+typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit, void *ctx);
 
 /* Public Function Prototypes ============================================== */
 
