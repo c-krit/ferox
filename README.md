@@ -169,29 +169,65 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 ### Arch Linux / Manjaro Linux
 
 ```console
-$ sudo pacman -Syu && sudo pacman -S base-devel raylib git
-$ git clone https://github.com/c-krit/ferox && cd ferox
+$ sudo pacman -Syu && sudo pacman -S base-devel git
+$ git clone https://github.com/c-krit/ferox ~/ferox && cd ~/ferox
 $ make
 ```
 
 In order to compile the examples, do:
 
 ```console
-$ cd examples && make
+$ sudo pacman -Syu && sudo pacman -S alsa-lib mesa libx11 libxrandr \
+  libxi libxcursor libxinerama
+$ git clone https://github.com/raysan5/raylib ~/raylib && cd ~/raylib/src
+$ make PLATFORM=PLATFORM_DESKTOP GLFW_LINUX_ENABLE_WAYLAND=OFF && make install
+```
+
+```console
+$ cd ~/ferox/examples && make
 ```
 
 ### Debian / Ubuntu
 
 ```console
 $ sudo apt install build-essential git
-$ git clone https://github.com/c-krit/ferox && cd ferox
+$ git clone https://github.com/c-krit/ferox ~/ferox && cd ~/ferox
 $ make
 ```
 
 In order to compile the examples, do:
 
 ```console
-$ cd examples && make
+$ sudo apt update && sudo apt install libasound2-dev libgl1-mesa-dev \
+  libglu1-mesa-dev libx11-dev libxrandr-dev libxi-dev libxcursor-dev \
+  libxinerama-dev libxkbcommon-dev
+$ git clone https://github.com/raysan5/raylib ~/raylib && cd ~/raylib/src
+$ make PLATFORM=PLATFORM_DESKTOP GLFW_LINUX_ENABLE_WAYLAND=OFF && make install
+```
+
+```console
+$ cd ~/ferox/examples && make
+```
+
+### Void Linux
+
+```console
+$ sudo xbps-install base-devel git
+$ git clone https://github.com/c-krit/ferox ~/ferox && cd ~/ferox
+$ make
+```
+
+In order to compile the examples, do:
+
+```console
+$ sudo xbps-install -Syu && sudo xbps-install alsa-lib-devel libglvnd-devel \
+  libX11-devel libXrandr-devel libXi-devel libXcursor-devel libXinerama-devel mesa
+$ git clone https://github.com/raysan5/raylib ~/raylib && cd ~/raylib/src
+$ make PLATFORM=PLATFORM_DESKTOP GLFW_LINUX_ENABLE_WAYLAND=OFF && make install
+```
+
+```console
+$ cd ~/ferox/examples && make
 ```
 
 </details>
