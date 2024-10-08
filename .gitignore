@@ -38,7 +38,7 @@
 # 빌드 결과물
 *.data
 *.exe
-*.js
 *.html
+*.js
 *.out
 *.wasm
