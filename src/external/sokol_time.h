@@ -14,7 +14,6 @@
     implementation.
 
     Optionally provide the following defines with your own implementations:
-    SOKOL_ASSERT(c)     - your own assert macro (default: assert(c))
     SOKOL_TIME_API_DECL - public function declaration prefix (default: extern)
     SOKOL_API_DECL      - same as SOKOL_TIME_API_DECL
     SOKOL_API_IMPL      - public function implementation prefix (default: -)
@@ -37,44 +36,6 @@
         not in a specific time unit, it is only useful to compute
         time differences.
 
-    uint64_t stm_diff(uint64_t new, uint64_t old);
-        Computes the time difference between new and old. This will always
-        return a positive, non-zero value.
-
-    uint64_t stm_since(uint64_t start);
-        Takes the current time, and returns the elapsed time since start
-        (this is a shortcut for "stm_diff(stm_now(), start)")
-
-    uint64_t stm_laptime(uint64_t* last_time);
-        This is useful for measuring frame time and other recurring
-        events. It takes the current time, returns the time difference
-        to the value in last_time, and stores the current time in
-        last_time for the next call. If the value in last_time is 0,
-        the return value will be zero (this usually happens on the
-        very first call).
-
-    uint64_t stm_round_to_common_refresh_rate(uint64_t duration)
-        This oddly named function takes a measured frame time and
-        returns the closest "nearby" common display refresh rate frame duration
-        in ticks. If the input duration isn't close to any common display
-        refresh rate, the input duration will be returned unchanged as a fallback.
-        The main purpose of this function is to remove jitter/inaccuracies from
-        measured frame times, and instead use the display refresh rate as
-        frame duration.
-        NOTE: for more robust frame timing, consider using the
-        sokol_app.h function sapp_frame_duration()
-
-    Use the following functions to convert a duration in ticks into
-    useful time units:
-
-    double stm_sec(uint64_t ticks);
-    double stm_ms(uint64_t ticks);
-    double stm_us(uint64_t ticks);
-    double stm_ns(uint64_t ticks);
-        Converts a tick value into seconds, milliseconds, microseconds
-        or nanoseconds. Note that not all platforms will have nanosecond
-        or even microsecond precision.
-
     Uses the following time measurement functions under the hood:
 
     Windows:        QueryPerformanceFrequency() / QueryPerformanceCounter()
@@ -84,7 +45,8 @@
 
     zlib/libpng license
 
-    Copyright (c) 2018 Andre Weissflog
+    Copyright (c) 2018 Andre Weissflog (https://github.com/floooh)
+    Copyright (c) 2024 Jaedeok Kim (https://github.com/jdeokkim)
 
     This software is provided 'as-is', without any express or implied warranty.
     In no event will the authors be held liable for any damages arising from the
@@ -127,14 +89,6 @@ extern "C" {
 
 SOKOL_TIME_API_DECL void stm_setup(void);
 SOKOL_TIME_API_DECL uint64_t stm_now(void);
-SOKOL_TIME_API_DECL uint64_t stm_diff(uint64_t new_ticks, uint64_t old_ticks);
-SOKOL_TIME_API_DECL uint64_t stm_since(uint64_t start_ticks);
-SOKOL_TIME_API_DECL uint64_t stm_laptime(uint64_t* last_time);
-SOKOL_TIME_API_DECL uint64_t stm_round_to_common_refresh_rate(uint64_t frame_ticks);
-SOKOL_TIME_API_DECL double stm_sec(uint64_t ticks);
-SOKOL_TIME_API_DECL double stm_ms(uint64_t ticks);
-SOKOL_TIME_API_DECL double stm_us(uint64_t ticks);
-SOKOL_TIME_API_DECL double stm_ns(uint64_t ticks);
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -148,10 +102,6 @@ SOKOL_TIME_API_DECL double stm_ns(uint64_t ticks);
 
 #ifndef SOKOL_API_IMPL
     #define SOKOL_API_IMPL
-#endif
-#ifndef SOKOL_ASSERT
-    #include <assert.h>
-    #define SOKOL_ASSERT(c) assert(c)
 #endif
 #ifndef _SOKOL_PRIVATE
     #if defined(__GNUC__) || defined(__clang__)
@@ -227,7 +177,6 @@ SOKOL_API_IMPL void stm_setup(void) {
 }
 
 SOKOL_API_IMPL uint64_t stm_now(void) {
-    SOKOL_ASSERT(_stm.initialized == 0xABCDABCD);
     uint64_t now;
     #if defined(_WIN32)
         LARGE_INTEGER qpc_t;
@@ -245,75 +194,6 @@ SOKOL_API_IMPL uint64_t stm_now(void) {
         now = ((uint64_t)ts.tv_sec*1000000000 + (uint64_t)ts.tv_nsec) - _stm.start;
     #endif
     return now;
-}
-
-SOKOL_API_IMPL uint64_t stm_diff(uint64_t new_ticks, uint64_t old_ticks) {
-    if (new_ticks > old_ticks) {
-        return new_ticks - old_ticks;
-    }
-    else {
-        return 1;
-    }
-}
-
-SOKOL_API_IMPL uint64_t stm_since(uint64_t start_ticks) {
-    return stm_diff(stm_now(), start_ticks);
-}
-
-SOKOL_API_IMPL uint64_t stm_laptime(uint64_t* last_time) {
-    SOKOL_ASSERT(last_time);
-    uint64_t dt = 0;
-    uint64_t now = stm_now();
-    if (0 != *last_time) {
-        dt = stm_diff(now, *last_time);
-    }
-    *last_time = now;
-    return dt;
-}
-
-// first number is frame duration in ns, second number is tolerance in ns,
-// the resulting min/max values must not overlap!
-static const uint64_t _stm_refresh_rates[][2] = {
-    { 16666667, 1000000 },  //  60 Hz: 16.6667 +- 1ms
-    { 13888889,  250000 },  //  72 Hz: 13.8889 +- 0.25ms
-    { 13333333,  250000 },  //  75 Hz: 13.3333 +- 0.25ms
-    { 11764706,  250000 },  //  85 Hz: 11.7647 +- 0.25
-    { 11111111,  250000 },  //  90 Hz: 11.1111 +- 0.25ms
-    { 10000000,  500000 },  // 100 Hz: 10.0000 +- 0.5ms
-    {  8333333,  500000 },  // 120 Hz:  8.3333 +- 0.5ms
-    {  6944445,  500000 },  // 144 Hz:  6.9445 +- 0.5ms
-    {  4166667, 1000000 },  // 240 Hz:  4.1666 +- 1ms
-    {        0,       0 },  // keep the last element always at zero
-};
-
-SOKOL_API_IMPL uint64_t stm_round_to_common_refresh_rate(uint64_t ticks) {
-    uint64_t ns;
-    int i = 0;
-    while (0 != (ns = _stm_refresh_rates[i][0])) {
-        uint64_t tol = _stm_refresh_rates[i][1];
-        if ((ticks > (ns - tol)) && (ticks < (ns + tol))) {
-            return ns;
-        }
-        i++;
-    }
-    // fallthough: didn't fit into any buckets
-    return ticks;
-}
-
-SOKOL_API_IMPL double stm_sec(uint64_t ticks) {
-    return (double)ticks / 1000000000.0;
-}
-
-SOKOL_API_IMPL double stm_ms(uint64_t ticks) {
-    return (double)ticks / 1000000.0;
-}
-
-SOKOL_API_IMPL double stm_us(uint64_t ticks) {
-    return (double)ticks / 1000.0;
-}
-
-SOKOL_API_IMPL double stm_ns(uint64_t ticks) {
-    return (double)ticks;
 }
 #endif /* SOKOL_TIME_IMPL */
 
