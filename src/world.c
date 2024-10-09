@@ -353,23 +353,24 @@ static bool frPreStepHashQueryCallback(frContextNode queryResult) {
         collision.restitution = entry->value.restitution;
 
         for (int i = 0; i < collision.count; i++) {
-            int newContactIndex = i, oldContactIndex = -1;
+            int newIndex = i, oldIndex = -1;
 
             for (int j = 0; j < entry->value.count; j++) {
-                int newContactId = collision.contacts[newContactIndex].id;
+                int newContactId = collision.contacts[newIndex].id;
                 int oldContactId = entry->value.contacts[j].id;
 
                 if (newContactId == oldContactId) {
-                    oldContactIndex = j;
+                    oldIndex = j;
 
                     break;
                 }
             }
 
-            if (oldContactIndex < 0) continue;
+            if (oldIndex < 0) continue;
 
-            frContact *newContact = &collision.contacts[newContactIndex];
-            frContact *oldContact = &entry->value.contacts[oldContactIndex];
+            const frContact *oldContact = &entry->value.contacts[oldIndex];
+
+            frContact *newContact = &collision.contacts[newIndex];
 
             float oldNormalScalar = oldContact->cache.normalScalar;
             float oldTangentScalar = oldContact->cache.tangentScalar;

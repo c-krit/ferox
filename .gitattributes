@@ -21,3 +21,4 @@
 #
 
 Makefile*  eol=lf
+**/Makefile*  eol=lf
