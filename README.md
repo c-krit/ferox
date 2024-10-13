@@ -395,6 +395,11 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 - [Rees, Gareth. “How do you detect where two line segments intersect?” stackoverflow.com. February, 2009.](https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282)
 - [Scratchapixel. “A Minimal Ray-Tracer: Rendering Simple Shapes (Sphere, Cube, Disk, Plane, etc.).” scratchapixel.com. November, 2022.](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html)
 
+### Miscellaneous
+
+- [Allan, Jackson. “An Extensive Benchmark of C and C++ Hash Tables.” jacksonallan.github.io. May 29, 2024.](https://jacksonallan.github.io/c_cpp_hash_tables_benchmark/)
+- [Anderson, Sean. “Bit Twiddling Hacks.” graphics.stanford.edu. 1997.](http://graphics.stanford.edu/%7Eseander/bithacks.html)
+
 ## License
 
 MIT License

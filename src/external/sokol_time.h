@@ -3,47 +3,12 @@
 #endif
 #ifndef SOKOL_TIME_INCLUDED
 /*
-    sokol_time.h    -- simple cross-platform time measurement
+    sokol_time.h -- simple cross-platform time measurement
+                 -- modified (stripped down) for c-krit/ferox
 
     Project URL: https://github.com/floooh/sokol
 
-    Do this:
-        #define SOKOL_IMPL or
-        #define SOKOL_TIME_IMPL
-    before you include this file in *one* C or C++ file to create the
-    implementation.
-
-    Optionally provide the following defines with your own implementations:
-    SOKOL_TIME_API_DECL - public function declaration prefix (default: extern)
-    SOKOL_API_DECL      - same as SOKOL_TIME_API_DECL
-    SOKOL_API_IMPL      - public function implementation prefix (default: -)
-
-    If sokol_time.h is compiled as a DLL, define the following before
-    including the declaration or implementation:
-
-    SOKOL_DLL
-
-    On Windows, SOKOL_DLL will define SOKOL_TIME_API_DECL as __declspec(dllexport)
-    or __declspec(dllimport) as needed.
-
-    void stm_setup();
-        Call once before any other functions to initialize sokol_time
-        (this calls for instance QueryPerformanceFrequency on Windows)
-
-    uint64_t stm_now();
-        Get current point in time in unspecified 'ticks'. The value that
-        is returned has no relation to the 'wall-clock' time and is
-        not in a specific time unit, it is only useful to compute
-        time differences.
-
-    Uses the following time measurement functions under the hood:
-
-    Windows:        QueryPerformanceFrequency() / QueryPerformanceCounter()
-    MacOS/iOS:      mach_absolute_time()
-    emscripten:     emscripten_get_now()
-    Linux+others:   clock_gettime(CLOCK_MONOTONIC)
-
-    zlib/libpng license
+    License: zlib/libpng license
 
     Copyright (c) 2018 Andre Weissflog (https://github.com/floooh)
     Copyright (c) 2024 Jaedeok Kim (https://github.com/jdeokkim)
@@ -67,6 +32,7 @@
         3. This notice may not be removed or altered from any source
         distribution.
 */
+
 #define SOKOL_TIME_INCLUDED (1)
 #include <stdint.h>
 

@@ -40,7 +40,6 @@ struct frRingBuffer_ {
 frRingBuffer *frCreateRingBuffer(size_t length) {
     frRingBuffer *result = calloc(1, sizeof *result);
 
-    // NOTE: http://graphics.stanford.edu/%7Eseander/bithacks.html
     {
         length--;
 
