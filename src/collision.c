@@ -29,7 +29,7 @@
 /* A structure that represents an edge of a convex polygon. */
 typedef struct frEdge_ {
     frVector2 data[3];
-    int indexes[2];
+    int indices[2];
     int count;
 } frEdge;
 
@@ -532,10 +532,10 @@ static bool frComputeCollisionPolys(const frShape *s1,
         collision->direction = direction;
 
         unsigned int contactIdMask = (refEdgeFlipped << 16)
-                                     | (refEdge.indexes[0] << 8);
+                                     | (refEdge.indices[0] << 8);
 
-        collision->contacts[0].id = contactIdMask | incEdge.indexes[0];
-        collision->contacts[1].id = contactIdMask | incEdge.indexes[1];
+        collision->contacts[0].id = contactIdMask | incEdge.indices[0];
+        collision->contacts[1].id = contactIdMask | incEdge.indices[1];
 
         if (depth1 < 0.0f) {
             collision->contacts[0].id = collision->contacts[1].id;
@@ -663,14 +663,14 @@ static frEdge frGetContactEdge(const frShape *s, frTransform tx, frVector2 v) {
                                                   tx);
 
         return (frEdge) { .data = { prevVertex, supportVertex, supportVertex },
-                          .indexes = { prevIndex, supportIndex },
+                          .indices = { prevIndex, supportIndex },
                           .count = 2 };
     } else {
         frVector2 nextVertex = frVector2Transform(vertices->data[nextIndex],
                                                   tx);
 
         return (frEdge) { .data = { supportVertex, nextVertex, supportVertex },
-                          .indexes = { supportIndex, nextIndex },
+                          .indices = { supportIndex, nextIndex },
                           .count = 2 };
     }
 }
