@@ -47,10 +47,10 @@ LIBRARY_PATH = lib
 SOURCE_PATH = src
 
 OBJECTS = \
-	${SOURCE_PATH}/broad-phase.o  \
+	${SOURCE_PATH}/broad_phase.o  \
 	${SOURCE_PATH}/collision.o    \
 	${SOURCE_PATH}/geometry.o     \
-	${SOURCE_PATH}/rigid-body.o   \
+	${SOURCE_PATH}/rigid_body.o   \
 	${SOURCE_PATH}/timer.o        \
 	${SOURCE_PATH}/utils.o        \
 	${SOURCE_PATH}/world.o
