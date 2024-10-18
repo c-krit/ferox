@@ -36,9 +36,8 @@ _COLOR_END = \033[m
 # =============================================================================
 
 PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/${PROJECT_NAME}
 
-LOG_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+LOG_PREFIX = ${_COLOR_BEGIN} ~>${_COLOR_END}
 
 # =============================================================================
 
@@ -73,8 +72,7 @@ CFLAGS += -Wall -Wpedantic -Wno-unused-but-set-variable -Wno-unused-value \
 all: pre-build build post-build
 
 pre-build:
-	@printf "${LOG_PREFIX} Using: '${CC}' and '${AR}' "
-	@printf "to build this project.\n"
+	@printf "${LOG_PREFIX} CC = ${CC}, AR = ${AR}, MAKE = ${MAKE}\n"
 
 build: ${TARGETS}
 

@@ -37,9 +37,8 @@ _COLOR_END = \033[m
 # =============================================================================
 
 PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox (tests)
 
-LOG_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+LOG_PREFIX = ${_COLOR_BEGIN} ~>${_COLOR_END}
 
 # =============================================================================
 
@@ -57,7 +56,7 @@ OBJECTS = \
 	${SOURCE_PATH}/utils.o        \
 	${SOURCE_PATH}/world.o
 
-TARGET_SUFFIX ?= out
+TARGET_SUFFIX = out
 
 TARGETS = ${BINARY_PATH}/ferox-tests.${TARGET_SUFFIX}
 
@@ -74,7 +73,7 @@ LDLIBS = -lferox -lm
 all: pre-build build post-build
 
 pre-build:
-	@printf "${LOG_PREFIX} Using: '${CC}' to build test suites.\n"
+	@printf "${LOG_PREFIX} CC = ${CC}, MAKE = ${MAKE}\n"
 
 build: ${TARGETS}
 

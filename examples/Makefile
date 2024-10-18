@@ -33,9 +33,8 @@ _COLOR_END = \033[m
 # =============================================================================
 
 PROJECT_NAME = ferox
-PROJECT_FULL_NAME = c-krit/ferox (examples)
 
-LOG_PREFIX = ${_COLOR_BEGIN}${PROJECT_FULL_NAME}:${_COLOR_END}
+LOG_PREFIX = ${_COLOR_BEGIN} ~>${_COLOR_END}
 
 # =============================================================================
 
@@ -47,7 +46,7 @@ INCLUDE_PATH = include
 LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
-TARGET_SUFFIX ?= out
+TARGET_SUFFIX = out
 
 TARGETS ?= \
 	${SOURCE_PATH}/basic.${TARGET_SUFFIX}    \
@@ -71,7 +70,7 @@ LDLIBS = -lferox -lraylib -ldl -lGL -lm -lpthread -lrt -lX11
 all: pre-build build post-build
 
 pre-build:
-	@printf "${LOG_PREFIX} Using: '${CC}' to build all examples.\n"
+	@printf "${LOG_PREFIX} CC = ${CC}, MAKE = ${MAKE}\n"
 
 build: ${TARGETS}
 
