@@ -27,6 +27,7 @@ A lightweight 2D physics engine written in C, for educational purposes.
 - Narrow-phase collision detection with SAT (Separating Axis Theorem)
 - Numerical integration with semi-implicit Euler method
 - Projected Gauss-Seidel iterative constraint solver
+- Persistent contacts (contact cache) with warm starting
 - Point-in-Convex-Hull, proximity and raycast queries
 - Support for basic collision event callbacks
 - WebAssembly examples powered by [raylib](https://github.com/raysan5/raylib)
@@ -404,7 +405,7 @@ $ make -f Makefile.mingw RAYLIB_PATH=../../raylib
 
 MIT License
 
-> Copyright (c) 2021-2023 Jaedeok Kim (jdeokkim@protonmail.com)
+> Copyright (c) 2021-2024 Jaedeok Kim (jdeokkim@protonmail.com)
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal

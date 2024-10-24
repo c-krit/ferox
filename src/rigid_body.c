@@ -225,7 +225,7 @@ void frSetBodyPosition(frBody *b, frVector2 position) {
 
 /* Sets the `angle` of `b`, in radians. */
 void frSetBodyAngle(frBody *b, float angle) {
-    if (b == NULL) return;
+    if (b == NULL || b->tx.angle == angle) return;
 
     b->tx.angle = frNormalizeAngle(angle);
 
@@ -264,8 +264,8 @@ bool frBodyContainsPoint(const frBody *b, frVector2 point) {
     if (b == NULL) return false;
 
     const frShape *s = frGetBodyShape(b);
-    frTransform tx = frGetBodyTransform(b);
 
+    frTransform tx = frGetBodyTransform(b);
     frShapeType type = frGetShapeType(s);
 
     if (type == FR_SHAPE_CIRCLE) {

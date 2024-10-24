@@ -52,7 +52,7 @@ extern "C" {
 #endif
 
 /* Empty-initializes the given object. */
-#define FR_API_STRUCT_ZERO(T) ((T) { 0 })
+#define FR_API_STRUCT_ZERO(T)  ((T) { 0 })
 
 /* User-Defined Macros ===================================================== */
 
