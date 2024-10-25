@@ -350,7 +350,7 @@ Lastly, in order to compile the examples, do:
 
 ```console
 $ cd examples
-$ make -f Makefile.mingw RAYLIB_PATH=../../raylib
+$ make -f Makefile.mingw RAYLIB_INCLUDE_PATH=../../raylib RAYLIB_LIBRARY_PATH=../../raylib
 ```
 
 </details>
