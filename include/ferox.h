@@ -125,7 +125,7 @@ typedef struct frContextNode_ {
     void *ctx;
 } frContextNode;
 
-/* (From 'broad-phase.c') ================================================== */
+/* <==================================================== [src/broad_phase.c] */
 
 /* A structure that represents a spatial hash. */
 typedef struct frSpatialHash_ frSpatialHash;
@@ -133,7 +133,7 @@ typedef struct frSpatialHash_ frSpatialHash;
 /* A callback function type for `frQuerySpatialHash()`. */
 typedef bool (*frHashQueryFunc)(frContextNode ctxNode);
 
-/* (From 'collision.c') ==================================================== */
+/* <====================================================== [src/collision.c] */
 
 /* A structure that represents a contact point. */
 typedef struct frContact_ {
@@ -174,7 +174,7 @@ typedef struct frRaycastHit_ {
     bool inside;
 } frRaycastHit;
 
-/* (From 'geometry.c') ===================================================== */
+/* <======================================================= [src/geometry.c] */
 
 /* An enumeration that represents the type of a collision shape. */
 typedef enum frShapeType_ {
@@ -199,7 +199,7 @@ typedef struct frVertices_ {
     int count;
 } frVertices;
 
-/* (From 'rigid-body.c') =================================================== */
+/* <===================================================== [src/rigid_body.c] */
 
 /* An enumeration that represents the type of a rigid body. */
 typedef enum frBodyType_ {
@@ -231,12 +231,12 @@ typedef struct frTransform_ {
     float angle;
 } frTransform;
 
-/* (From 'utils.c') ======================================================== */
+/* <========================================================== [src/utils.c] */
 
 /* A structure that represents a ring buffer for storing indexed data. */
 typedef struct frRingBuffer_ frRingBuffer;
 
-/* (From 'world.c') ======================================================== */
+/* <========================================================== [src/world.c] */
 
 /* A structure that represents a pair of two rigid bodies. */
 typedef struct frBodyPair_ {
@@ -256,7 +256,7 @@ typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit, void *ctx);
 
 /* Public Function Prototypes ============================================== */
 
-/* (From 'broad-phase.c') ================================================== */
+/* <==================================================== [src/broad_phase.c] */
 
 /* Creates a new spatial hash with the given `cellSize`. */
 frSpatialHash *frCreateSpatialHash(float cellSize);
@@ -279,7 +279,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
                         frHashQueryFunc func,
                         void *userData);
 
-/* (From 'collision.c') ==================================================== */
+/* <====================================================== [src/collision.c] */
 
 /* 
     Checks whether `b1` and `b2` are colliding,
@@ -290,7 +290,7 @@ bool frComputeCollision(frBody *b1, frBody *b2, frCollision *collision);
 /* Casts a `ray` against `b`. */
 bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit);
 
-/* (From 'geometry.c') ===================================================== */
+/* <======================================================= [src/geometry.c] */
 
 /* Creates a 'circle' collision shape. */
 frShape *frCreateCircle(frMaterial material, float radius);
@@ -379,7 +379,7 @@ void frSetRectangleDimensions(frShape *s, float width, float height);
 /* Sets the `vertices` of `s`, assuming `s` is a 'polygon' collision shape. */
 void frSetPolygonVertices(frShape *s, const frVertices *vertices);
 
-/* (From 'rigid-body.c') =================================================== */
+/* <===================================================== [src/rigid_body.c] */
 
 /* Creates a rigid body at `position`. */
 frBody *frCreateBody(frBodyType type, frVector2 position);
@@ -511,12 +511,12 @@ void frResolveCollision(frBody *b1,
                         frCollision *collision,
                         float inverseDt);
 
-/* (From 'timer.c') ======================================================== */
+/* <========================================================== [src/timer.c] */
 
 /* Returns the current time of the monotonic clock, in seconds. */
 float frGetCurrentTime(void);
 
-/* (From 'utils.c') ======================================================== */
+/* <========================================================== [src/utils.c] */
 
 /* Creates a ring buffer with the size of `length`. */
 frRingBuffer *frCreateRingBuffer(size_t length);
@@ -530,7 +530,7 @@ bool frAddNodeToRingBuffer(frRingBuffer *rbf, frContextNode node);
 /* Removes a node from `rbf` and stores it to `node`. */
 bool frRemoveNodeFromRingBuffer(frRingBuffer *rbf, frContextNode *node);
 
-/* (From 'world.c') ======================================================== */
+/* <========================================================== [src/world.c] */
 
 /* 
     Creates a world with the `gravity` vector and `cellSize` 
