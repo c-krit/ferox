@@ -36,25 +36,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-/* Macros =================================================================> */
-
-/* Compiler-specific attribute for a function that must be inlined. */
-#ifdef _MSC_VER
-    #define FR_API_INLINE __forceinline
-#elif defined(__GNUC__)
-    #if defined(__STRICT_ANSI__)
-        #define FR_API_INLINE __inline__ __attribute__((always_inline))
-    #else
-        #define FR_API_INLINE inline __attribute__((always_inline))
-    #endif
-#else
-    #define FR_API_INLINE inline
-#endif
-
-/* Empty-initializes the given object. */
-#define FR_API_STRUCT_ZERO(T)  ((T) { 0 })
-
-/* User-Defined Macros ====================================================> */
+/* Library Configuration ==================================================> */
 
 // clang-format off
 
@@ -94,6 +76,26 @@ extern "C" {
 #endif
 
 // clang-format on
+
+/* Macros =================================================================> */
+
+/* Compiler-specific attribute for a function that must be inlined. */
+#ifdef _MSC_VER
+    #define FR_API_INLINE __forceinline
+#elif defined(__GNUC__)
+    #if defined(__STRICT_ANSI__)
+        #define FR_API_INLINE __inline__ __attribute__((always_inline))
+    #else
+        #define FR_API_INLINE inline __attribute__((always_inline))
+    #endif
+#else
+    #define FR_API_INLINE inline
+#endif
+
+/* ========================================================================> */
+
+/* Empty-initializes the given object. */
+#define frStructZero(T)   ((T) { 0 })
 
 /* Typedefs ===============================================================> */
 
@@ -733,14 +735,14 @@ frVector2CounterClockwise(frVector2 v1, frVector2 v2, frVector2 v3) {
 FR_API_INLINE frVector2 frVector2PixelsToUnits(frVector2 v) {
     return (FR_GEOMETRY_PIXELS_PER_UNIT > 0.0f)
                ? frVector2ScalarMultiply(v, 1.0f / FR_GEOMETRY_PIXELS_PER_UNIT)
-               : FR_API_STRUCT_ZERO(frVector2);
+               : frStructZero(frVector2);
 }
 
 /* Converts each component of `v` (in units) to pixels. */
 FR_API_INLINE frVector2 frVector2UnitsToPixels(frVector2 v) {
     return (FR_GEOMETRY_PIXELS_PER_UNIT > 0.0f)
                ? frVector2ScalarMultiply(v, FR_GEOMETRY_PIXELS_PER_UNIT)
-               : FR_API_STRUCT_ZERO(frVector2);
+               : frStructZero(frVector2);
 }
 
 /* Converts `k` (in pixels) to units. */

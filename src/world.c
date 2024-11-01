@@ -182,7 +182,7 @@ int frGetBodyCountInWorld(const frWorld *w) {
 
 /* Returns the gravity acceleration vector of `w`. */
 frVector2 frGetWorldGravity(const frWorld *w) {
-    return (w != NULL) ? w->gravity : FR_API_STRUCT_ZERO(frVector2);
+    return (w != NULL) ? w->gravity : frStructZero(frVector2);
 }
 
 /* Sets the collision event `handler` of `w`. */

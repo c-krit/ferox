@@ -112,12 +112,12 @@ frShape *frGetBodyShape(const frBody *b) {
 
 /* Returns the transform of `b`. */
 frTransform frGetBodyTransform(const frBody *b) {
-    return (b != NULL) ? b->tx : FR_API_STRUCT_ZERO(frTransform);
+    return (b != NULL) ? b->tx : frStructZero(frTransform);
 }
 
 /* Returns the position of `b`. */
 frVector2 frGetBodyPosition(const frBody *b) {
-    return (b != NULL) ? b->tx.position : FR_API_STRUCT_ZERO(frVector2);
+    return (b != NULL) ? b->tx.position : frStructZero(frVector2);
 }
 
 /* Returns the angle of `b`, in radians. */
@@ -152,7 +152,7 @@ float frGetBodyGravityScale(const frBody *b) {
 
 /* Returns the velocity of `b`. */
 frVector2 frGetBodyVelocity(const frBody *b) {
-    return (b != NULL) ? b->mtn.velocity : FR_API_STRUCT_ZERO(frVector2);
+    return (b != NULL) ? b->mtn.velocity : frStructZero(frVector2);
 }
 
 /* Returns the angular velocity of `b`. */
@@ -162,7 +162,7 @@ float frGetBodyAngularVelocity(const frBody *b) {
 
 /* Returns the net force of `b`. */
 frVector2 frGetBodyForce(const frBody *b) {
-    return (b != NULL) ? b->mtn.force : FR_API_STRUCT_ZERO(frVector2);
+    return (b != NULL) ? b->mtn.force : frStructZero(frVector2);
 }
 
 /* Returns the net torque of `b`. */
@@ -173,7 +173,7 @@ float frGetBodyTorque(const frBody *b) {
 /* Returns the AABB (Axis-Aligned Bounding Box) of `b`. */
 frAABB frGetBodyAABB(const frBody *b) {
     return (b != NULL && b->shape != NULL) ? b->aabb
-                                           : FR_API_STRUCT_ZERO(frAABB);
+                                           : frStructZero(frAABB);
 }
 
 /* Returns the user data of `b`. */
@@ -209,7 +209,7 @@ void frSetBodyShape(frBody *b, frShape *s) {
     b->shape = s;
 
     b->aabb = (s != NULL) ? frGetShapeAABB(s, b->tx)
-                          : FR_API_STRUCT_ZERO(frAABB);
+                          : frStructZero(frAABB);
 
     frComputeBodyMass(b);
 }

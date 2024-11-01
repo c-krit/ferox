@@ -120,7 +120,7 @@ frShapeType frGetShapeType(const frShape *s) {
 
 /* Returns the material of `s`. */
 frMaterial frGetShapeMaterial(const frShape *s) {
-    return (s != NULL) ? s->material : FR_API_STRUCT_ZERO(frMaterial);
+    return (s != NULL) ? s->material : frStructZero(frMaterial);
 }
 
 /* Returns the density of `s`. */
@@ -181,7 +181,7 @@ float frGetShapeInertia(const frShape *s) {
 
 /* Returns the AABB (Axis-Aligned Bounding Box) of `s`. */
 frAABB frGetShapeAABB(const frShape *s, frTransform tx) {
-    frAABB result = FR_API_STRUCT_ZERO(frAABB);
+    frAABB result = frStructZero(frAABB);
 
     if (s != NULL) {
         if (s->type == FR_SHAPE_CIRCLE) {
@@ -231,7 +231,7 @@ float frGetCircleRadius(const frShape *s) {
 frVector2 frGetPolygonVertex(const frShape *s, int index) {
     if (frGetShapeType(s) != FR_SHAPE_POLYGON || index < 0
         || index >= s->data.polygon.vertices.count)
-        return FR_API_STRUCT_ZERO(frVector2);
+        return frStructZero(frVector2);
 
     return s->data.polygon.vertices.data[index];
 }
@@ -249,7 +249,7 @@ const frVertices *frGetPolygonVertices(const frShape *s) {
 frVector2 frGetPolygonNormal(const frShape *s, int index) {
     if (frGetShapeType(s) != FR_SHAPE_POLYGON || index < 0
         || index >= s->data.polygon.normals.count)
-        return FR_API_STRUCT_ZERO(frVector2);
+        return frStructZero(frVector2);
 
     return s->data.polygon.normals.data[index];
 }

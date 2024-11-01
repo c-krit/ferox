@@ -149,7 +149,7 @@ static void InitExample(void) {
 
     SetMousePosition(0.5f * SCREEN_WIDTH, 0.5f * SCREEN_HEIGHT);
 
-    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), CELL_SIZE);
+    world = frCreateWorld(frStructZero(frVector2), CELL_SIZE);
 
     frSetWorldCollisionHandler(world,
                                (frCollisionHandler) {
@@ -178,7 +178,7 @@ static void InitExample(void) {
         FR_BODY_KINEMATIC,
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = 0.5f * SCREEN_HEIGHT }),
-        frCreatePolygon(FR_API_STRUCT_ZERO(frMaterial), &playerVertices));
+        frCreatePolygon(frStructZero(frMaterial), &playerVertices));
 
     frSetBodyUserData(player, (void *) &entityData[ENTITY_PLAYER]);
 

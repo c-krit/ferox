@@ -111,7 +111,7 @@ static void InitExample(void) {
         FR_BODY_KINEMATIC,
         frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
                                              .y = 0.5f * SCREEN_HEIGHT }),
-        frCreatePolygon(FR_API_STRUCT_ZERO(frMaterial),
+        frCreatePolygon(frStructZero(frMaterial),
                         &(const frVertices) {
                             .data = { frVector2PixelsToUnits((frVector2) {
                                           .x = 0.0f, .y = -16.0f }),
@@ -136,7 +136,7 @@ static void InitExample(void) {
         frBody *body =
             frCreateBodyFromShape(FR_BODY_STATIC,
                                   frVector2PixelsToUnits(position),
-                                  frCreateCircle(FR_API_STRUCT_ZERO(frMaterial),
+                                  frCreateCircle(frStructZero(frMaterial),
                                                  0.22f * GetRandomValue(2, 4)));
 
         frAddBodyToWorld(world, body);

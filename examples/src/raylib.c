@@ -108,7 +108,7 @@ int main(void) {
 /* Private Functions ======================================================= */
 
 static void InitExample(void) {
-    world = frCreateWorld(FR_API_STRUCT_ZERO(frVector2), CELL_SIZE);
+    world = frCreateWorld(frStructZero(frVector2), CELL_SIZE);
 
     raylibTexture = FileExists(RAYLIB_TEXTURE_PATH)
                         ? LoadTexture(RAYLIB_TEXTURE_PATH)

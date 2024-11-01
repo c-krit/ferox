@@ -115,7 +115,7 @@ static void InitExample(void) {
         bodies[i] = frCreateBodyFromShape(
             FR_BODY_STATIC,
             frVector2PixelsToUnits(position),
-            frCreateRectangle(FR_API_STRUCT_ZERO(frMaterial),
+            frCreateRectangle(frStructZero(frMaterial),
                               0.35f * GetRandomValue(1, 3),
                               0.35f * GetRandomValue(1, 3)));
 
