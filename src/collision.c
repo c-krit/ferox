@@ -20,11 +20,11 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include "ferox.h"
 
-/* Typedefs ================================================================ */
+/* Typedefs ===============================================================> */
 
 /* A structure that represents an edge of a convex polygon. */
 typedef struct frEdge_ {
@@ -33,7 +33,7 @@ typedef struct frEdge_ {
     int count;
 } frEdge;
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 /* 
     Clips `e` so that the dot product of each vertex in `e` 
@@ -105,7 +105,7 @@ static int frGetSeparatingAxisIndex(const frShape *s1,
 static int
 frGetSupportPointIndex(const frVertices *vertices, frTransform tx, frVector2 v);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 /* 
     Checks whether `b1` and `b2` are colliding,
@@ -219,7 +219,7 @@ bool frComputeRaycast(const frBody *b, frRay ray, frRaycastHit *raycastHit) {
     }
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 /* 
     Clips `e` so that the dot product of each vertex in `e` 
@@ -281,8 +281,6 @@ static bool frComputeCollisionCircles(const frShape *s1,
 
         collision->direction = frVector2ScalarMultiply(direction,
                                                        1.0f / magnitude);
-
-        /* TODO: ... */
 
         collision->contacts[0].point =
             frVector2Transform(frVector2ScalarMultiply(collision->direction,
@@ -366,8 +364,6 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
             if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                 collision->direction = frVector2Negate(collision->direction);
 
-            /* TODO: ... */
-
             collision->contacts[0].point = frVector2Add(
                 circleTx.position,
                 frVector2ScalarMultiply(collision->direction, radius));
@@ -416,8 +412,6 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
                     collision->direction = frVector2Negate(
                         collision->direction);
 
-                /* TODO: ... */
-
                 collision->contacts[0].point = frVector2Transform(
                     frVector2ScalarMultiply(collision->direction, radius),
                     circleTx);
@@ -438,8 +432,6 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                     collision->direction = frVector2Negate(
                         collision->direction);
-
-                /* TODO: ... */
 
                 collision->contacts[0].point = frVector2Add(
                     circleTx.position,

@@ -20,13 +20,17 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include <limits.h>
 
 #include "ferox.h"
 
-/* Typedefs ================================================================ */
+/* Macros =================================================================> */
+
+#define INT_BIT  (sizeof(int) * CHAR_BIT)
+
+/* Typedefs ===============================================================> */
 
 /* A structure that represents a ring buffer for storing indexed data. */
 struct frRingBuffer_ {
@@ -34,7 +38,42 @@ struct frRingBuffer_ {
     int head, tail, length;
 };
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
+
+/* Creates a bit array with `count` bits. */
+frBitArray frCreateBitArray(int count) {
+    int size = (count + (INT_BIT - 1) / INT_BIT);
+    
+    frBitArray ba = calloc(size, sizeof *ba);
+
+    return ba;
+}
+
+/* Releases the memory allocated for `ba`. */
+void frReleaseBitArray(frBitArray ba) {
+    if (ba != NULL) free(ba);
+}
+
+/* Returns the `i`-th bit of `ba`. */
+int frBitArrayGet(const frBitArray ba, int i) {
+    return (ba != NULL) ? (ba[i / INT_BIT] & (1 << (i % INT_BIT))) : -1;
+}
+
+/* Sets the `i`-th bit of `ba`. */
+void frBitArraySet(frBitArray ba, int i) {
+    if (ba == NULL) return;
+    
+    ba[i / INT_BIT] |= (1 << (i % INT_BIT));
+}
+
+/* Resets the `i`-th bit of `ba`. */
+void frBitArrayReset(frBitArray ba, int i) {
+    if (ba == NULL) return;
+    
+    ba[i / INT_BIT] &= ~(1 << (i % INT_BIT));
+}
+
+/* ========================================================================> */
 
 /* Creates a ring buffer with the size of `length`. */
 frRingBuffer *frCreateRingBuffer(size_t length) {

@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -36,7 +36,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-/* Macros ================================================================== */
+/* Macros =================================================================> */
 
 /* Compiler-specific attribute for a function that must be inlined. */
 #ifdef _MSC_VER
@@ -54,7 +54,7 @@ extern "C" {
 /* Empty-initializes the given object. */
 #define FR_API_STRUCT_ZERO(T)  ((T) { 0 })
 
-/* User-Defined Macros ===================================================== */
+/* User-Defined Macros ====================================================> */
 
 // clang-format off
 
@@ -95,7 +95,7 @@ extern "C" {
 
 // clang-format on
 
-/* Typedefs ================================================================ */
+/* Typedefs ===============================================================> */
 
 /* A structure that represents a two-dimensional vector. */
 typedef struct frVector2_ {
@@ -233,6 +233,9 @@ typedef struct frTransform_ {
 
 /* <========================================================== [src/utils.c] */
 
+/* A data type that represents a bit array.*/
+typedef int *frBitArray;
+
 /* A structure that represents a ring buffer for storing indexed data. */
 typedef struct frRingBuffer_ frRingBuffer;
 
@@ -254,7 +257,7 @@ typedef struct frCollisionHandler_ {
 /* A callback function type for `frComputeRaycastForWorld()`. */
 typedef void (*frRaycastQueryFunc)(frRaycastHit raycastHit, void *ctx);
 
-/* Public Function Prototypes ============================================== */
+/* Public Function Prototypes =============================================> */
 
 /* <==================================================== [src/broad_phase.c] */
 
@@ -518,6 +521,23 @@ float frGetCurrentTime(void);
 
 /* <========================================================== [src/utils.c] */
 
+/* Creates a bit array with `count` bits. */
+frBitArray frCreateBitArray(int count);
+
+/* Releases the memory allocated for `ba`. */
+void frReleaseBitArray(frBitArray ba);
+
+/* Returns the `i`-th bit of `ba`. */
+int frBitArrayGet(const frBitArray ba, int i);
+
+/* Sets the `i`-th bit of `ba`. */
+void frBitArraySet(frBitArray ba, int i);
+
+/* Resets the `i`-th bit of `ba`. */
+void frBitArrayReset(frBitArray ba, int i);
+
+/* ========================================================================> */
+
 /* Creates a ring buffer with the size of `length`. */
 frRingBuffer *frCreateRingBuffer(size_t length);
 
@@ -586,7 +606,7 @@ void frComputeWorldRaycast(frWorld *w,
                            frRaycastQueryFunc func,
                            void *userData);
 
-/* Inline Functions ======================================================== */
+/* Inline Functions =======================================================> */
 
 /* Adds `v1` and `v2`. */
 FR_API_INLINE frVector2 frVector2Add(frVector2 v1, frVector2 v2) {

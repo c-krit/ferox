@@ -20,14 +20,14 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 /* NOTE: `STB_DS_IMPLEMENTATION` is already defined in 'broad-phase.c' */
 #include "external/stb_ds.h"
 
 #include "ferox.h"
 
-/* Typedefs ================================================================ */
+/* Typedefs ===============================================================> */
 
 /* A structure that represents the type of an operation for a world. */
 typedef enum frWorldOpType_ {
@@ -73,7 +73,7 @@ typedef struct frRaycastHashQueryCtx_ {
     void *ctx;
 } frRaycastHashQueryCtx;
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 /* 
     A callback function for `frQuerySpatialHash()` 
@@ -96,7 +96,7 @@ static void frPreStepWorld(frWorld *w);
 */
 static void frPostStepWorld(frWorld *w);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 /* 
     Creates a world with the `gravity` vector and `cellSize` 
@@ -305,7 +305,7 @@ void frComputeWorldRaycast(frWorld *w,
                                                   .func = func });
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 /* 
     A callback function for `frQuerySpatialHash()` 

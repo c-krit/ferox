@@ -20,14 +20,14 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #define STB_DS_IMPLEMENTATION
 #include "external/stb_ds.h"
 
 #include "ferox.h"
 
-/* Typedefs ================================================================ */
+/* Typedefs ===============================================================> */
 
 /* A structure that represents the key of a spatial hash entry. */
 typedef struct frSpatialHashKey_ {
@@ -50,7 +50,7 @@ struct frSpatialHash_ {
     frSpatialHashEntry *entries;
 };
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 /* 
     Returns ​a negative integer value if `a` is less than `b`, ​a positive 
@@ -59,7 +59,7 @@ struct frSpatialHash_ {
 */
 static int frQSortCompare(const void *a, const void *b);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 /* Creates a new spatial hash with the given `cellSize`. */
 frSpatialHash *frCreateSpatialHash(float cellSize) {
@@ -187,7 +187,7 @@ void frQuerySpatialHash(frSpatialHash *sh,
         func((frContextNode) { .id = sh->queryResult[i], .ctx = userData });
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 /* 
     Returns ​a negative integer value if `a` is less than `b`, ​a positive 

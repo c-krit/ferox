@@ -32,16 +32,16 @@
 
 #include "ferox.h"
 
-/* Constants =============================================================== */
+/* Constants ==============================================================> */
 
 /* Constant for `frGetCurrentTime()`. */
 const float TICKS_TO_SECONDS = 1.0f / 1000000000.0f;
 
-/* Private Variables ======================================================= */
+/* Private Variables ======================================================> */
 
 static bool initialized = false;
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 /* Returns the current time of the monotonic clock, in seconds. */
 float frGetCurrentTime(void) {

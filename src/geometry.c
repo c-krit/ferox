@@ -20,11 +20,11 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include "ferox.h"
 
-/* Typedefs ================================================================ */
+/* Typedefs ===============================================================> */
 
 /* A union that represents the internal data of a collision shape. */
 typedef union frShapeData_ {
@@ -47,7 +47,7 @@ struct frShape_ {
     float area;
 };
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 /* 
     Computes the convex hull for the given `input` points 
@@ -55,7 +55,7 @@ struct frShape_ {
 */
 static void frJarvisMarch(const frVertices *input, frVertices *output);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 /* Creates a 'circle' collision shape. */
 frShape *frCreateCircle(frMaterial material, float radius) {
@@ -355,7 +355,7 @@ void frSetPolygonVertices(frShape *s, const frVertices *vertices) {
     s->area = fabsf(0.5f * twiceAreaSum);
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 /* 
     Computes the convex hull for the given `input` points 

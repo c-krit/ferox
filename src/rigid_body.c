@@ -20,11 +20,11 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include "ferox.h"
 
-/* Typedefs ================================================================ */
+/* Typedefs ===============================================================> */
 
 /* A structure that represents the motion data of a rigid body. */
 typedef struct frMotionData_ {
@@ -48,12 +48,12 @@ struct frBody_ {
     void *ctx;
 };
 
-/* Constants =============================================================== */
+/* Constants ==============================================================> */
 
 /* Constants for `frNormalizeAngle()`. */
 const float TWO_PI = 2.0f * M_PI, INVERSE_TWO_PI = 1.0f / (2.0f * M_PI);
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 /* Computes the mass and the moment of inertia for `b`. */
 static void frComputeBodyMass(frBody *b);
@@ -61,7 +61,7 @@ static void frComputeBodyMass(frBody *b);
 /* Normalizes the `angle` to a range `[0, 2π]`. */
 static FR_API_INLINE float frNormalizeAngle(float angle);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 /* Creates a rigid body at `position`. */
 frBody *frCreateBody(frBodyType type, frVector2 position) {
@@ -552,7 +552,7 @@ void frResolveCollision(frBody *b1,
     }
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 /* Computes the mass and the moment of inertia for `b`. */
 static void frComputeBodyMass(frBody *b) {
