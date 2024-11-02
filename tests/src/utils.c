@@ -52,20 +52,20 @@ TEST utRingBufferOps(void) {
 
             bool result = (i < (RING_BUFFER_LENGTH - 1));
 
-            ASSERT_EQ(result, frAddNodeToRingBuffer(rbf, node));
+            ASSERT_EQ(result, frAddToRingBuffer(rbf, node));
         }
 
-        ASSERT_EQ(false, frAddNodeToRingBuffer(rbf, node));
+        ASSERT_EQ(false, frAddToRingBuffer(rbf, node));
 
         for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
             bool result = (i < (RING_BUFFER_LENGTH - 1));
 
-            ASSERT_EQ(result, frRemoveNodeFromRingBuffer(rbf, &node));
+            ASSERT_EQ(result, frRemoveFromRingBuffer(rbf, &node));
             
             if (result == true) ASSERT_EQ(i, node.id);
         }
 
-        ASSERT_EQ(false, frRemoveNodeFromRingBuffer(rbf, NULL));
+        ASSERT_EQ(false, frRemoveFromRingBuffer(rbf, NULL));
     }
 
     frReleaseRingBuffer(rbf);

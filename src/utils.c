@@ -24,6 +24,9 @@
 
 #include <limits.h>
 
+#define STB_DS_IMPLEMENTATION
+#include "external/stb_ds.h"
+
 #include "ferox.h"
 
 /* Macros =================================================================> */
@@ -100,7 +103,7 @@ void frReleaseRingBuffer(frRingBuffer *rbf) {
 }
 
 /* Adds a `node` to `rbf`. */
-bool frAddNodeToRingBuffer(frRingBuffer *rbf, frContextNode node) {
+bool frAddToRingBuffer(frRingBuffer *rbf, frContextNode node) {
     if (rbf == NULL || ((rbf->head + 1) & (rbf->length - 1)) == rbf->tail)
         return false;
 
@@ -112,7 +115,7 @@ bool frAddNodeToRingBuffer(frRingBuffer *rbf, frContextNode node) {
 }
 
 /* Removes a node from `rbf` and stores it to `node`. */
-bool frRemoveNodeFromRingBuffer(frRingBuffer *rbf, frContextNode *node) {
+bool frRemoveFromRingBuffer(frRingBuffer *rbf, frContextNode *node) {
     if (rbf == NULL || (rbf->head == rbf->tail)) return false;
 
     if (node != NULL) *node = rbf->buffer[rbf->tail];

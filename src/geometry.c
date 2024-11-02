@@ -225,15 +225,15 @@ float frGetCircleRadius(const frShape *s) {
 }
 
 /* 
-    Returns a vertex with the given `index` of `s`, 
-    assuming `s` is a 'polygon' collision shape. 
+    Returns a vertex with the given `i`ndex of `s`, 
+    assuming `s` is a 'polygon' collision shape.
 */
-frVector2 frGetPolygonVertex(const frShape *s, int index) {
-    if (frGetShapeType(s) != FR_SHAPE_POLYGON || index < 0
-        || index >= s->data.polygon.vertices.count)
+frVector2 frGetPolygonVertex(const frShape *s, int i) {
+    if (frGetShapeType(s) != FR_SHAPE_POLYGON || i < 0
+        || i >= s->data.polygon.vertices.count)
         return frStructZero(frVector2);
 
-    return s->data.polygon.vertices.data[index];
+    return s->data.polygon.vertices.data[i];
 }
 
 /* Returns the vertices of `s`, assuming `s` is a 'polygon' collision shape. */
@@ -243,15 +243,15 @@ const frVertices *frGetPolygonVertices(const frShape *s) {
 }
 
 /* 
-    Returns a normal with the given `index` of `s`, 
+    Returns a normal with the given `i`ndex of `s`, 
     assuming `s` is a 'polygon' collision shape. 
 */
-frVector2 frGetPolygonNormal(const frShape *s, int index) {
-    if (frGetShapeType(s) != FR_SHAPE_POLYGON || index < 0
-        || index >= s->data.polygon.normals.count)
+frVector2 frGetPolygonNormal(const frShape *s, int i) {
+    if (frGetShapeType(s) != FR_SHAPE_POLYGON || i < 0
+        || i >= s->data.polygon.normals.count)
         return frStructZero(frVector2);
 
-    return s->data.polygon.normals.data[index];
+    return s->data.polygon.normals.data[i];
 }
 
 /* Returns the normals of `s`, assuming `s` is a 'polygon' collision shape. */

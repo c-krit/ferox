@@ -44,15 +44,15 @@ SUITE(collision) {
 /* Private Functions ======================================================= */
 
 TEST utCircleVsCircle(void) {
-    frShape *s1 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.0f);
-    frShape *s2 = frCreateCircle(FR_API_STRUCT_ZERO(frMaterial), 1.15f);
+    frShape *s1 = frCreateCircle(frStructZero(frMaterial), 1.0f);
+    frShape *s2 = frCreateCircle(frStructZero(frMaterial), 1.15f);
 
     frBody *b1 = frCreateBodyFromShape(FR_BODY_KINEMATIC,
-                                       FR_API_STRUCT_ZERO(frVector2),
+                                       frStructZero(frVector2),
                                        s1);
 
     frBody *b2 = frCreateBodyFromShape(FR_BODY_KINEMATIC,
-                                       FR_API_STRUCT_ZERO(frVector2),
+                                       frStructZero(frVector2),
                                        s2);
 
     frCollision collision = { .count = 0 };

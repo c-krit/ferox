@@ -22,7 +22,7 @@
 
 /* Includes ===============================================================> */
 
-/* NOTE: `STB_DS_IMPLEMENTATION` is already defined in 'broad-phase.c' */
+/* NOTE: `STB_DS_IMPLEMENTATION` is already defined in `src/utils.c` */
 #include "external/stb_ds.h"
 
 #include "ferox.h"
@@ -144,7 +144,7 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         || arrlen(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
         return false;
 
-    return frAddNodeToRingBuffer(w->rbf,
+    return frAddToRingBuffer(w->rbf,
                                  (frContextNode) { .id = FR_OPT_ADD_BODY,
                                                    .ctx = b });
 }
@@ -153,7 +153,7 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
 bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
-    return frAddNodeToRingBuffer(w->rbf,
+    return frAddToRingBuffer(w->rbf,
                                  (frContextNode) { .id = FR_OPT_REMOVE_BODY,
                                                    .ctx = b });
 }
@@ -168,11 +168,11 @@ bool frIsBodyInWorld(const frWorld *w, frBody *b) {
     return false;
 }
 
-/* Returns a rigid body at the given `index` in `w`. */
-frBody *frGetBodyInWorld(const frWorld *w, int index) {
-    if (w == NULL || index < 0 || index >= arrlen(w->bodies)) return NULL;
+/* Returns a rigid body at the given `i`ndex in `w`. */
+frBody *frGetBodyInWorld(const frWorld *w, int i) {
+    if (w == NULL || i < 0 || i >= arrlen(w->bodies)) return NULL;
 
-    return w->bodies[index];
+    return w->bodies[i];
 }
 
 /* Returns the number of rigid bodies in `w`. */
@@ -434,7 +434,7 @@ static void frPreStepWorld(frWorld *w) {
 static void frPostStepWorld(frWorld *w) {
     frContextNode node = { .id = FR_OPT_UNKNOWN };
 
-    while (frRemoveNodeFromRingBuffer(w->rbf, &node)) {
+    while (frRemoveFromRingBuffer(w->rbf, &node)) {
         switch (node.id) {
             case FR_OPT_ADD_BODY:
                 arrput(w->bodies, node.ctx);

@@ -340,19 +340,19 @@ frAABB frGetShapeAABB(const frShape *s, frTransform tx);
 float frGetCircleRadius(const frShape *s);
 
 /* 
-    Returns a vertex with the given `index` of `s`, 
+    Returns a vertex with the given `i`ndex of `s`, 
     assuming `s` is a 'polygon' collision shape. 
 */
-frVector2 frGetPolygonVertex(const frShape *s, int index);
+frVector2 frGetPolygonVertex(const frShape *s, int i);
 
 /* Returns the vertices of `s`, assuming `s` is a 'polygon' collision shape. */
 const frVertices *frGetPolygonVertices(const frShape *s);
 
 /* 
-    Returns a normal with the given `index` of `s`, 
+    Returns a normal with the given `i`ndex of `s`, 
     assuming `s` is a 'polygon' collision shape. 
 */
-frVector2 frGetPolygonNormal(const frShape *s, int index);
+frVector2 frGetPolygonNormal(const frShape *s, int i);
 
 /* Returns the normals of `s`, assuming `s` is a 'polygon' collision shape. */
 const frVertices *frGetPolygonNormals(const frShape *s);
@@ -547,10 +547,10 @@ frRingBuffer *frCreateRingBuffer(size_t length);
 void frReleaseRingBuffer(frRingBuffer *rbf);
 
 /* Adds a `node` to `rbf`. */
-bool frAddNodeToRingBuffer(frRingBuffer *rbf, frContextNode node);
+bool frAddToRingBuffer(frRingBuffer *rbf, frContextNode node);
 
 /* Removes a node from `rbf` and stores it to `node`. */
-bool frRemoveNodeFromRingBuffer(frRingBuffer *rbf, frContextNode *node);
+bool frRemoveFromRingBuffer(frRingBuffer *rbf, frContextNode *node);
 
 /* <========================================================== [src/world.c] */
 
@@ -575,8 +575,8 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b);
 /* Checks if the given `b`ody is in `w`. */
 bool frIsBodyInWorld(const frWorld *w, frBody *b);
 
-/* Returns a rigid body at the given `index` in `w`. */
-frBody *frGetBodyInWorld(const frWorld *w, int index);
+/* Returns a rigid body at the given `i`ndex in `w`. */
+frBody *frGetBodyInWorld(const frWorld *w, int i);
 
 /* Returns the number of rigid bodies in `w`. */
 int frGetBodyCountInWorld(const frWorld *w);
