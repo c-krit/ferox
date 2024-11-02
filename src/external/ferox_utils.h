@@ -32,6 +32,38 @@
 
 /* Macros =================================================================> */
 
+#define INT_BIT  (sizeof(int) * CHAR_BIT)
+
+/* ========================================================================> */
+
+/* Creates a bit array with `count` bits. */
+#define frCreateBitArray(count)               \
+    calloc(                                   \
+        ((count) + (INT_BIT - 1) / INT_BIT),  \
+        sizeof(frBitArray)                    \
+    )
+
+/* Releases the memory allocated for `ba`. */
+#define frReleaseBitArray(ba)  \
+    free(ba)
+
+/* Returns the `i`-th bit of `ba`. */
+#define frBitArrayGet(ba, i)                                \
+    (((ba) != NULL)                                         \
+        ? !!((ba)[(i) / INT_BIT] & (1 << ((i) % INT_BIT)))  \
+        : -1                                                \
+    )
+
+/* Sets the `i`-th bit of `ba`. */
+#define frBitArraySet(ba, i)                         \
+    ((ba)[(i) / INT_BIT] |= (1 << ((i) % INT_BIT)))
+
+/* Resets the `i`-th bit of `ba`. */
+#define frBitArrayReset(ba, i)                        \
+    ((ba)[(i) / INT_BIT] &= ~(1 << ((i) % INT_BIT)))
+
+/* ========================================================================> */
+
 /* A structure that represents a ring buffer for storing indexed data. */
 #define frRingBuffer(type)  \
     struct {                \
@@ -43,28 +75,28 @@
 /*
     NOTE: https://graphics.stanford.edu/%7Eseander/bithacks.html
     
-    Example #1: `v = 0b00010101`
+    Example #1: `x = 0b00010101`
     
-    => `v = 0b00010100`
-    => `v = 0b00011111`
-    => `v = 0b00100000`
+    => `x = 0b00010100`
+    => `x = 0b00011111`
+    => `x = 0b00100000`
 
-    Example #2: `v = 0b00010100`
+    Example #2: `x = 0b00010100`
     
-    => `v = 0b00010011`
-    => `v = 0b00011111`
-    => `v = 0b00100000`
+    => `x = 0b00010011`
+    => `x = 0b00011111`
+    => `x = 0b00100000`
 */
 
-/* Rounds up `v` to the next highest power of 2. */
-#define frRoundUp32(v)  \
-    (--(v),             \
-     (v) |= (v) >> 1,   \
-     (v) |= (v) >> 2,   \
-     (v) |= (v) >> 4,   \
-     (v) |= (v) >> 8,   \
-     (v) |= (v) >> 16,  \
-     ++(v))
+/* Rounds up `x` to the next highest power of 2. */
+#define frRoundUp32(x)  \
+     (--(x),            \
+     (x) |= (x) >> 1,   \
+     (x) |= (x) >> 2,   \
+     (x) |= (x) >> 4,   \
+     (x) |= (x) >> 8,   \
+     (x) |= (x) >> 16,  \
+     ++(x))
 
 /* ========================================================================> */
 
@@ -109,34 +141,6 @@
         )                                                          \
         : false                                                    \
     )
-
-/* ========================================================================> */
-
-/* Creates a bit array with `count` bits. */
-#define frCreateBitArray(count)               \
-    calloc(                                   \
-        ((count) + (INT_BIT - 1) / INT_BIT),  \
-        sizeof(frBitArray)                    \
-    )
-
-/* Releases the memory allocated for `ba`. */
-#define frReleaseBitArray(ba)  \
-    free(ba)
-
-/* Returns the `i`-th bit of `ba`. */
-#define frBitArrayGet(ba, i)                              \
-    (((ba) != NULL)                                       \
-        ? ((ba)[(i) / INT_BIT] & (1 << ((i) % INT_BIT)))  \
-        : -1                                              \
-    )
-
-/* Sets the `i`-th bit of `ba`. */
-#define frBitArraySet(ba, i)                         \
-    ((ba)[(i) / INT_BIT] |= (1 << ((i) % INT_BIT)))
-
-/* Resets the `i`-th bit of `ba`. */
-#define frBitArrayReset(ba, i)                        \
-    ((ba)[(i) / INT_BIT] &= ~(1 << ((i) % INT_BIT)))
 
 /* Typedefs ===============================================================> */
 

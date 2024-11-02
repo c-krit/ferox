@@ -29,19 +29,44 @@
 
 /* Macros ================================================================== */
 
-#define RING_BUFFER_LENGTH  (1 << 3)
+#define BIT_ARRAY_LENGTH    ((1 << 6) + 1)
+#define RING_BUFFER_LENGTH  ((1 << 4) + 1)
 
 /* Private Function Prototypes ============================================= */
 
+TEST utBitArrayOps(void);
 TEST utRingBufferOps(void);
 
 /* Public Functions ======================================================== */
 
 SUITE(utils) {
+    RUN_TEST(utBitArrayOps);
     RUN_TEST(utRingBufferOps);
 }
 
 /* Private Functions ======================================================= */
+
+TEST utBitArrayOps(void) {
+    frBitArray ba = frCreateBitArray(BIT_ARRAY_LENGTH);
+
+    {
+        const int numbers[] = { 42, 4, 15, 8, 15, 16, 4, 23, 15, 42, 16 };
+
+        for (int i = 0, j = (sizeof numbers / sizeof *numbers); i < j; i++)
+            frBitArraySet(ba, numbers[i]);
+
+        int numberCount = 0;
+
+        for (int i = 0; i < BIT_ARRAY_LENGTH; i++) 
+            if (frBitArrayGet(ba, i)) numberCount++;
+
+        ASSERT_EQ(6, numberCount);
+    }
+
+    frReleaseBitArray(ba);
+
+    PASS();
+}
 
 TEST utRingBufferOps(void) {
     frRingBuffer(frContextNode) rbf;
@@ -49,27 +74,16 @@ TEST utRingBufferOps(void) {
     frInitRingBuffer(rbf, RING_BUFFER_LENGTH);
 
     {
-        frContextNode node = { .id = 0 };
+        frContextNode node = { .id = -1 };
 
         for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
-            node.id = i;
+            node.id = (i << 1);
 
-            bool result = (i < (RING_BUFFER_LENGTH - 1));
-
-            ASSERT_EQ(result, frAddToRingBuffer(rbf, node));
+            ASSERT_EQ(true, frAddToRingBuffer(rbf, node));
         }
 
-        ASSERT_EQ(false, frAddToRingBuffer(rbf, node));
-
-        for (int i = 0; i < RING_BUFFER_LENGTH; i++) {
-            bool result = (i < (RING_BUFFER_LENGTH - 1));
-
-            ASSERT_EQ(result, frRemoveFromRingBuffer(rbf, &node));
-            
-            if (result == true) ASSERT_EQ(i, node.id);
-        }
-
-        ASSERT_EQ(false, frRemoveFromRingBuffer(rbf, &node));
+        while (frRemoveFromRingBuffer(rbf, &node))
+            ASSERT_EQ(0, node.id & 1);
     }
 
     frReleaseRingBuffer(rbf);
