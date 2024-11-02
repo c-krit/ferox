@@ -23,6 +23,8 @@
 /* Includes ================================================================ */
 
 #include "ferox.h"
+#include "ferox_utils.h"
+
 #include "greatest.h"
 
 /* Macros ================================================================== */
@@ -42,7 +44,9 @@ SUITE(utils) {
 /* Private Functions ======================================================= */
 
 TEST utRingBufferOps(void) {
-    frRingBuffer *rbf = frCreateRingBuffer(RING_BUFFER_LENGTH);
+    frRingBuffer(frContextNode) rbf;
+
+    frInitRingBuffer(rbf, RING_BUFFER_LENGTH);
 
     {
         frContextNode node = { .id = 0 };
@@ -65,7 +69,7 @@ TEST utRingBufferOps(void) {
             if (result == true) ASSERT_EQ(i, node.id);
         }
 
-        ASSERT_EQ(false, frRemoveFromRingBuffer(rbf, NULL));
+        ASSERT_EQ(false, frRemoveFromRingBuffer(rbf, &node));
     }
 
     frReleaseRingBuffer(rbf);

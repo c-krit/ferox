@@ -47,23 +47,23 @@ LIBRARY_PATH = ../lib
 SOURCE_PATH = src
 
 OBJECTS = \
-	${SOURCE_PATH}/broad-phase.o  \
+	${SOURCE_PATH}/broad_phase.o  \
 	${SOURCE_PATH}/collision.o    \
-	${SOURCE_PATH}/ferox-tests.o  \
+	${SOURCE_PATH}/ferox_tests.o  \
 	${SOURCE_PATH}/geometry.o     \
-	${SOURCE_PATH}/rigid-body.o   \
+	${SOURCE_PATH}/rigid_body.o   \
 	${SOURCE_PATH}/utils.o        \
 	${SOURCE_PATH}/world.o
 
 TARGET_SUFFIX = out
 
-TARGETS = ${BINARY_PATH}/ferox-tests.${TARGET_SUFFIX}
+TARGETS = ${BINARY_PATH}/ferox_tests.${TARGET_SUFFIX}
 
 # ============================================================================>
 
 CC = cc
 CFLAGS = -D_DEFAULT_SOURCE -g -I${INCLUDE_PATH} -I../${INCLUDE_PATH} \
-	-O2 -std=gnu99
+	-I../${SOURCE_PATH}/external -O2 -std=gnu99
 LDFLAGS = -L${LIBRARY_PATH}
 LDLIBS = -lferox -lm
 

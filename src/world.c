@@ -22,7 +22,9 @@
 
 /* Includes ===============================================================> */
 
-/* NOTE: `STB_DS_IMPLEMENTATION` is already defined in `src/utils.c` */
+#include "external/ferox_utils.h"
+
+#define STB_DS_IMPLEMENTATION
 #include "external/stb_ds.h"
 
 #include "ferox.h"
@@ -45,7 +47,7 @@ typedef struct frContactCacheEntry_ {
 /* A structure that represents a simulation container. */
 struct frWorld_ {
     frBody **bodies;
-    frRingBuffer *rbf;
+    frRingBuffer(frContextNode) rbf;
     frSpatialHash *hash;
     frContactCacheEntry *cache;
     float accumulator, timestamp;
@@ -106,8 +108,9 @@ frWorld *frCreateWorld(frVector2 gravity, float cellSize) {
     frWorld *result = calloc(1, sizeof *result);
 
     result->gravity = gravity;
-    result->rbf = frCreateRingBuffer(FR_WORLD_MAX_OBJECT_COUNT);
     result->hash = frCreateSpatialHash(cellSize);
+
+    frInitRingBuffer(result->rbf, FR_WORLD_MAX_OBJECT_COUNT);
 
     arrsetcap(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
 
@@ -145,8 +148,8 @@ bool frAddBodyToWorld(frWorld *w, frBody *b) {
         return false;
 
     return frAddToRingBuffer(w->rbf,
-                                 (frContextNode) { .id = FR_OPT_ADD_BODY,
-                                                   .ctx = b });
+                                 ((frContextNode) { .id = FR_OPT_ADD_BODY,
+                                                   .ctx = b }));
 }
 
 /* Removes a rigid `b`ody from `w`. */
@@ -154,8 +157,8 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
     return frAddToRingBuffer(w->rbf,
-                                 (frContextNode) { .id = FR_OPT_REMOVE_BODY,
-                                                   .ctx = b });
+                                 ((frContextNode) { .id = FR_OPT_REMOVE_BODY,
+                                                   .ctx = b }));
 }
 
 /* Checks if the given `b`ody is in `w`. */

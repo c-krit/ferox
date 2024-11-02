@@ -233,14 +233,6 @@ typedef struct frTransform_ {
     float angle;
 } frTransform;
 
-/* <========================================================== [src/utils.c] */
-
-/* A data type that represents a bit array.*/
-typedef int *frBitArray;
-
-/* A structure that represents a ring buffer for storing indexed data. */
-typedef struct frRingBuffer_ frRingBuffer;
-
 /* <========================================================== [src/world.c] */
 
 /* A structure that represents a pair of two rigid bodies. */
@@ -520,37 +512,6 @@ void frResolveCollision(frBody *b1,
 
 /* Returns the current time of the monotonic clock, in seconds. */
 float frGetCurrentTime(void);
-
-/* <========================================================== [src/utils.c] */
-
-/* Creates a bit array with `count` bits. */
-frBitArray frCreateBitArray(int count);
-
-/* Releases the memory allocated for `ba`. */
-void frReleaseBitArray(frBitArray ba);
-
-/* Returns the `i`-th bit of `ba`. */
-int frBitArrayGet(const frBitArray ba, int i);
-
-/* Sets the `i`-th bit of `ba`. */
-void frBitArraySet(frBitArray ba, int i);
-
-/* Resets the `i`-th bit of `ba`. */
-void frBitArrayReset(frBitArray ba, int i);
-
-/* ========================================================================> */
-
-/* Creates a ring buffer with the size of `length`. */
-frRingBuffer *frCreateRingBuffer(size_t length);
-
-/* Releases the memory allocated for `rbf`. */
-void frReleaseRingBuffer(frRingBuffer *rbf);
-
-/* Adds a `node` to `rbf`. */
-bool frAddToRingBuffer(frRingBuffer *rbf, frContextNode node);
-
-/* Removes a node from `rbf` and stores it to `node`. */
-bool frRemoveFromRingBuffer(frRingBuffer *rbf, frContextNode *node);
 
 /* <========================================================== [src/world.c] */
 
