@@ -46,7 +46,7 @@ typedef struct frContactCacheEntry_ {
 
 /* A structure that represents a simulation container. */
 struct frWorld_ {
-    frBody **bodies;
+    frDynArray(frBody *) bodies;
     frRingBuffer(frContextNode) rbf;
     frSpatialHash *hash;
     frContactCacheEntry *cache;
@@ -110,9 +110,8 @@ frWorld *frCreateWorld(frVector2 gravity, float cellSize) {
     result->gravity = gravity;
     result->hash = frCreateSpatialHash(cellSize);
 
+    frSetDynArrayCapacity(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
     frInitRingBuffer(result->rbf, FR_WORLD_MAX_OBJECT_COUNT);
-
-    arrsetcap(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
 
     return result;
 }
@@ -121,13 +120,15 @@ frWorld *frCreateWorld(frVector2 gravity, float cellSize) {
 void frReleaseWorld(frWorld *w) {
     if (w == NULL) return;
 
-    for (int i = 0; i < arrlen(w->bodies); i++)
-        frReleaseBody(w->bodies[i]);
-
-    arrfree(w->bodies), hmfree(w->cache);
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+        frReleaseBody(frGetDynArrayValue(w->bodies, i));
 
     frReleaseSpatialHash(w->hash);
+
+    frReleaseDynArray(w->bodies);
     frReleaseRingBuffer(w->rbf);
+
+    hmfree(w->cache);
 
     free(w);
 }
@@ -138,18 +139,18 @@ void frClearWorld(frWorld *w) {
 
     frClearSpatialHash(w->hash);
 
-    arrsetlen(w->bodies, 0);
+    frSetDynArrayLength(w->bodies, 0);
 }
 
 /* Adds a rigid `b`ody to `w`. */
 bool frAddBodyToWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL
-        || arrlen(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
+        || frGetDynArrayLength(w->bodies) >= FR_WORLD_MAX_OBJECT_COUNT)
         return false;
 
     return frAddToRingBuffer(w->rbf,
-                                 ((frContextNode) { .id = FR_OPT_ADD_BODY,
-                                                   .ctx = b }));
+                             ((frContextNode) { .id = FR_OPT_ADD_BODY,
+                                                .ctx = b }));
 }
 
 /* Removes a rigid `b`ody from `w`. */
@@ -157,30 +158,30 @@ bool frRemoveBodyFromWorld(frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
     return frAddToRingBuffer(w->rbf,
-                                 ((frContextNode) { .id = FR_OPT_REMOVE_BODY,
-                                                   .ctx = b }));
+                             ((frContextNode) { .id = FR_OPT_REMOVE_BODY,
+                                                .ctx = b }));
 }
 
 /* Checks if the given `b`ody is in `w`. */
 bool frIsBodyInWorld(const frWorld *w, frBody *b) {
     if (w == NULL || b == NULL) return false;
 
-    for (int i = 0; i < arrlen(w->bodies); i++)
-        if (w->bodies[i] == b) return true;
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+        if (frGetDynArrayValue(w->bodies, i) == b) return true;
 
     return false;
 }
 
 /* Returns a rigid body at the given `i`ndex in `w`. */
 frBody *frGetBodyInWorld(const frWorld *w, int i) {
-    if (w == NULL || i < 0 || i >= arrlen(w->bodies)) return NULL;
+    if (w == NULL || i < 0 || i >= frGetDynArrayLength(w->bodies)) return NULL;
 
-    return w->bodies[i];
+    return frGetDynArrayValue(w->bodies, i);
 }
 
 /* Returns the number of rigid bodies in `w`. */
 int frGetBodyCountInWorld(const frWorld *w) {
-    return (w != NULL) ? arrlen(w->bodies) : 0;
+    return (w != NULL) ? frGetDynArrayLength(w->bodies) : 0;
 }
 
 /* Returns the gravity acceleration vector of `w`. */
@@ -211,10 +212,10 @@ void frStepWorld(frWorld *w, float dt) {
             w->handler.preStep(w->cache[j].key, collision);
     }
 
-    for (int i = 0; i < arrlen(w->bodies); i++) {
-        frApplyGravityToBody(w->bodies[i], w->gravity);
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++) {
+        frApplyGravityToBody(frGetDynArrayValue(w->bodies, i), w->gravity);
 
-        frIntegrateForBodyVelocity(w->bodies[i], dt);
+        frIntegrateForBodyVelocity(frGetDynArrayValue(w->bodies, i), dt);
     }
 
     int entryCount = hmlen(w->cache);
@@ -246,8 +247,8 @@ void frStepWorld(frWorld *w, float dt) {
                                &w->cache[j].value,
                                inverseDt);
 
-    for (int i = 0; i < arrlen(w->bodies); i++)
-        frIntegrateForBodyPosition(w->bodies[i], dt);
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+        frIntegrateForBodyPosition(frGetDynArrayValue(w->bodies, i), dt);
 
     for (int j = 0; j < hmlen(w->cache); j++) {
         frCollision *collision = &w->cache[j].value;
@@ -287,8 +288,10 @@ void frComputeWorldRaycast(frWorld *w,
 
     frClearSpatialHash(w->hash);
 
-    for (int i = 0; i < arrlen(w->bodies); i++)
-        frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+        frInsertIntoSpatialHash(w->hash,
+                                frGetBodyAABB(frGetDynArrayValue(w->bodies, i)),
+                                i);
 
     frVector2 minVertex = ray.origin,
               maxVertex = frVector2Add(
@@ -323,8 +326,8 @@ static bool frPreStepHashQueryCallback(frContextNode queryResult) {
 
     frWorld *world = queryCtx->world;
 
-    frBody *b1 = world->bodies[firstIndex];
-    frBody *b2 = world->bodies[secondIndex];
+    frBody *b1 = frGetDynArrayValue(world->bodies, firstIndex);
+    frBody *b2 = frGetDynArrayValue(world->bodies, secondIndex);
 
     if (frGetBodyInverseMass(b1) + frGetBodyInverseMass(b2) <= 0.0f)
         return false;
@@ -405,12 +408,12 @@ static bool frPreStepHashQueryCallback(frContextNode queryResult) {
 static bool frRaycastHashQueryCallback(frContextNode ctxNode) {
     frRaycastHashQueryCtx *queryCtx = ctxNode.ctx;
 
+    const frBody *body = frGetDynArrayValue(queryCtx->world->bodies,
+                                            ctxNode.id);
+
     frRaycastHit raycastHit = { .distance = 0.0f };
 
-    if (!frComputeRaycast(queryCtx->world->bodies[ctxNode.id],
-                          queryCtx->ray,
-                          &raycastHit))
-        return false;
+    if (!frComputeRaycast(body, queryCtx->ray, &raycastHit)) return false;
 
     queryCtx->func(raycastHit, queryCtx->ctx);
 
@@ -419,12 +422,14 @@ static bool frRaycastHashQueryCallback(frContextNode ctxNode) {
 
 /* Finds all pairs of bodies in `w` that are colliding. */
 static void frPreStepWorld(frWorld *w) {
-    for (int i = 0; i < arrlen(w->bodies); i++)
-        frInsertIntoSpatialHash(w->hash, frGetBodyAABB(w->bodies[i]), i);
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+        frInsertIntoSpatialHash(w->hash,
+                                frGetBodyAABB(frGetDynArrayValue(w->bodies, i)),
+                                i);
 
-    for (int i = 0; i < arrlen(w->bodies); i++)
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
         frQuerySpatialHash(w->hash,
-                           frGetBodyAABB(w->bodies[i]),
+                           frGetBodyAABB(frGetDynArrayValue(w->bodies, i)),
                            frPreStepHashQueryCallback,
                            &(frPreStepHashQueryCtx) { .world = w,
                                                       .bodyIndex = i });
@@ -440,14 +445,20 @@ static void frPostStepWorld(frWorld *w) {
     while (frRemoveFromRingBuffer(w->rbf, &node)) {
         switch (node.id) {
             case FR_OPT_ADD_BODY:
-                arrput(w->bodies, node.ctx);
+                frDynArrayPush(w->bodies, node.ctx);
 
                 break;
 
             case FR_OPT_REMOVE_BODY:
-                for (int i = 0; i < arrlen(w->bodies); i++)
-                    if (w->bodies[i] == node.ctx) {
-                        arrdelswap(w->bodies, i);
+                for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+                    if (frGetDynArrayValue(w->bodies, i) == node.ctx) {
+                        frDynArraySwap(frBody *,
+                                       w->bodies,
+                                       i,
+                                       frGetDynArrayLength(w->bodies) - 1);
+
+                        frSetDynArrayLength(w->bodies,
+                                            frGetDynArrayLength(w->bodies) - 1);
 
                         break;
                     }
@@ -459,8 +470,8 @@ static void frPostStepWorld(frWorld *w) {
         }
     }
 
-    for (int i = 0; i < arrlen(w->bodies); i++)
-        frClearBodyForces(w->bodies[i]);
+    for (int i = 0; i < frGetDynArrayLength(w->bodies); i++)
+        frClearBodyForces(frGetDynArrayValue(w->bodies, i));
 
     frClearSpatialHash(w->hash);
 }

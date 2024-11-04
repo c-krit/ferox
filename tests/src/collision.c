@@ -20,20 +20,20 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include <float.h>
 
 #include "ferox.h"
 #include "greatest.h"
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 TEST utCircleVsCircle(void);
 TEST utCircleVsPolygon(void);
 TEST utPolygonVsPolygon(void);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 SUITE(collision) {
     RUN_TEST(utCircleVsCircle);
@@ -41,7 +41,7 @@ SUITE(collision) {
     RUN_TEST(utPolygonVsPolygon);
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 TEST utCircleVsCircle(void) {
     frShape *s1 = frCreateCircle(frStructZero(frMaterial), 1.0f);
@@ -107,6 +107,9 @@ TEST utCircleVsCircle(void) {
         ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.x, FLT_EPSILON);
         ASSERT_IN_RANGE(1.0f, collision.contacts[0].point.y, FLT_EPSILON);
     }
+
+    frReleaseBody(b1), frReleaseBody(b2);
+    frReleaseShape(s1), frReleaseShape(s2);
 
     PASS();
 }

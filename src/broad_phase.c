@@ -22,41 +22,34 @@
 
 /* Includes ===============================================================> */
 
+#include "external/ferox_utils.h"
 #include "external/stb_ds.h"
 
 #include "ferox.h"
 
 /* Typedefs ===============================================================> */
 
-/* A structure that represents the key of a spatial hash entry. */
-typedef struct frSpatialHashKey_ {
+/* 
+    A structure that represents a two-dimensional vector 
+    with `int` coordinates.
+*/
+typedef struct frVector2i_ {
     int x, y;
-} frSpatialHashKey;
-
-/* A structure that represents the value of a spatial hash entry. */
-typedef int *frSpatialHashValue;
+} frVector2i;
 
 /* A structure that represents the key-value pair of a spatial hash.*/
 typedef struct frSpatialHashEntry_ {
-    frSpatialHashKey key;
-    frSpatialHashValue value;
+    frVector2i key;
+    frDynArray(int) value;
 } frSpatialHashEntry;
 
 /* A struct that represents a spatial hash. */
 struct frSpatialHash_ {
-    float cellSize, inverseCellSize;
-    frSpatialHashValue queryResult;
     frSpatialHashEntry *entries;
+    float cellSize, inverseCellSize;
+    frDynArray(int) queryResult;
+    frBitArray indexSet;
 };
-
-/* Private Function Prototypes ============================================> */
-
-/* 
-    Returns ​a negative integer value if `a` is less than `b`, ​a positive 
-    integer value if `a` is greater than `b` and zero if `a` and `b` 
-    are equivalent.
-*/
-static int frQSortCompare(const void *a, const void *b);
 
 /* Public Functions =======================================================> */
 
@@ -64,11 +57,14 @@ static int frQSortCompare(const void *a, const void *b);
 frSpatialHash *frCreateSpatialHash(float cellSize) {
     if (cellSize <= 0.0f) return NULL;
 
-    // NOTE: `sh->queryResult` and `sh->entries` must be initialized to `NULL`
     frSpatialHash *sh = calloc(1, sizeof *sh);
 
     sh->cellSize = cellSize;
     sh->inverseCellSize = 1.0f / cellSize;
+
+    sh->indexSet = frCreateBitArray(FR_WORLD_MAX_OBJECT_COUNT);
+
+    frInitDynArray(sh->queryResult);
 
     return sh;
 }
@@ -78,19 +74,20 @@ void frReleaseSpatialHash(frSpatialHash *sh) {
     if (sh == NULL) return;
 
     for (int i = 0; i < hmlen(sh->entries); i++)
-        arrfree(sh->entries[i].value);
+        frReleaseDynArray(sh->entries[i].value);
 
-    hmfree(sh->entries), arrfree(sh->queryResult), free(sh);
+    frReleaseBitArray(sh->indexSet);
+    frReleaseDynArray(sh->queryResult);
+
+    hmfree(sh->entries), free(sh);
 }
 
 /* Erases all elements from `sh`. */
 void frClearSpatialHash(frSpatialHash *sh) {
     if (sh == NULL) return;
 
-    arrsetlen(sh->queryResult, 0);
-
     for (int i = 0; i < hmlen(sh->entries); i++)
-        arrsetlen(sh->entries[i].value, 0);
+        frSetDynArrayLength(sh->entries[i].value, 0);
 }
 
 /* Returns the cell size of `sh`. */
@@ -112,16 +109,17 @@ void frInsertIntoSpatialHash(frSpatialHash *sh, frAABB key, int value) {
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
-            frSpatialHashKey key = { .x = x, .y = y };
+            frVector2i key = { .x = x, .y = y };
 
             frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
             if (entry != NULL) {
-                arrput(entry->value, value);
+                frDynArrayPush(entry->value, value);
             } else {
                 frSpatialHashEntry newEntry = { .key = key };
 
-                arrput(newEntry.value, value);
+                frInitDynArray(newEntry.value);
+                frDynArrayPush(newEntry.value, value);
 
                 hmputs(sh->entries, newEntry);
             }
@@ -143,59 +141,45 @@ void frQuerySpatialHash(frSpatialHash *sh,
     int maxX = (aabb.x + aabb.width) * inverseCellSize;
     int maxY = (aabb.y + aabb.height) * inverseCellSize;
 
-    arrsetlen(sh->queryResult, 0);
+    frSetDynArrayLength(sh->queryResult, 0);
 
     for (int y = minY; y <= maxY; y++)
         for (int x = minX; x <= maxX; x++) {
-            frSpatialHashKey key = { .x = x, .y = y };
+            frVector2i key = { .x = x, .y = y };
 
             frSpatialHashEntry *entry = hmgetp_null(sh->entries, key);
 
             if (entry == NULL) continue;
 
-            for (int i = 0; i < arrlen(entry->value); i++)
-                arrput(sh->queryResult, entry->value[i]);
+            for (int i = 0; i < frGetDynArrayLength(entry->value); i++)
+                frDynArrayPush(
+                    sh->queryResult, 
+                    frGetDynArrayValue(entry->value, i)
+                );
         }
 
-    size_t oldLength = arrlen(sh->queryResult);
+    {
+        frBitArrayClear(sh->indexSet, FR_WORLD_MAX_OBJECT_COUNT);
 
-    if (oldLength > 1) {
-        // NOTE: Sort the array first, then remove duplicates!
-        qsort(sh->queryResult,
-              oldLength,
-              sizeof *(sh->queryResult),
-              frQSortCompare);
+        for (int i = 0; i < frGetDynArrayLength(sh->queryResult); i++)
+            frBitArraySet(sh->indexSet, frGetDynArrayValue(sh->queryResult, i));
 
-        size_t newLength = 0;
+        frSetDynArrayLength(sh->queryResult, 0);
 
-        for (int i = 0; i < oldLength; i++)
-            if (sh->queryResult[i] != sh->queryResult[i + 1])
-                sh->queryResult[newLength++] = sh->queryResult[i];
-
-        if (sh->queryResult[newLength - 1] != sh->queryResult[oldLength - 1])
-            sh->queryResult[newLength++] = sh->queryResult[oldLength - 1];
-
-        arrsetlen(sh->queryResult, newLength);
+        for (int i = 0; i < FR_WORLD_MAX_OBJECT_COUNT; i++)
+            if (frBitArrayGet(sh->indexSet, i))
+                frDynArrayPush(sh->queryResult, i);
     }
 
     /*
         NOTE: For each object in the query result, the callback `func`tion
         will be called with the user data pointer `ctx`.
     */
-    for (int i = 0; i < arrlen(sh->queryResult); i++)
-        func((frContextNode) { .id = sh->queryResult[i], .ctx = userData });
-}
-
-/* Private Functions ======================================================> */
-
-/* 
-    Returns ​a negative integer value if `a` is less than `b`, ​a positive 
-    integer value if `a` is greater than `b` and zero if `a` and `b` 
-    are equivalent.
-*/
-static int frQSortCompare(const void *a, const void *b) {
-    const int x = *(const int *) a;
-    const int y = *(const int *) b;
-
-    return (x > y) - (x < y);
+    for (int i = 0; i < frGetDynArrayLength(sh->queryResult); i++)
+        func(
+            (frContextNode) { 
+                .id = frGetDynArrayValue(sh->queryResult, i), 
+                .ctx = userData 
+            }
+        );
 }

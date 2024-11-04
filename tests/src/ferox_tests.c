@@ -20,16 +20,16 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include "ferox.h"
 #include "greatest.h"
 
-/* 'Prelude' Functions ===================================================== */
+/* 'Prelude' Functions ====================================================> */
 
 GREATEST_MAIN_DEFS();
 
-/* Public Function Prototypes ============================================== */
+/* Public Function Prototypes =============================================> */
 
 SUITE_EXTERN(broad_phase);
 SUITE_EXTERN(collision);
@@ -38,7 +38,7 @@ SUITE_EXTERN(rigid_body);
 SUITE_EXTERN(utils);
 SUITE_EXTERN(world);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 int main(int argc, char *argv[]) {
     GREATEST_MAIN_BEGIN();

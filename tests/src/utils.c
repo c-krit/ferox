@@ -20,31 +20,34 @@
     DEALINGS IN THE SOFTWARE.
 */
 
-/* Includes ================================================================ */
+/* Includes ===============================================================> */
 
 #include "ferox.h"
 #include "ferox_utils.h"
 
 #include "greatest.h"
 
-/* Macros ================================================================== */
+/* Macros =================================================================> */
 
 #define BIT_ARRAY_LENGTH    ((1 << 6) + 1)
+#define DYN_ARRAY_CAPACITY  ((1 << 5) + 1)
 #define RING_BUFFER_LENGTH  ((1 << 4) + 1)
 
-/* Private Function Prototypes ============================================= */
+/* Private Function Prototypes ============================================> */
 
 TEST utBitArrayOps(void);
+TEST utDynArrayOps(void);
 TEST utRingBufferOps(void);
 
-/* Public Functions ======================================================== */
+/* Public Functions =======================================================> */
 
 SUITE(utils) {
     RUN_TEST(utBitArrayOps);
+    RUN_TEST(utDynArrayOps);
     RUN_TEST(utRingBufferOps);
 }
 
-/* Private Functions ======================================================= */
+/* Private Functions ======================================================> */
 
 TEST utBitArrayOps(void) {
     frBitArray ba = frCreateBitArray(BIT_ARRAY_LENGTH);
@@ -64,6 +67,36 @@ TEST utBitArrayOps(void) {
     }
 
     frReleaseBitArray(ba);
+
+    PASS();
+}
+
+TEST utDynArrayOps(void) {
+    frDynArray(int) values;
+
+    frInitDynArray(values);
+
+    {
+        frSetDynArrayCapacity(values, DYN_ARRAY_CAPACITY);
+
+        ASSERT_EQ(DYN_ARRAY_CAPACITY, frGetDynArrayCapacity(values));
+
+        for (int i = 0; i < DYN_ARRAY_CAPACITY + 1; i++)
+            frDynArrayPush(values, 2 * i);
+
+        ASSERT_LT(DYN_ARRAY_CAPACITY, frGetDynArrayCapacity(values));
+
+        ASSERT_EQ(
+            (DYN_ARRAY_CAPACITY << 1), 
+            frGetDynArrayValue(values, DYN_ARRAY_CAPACITY)
+        );
+
+        frSetDynArrayCapacity(values, (DYN_ARRAY_CAPACITY >> 1));
+
+        ASSERT_EQ((DYN_ARRAY_CAPACITY >> 1), frGetDynArrayLength(values));
+    }
+
+    frReleaseDynArray(values);
 
     PASS();
 }

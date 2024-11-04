@@ -25,7 +25,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // `__cplusplus`
 
 /* Includes ===============================================================> */
 
@@ -80,17 +80,19 @@ extern "C" {
 /* Macros =================================================================> */
 
 /* Compiler-specific attribute for a function that must be inlined. */
-#ifdef _MSC_VER
-    #define FR_API_INLINE __forceinline
-#elif defined(__GNUC__)
-    #if defined(__STRICT_ANSI__)
-        #define FR_API_INLINE __inline__ __attribute__((always_inline))
+#ifndef FR_API_INLINE
+    #ifdef _MSC_VER
+        #define FR_API_INLINE __forceinline
+    #elif defined(__GNUC__)
+        #if defined(__STRICT_ANSI__)
+            #define FR_API_INLINE __inline__ __attribute__((always_inline))
+        #else
+            #define FR_API_INLINE inline __attribute__((always_inline))
+        #endif
     #else
-        #define FR_API_INLINE inline __attribute__((always_inline))
+        #define FR_API_INLINE inline
     #endif
-#else
-    #define FR_API_INLINE inline
-#endif
+#endif  // `FR_API_INLINE`
 
 /* ========================================================================> */
 
@@ -103,6 +105,9 @@ extern "C" {
 typedef struct frVector2_ {
     float x, y;
 } frVector2;
+
+/* An alias for the `frVector2` data type. */
+typedef frVector2 frVector2f;
 
 /* A structure that represents an axis-aligned bounding box. */
 typedef struct frAABB_ {
@@ -722,6 +727,6 @@ FR_API_INLINE float frUnitsToPixels(float k) {
 
 #ifdef __cplusplus
 }
-#endif
+#endif  // `__cplusplus`
 
 #endif  // `FEROX_H`
