@@ -263,9 +263,9 @@ void frSetBodyUserData(frBody *b, void *userData) {
 bool frBodyContainsPoint(const frBody *b, frVector2 point) {
     if (b == NULL) return false;
 
-    const frShape *s = frGetBodyShape(b);
+    const frShape *s = b->shape;
 
-    frTransform tx = frGetBodyTransform(b);
+    frTransform tx = b->tx;
     frShapeType type = frGetShapeType(s);
 
     if (type == FR_SHAPE_CIRCLE) {
@@ -338,11 +338,11 @@ void frApplyAccumulatedImpulses(frBody *b1,
     if (b1 == NULL || b2 == NULL || collision == NULL) return;
 
     if (b1->mtn.inverseMass + b2->mtn.inverseMass <= 0.0f) {
-        if (frGetBodyType(b1) == FR_BODY_STATIC)
+        if (b1->type == FR_BODY_STATIC)
             b1->mtn.velocity.x = b1->mtn.velocity
                                      .y = b1->mtn.angularVelocity = 0.0f;
 
-        if (frGetBodyType(b2) == FR_BODY_STATIC)
+        if (b2->type == FR_BODY_STATIC)
             b2->mtn.velocity.x = b2->mtn.velocity
                                      .y = b2->mtn.angularVelocity = 0.0f;
 
@@ -355,9 +355,9 @@ void frApplyAccumulatedImpulses(frBody *b1,
         frVector2 contactPoint = collision->contacts[i].point;
 
         frVector2 relPosition1 = frVector2Subtract(contactPoint,
-                                                   frGetBodyPosition(b1));
+                                                   b1->tx.position);
         frVector2 relPosition2 = frVector2Subtract(contactPoint,
-                                                   frGetBodyPosition(b2));
+                                                   b2->tx.position);
 
         float relPositionCross1 = frVector2Cross(relPosition1,
                                                  collision->direction);
@@ -460,9 +460,9 @@ void frResolveCollision(frBody *b1,
         frVector2 contactPoint = collision->contacts[i].point;
 
         frVector2 relPosition1 = frVector2Subtract(contactPoint,
-                                                   frGetBodyPosition(b1));
+                                                   b1->tx.position);
         frVector2 relPosition2 = frVector2Subtract(contactPoint,
-                                                   frGetBodyPosition(b2));
+                                                   b2->tx.position);
 
         frVector2 relNormal1 = frVector2LeftNormal(relPosition1);
         frVector2 relNormal2 = frVector2LeftNormal(relPosition2);

@@ -37,8 +37,8 @@
 /* Creates a bit array with `n` bits. */
 #define frCreateBitArray(n)               \
     calloc(                               \
-        ((n) + (INT_BIT - 1) / INT_BIT),  \
-        sizeof(frBitArray)                \
+        ((n) + (INT_BIT - 1)) / INT_BIT,  \
+        sizeof(int)                       \
     )
 
 /* Releases the memory allocated for `ba`. */
