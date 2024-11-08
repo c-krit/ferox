@@ -78,7 +78,7 @@ build: ${TARGETS}
 
 .c.o:
 	@printf "${LOG_PREFIX} Compiling: $@ (from $<)\n"
-	@${CC} -c $< -o $@ ${CFLAGS} ${LDFLAGS} ${LDLIBS}
+	@${CC} -c $< -o $@ ${CFLAGS}
 
 ${TARGETS}: ${OBJECTS}
 	@mkdir -p ${BINARY_PATH}
