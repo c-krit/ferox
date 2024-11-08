@@ -26,7 +26,7 @@
 #include "raylib.h"
 
 #define FEROX_RAYLIB_IMPLEMENTATION
-#include "ferox-raylib.h"
+#include "ferox_raylib.h"
 
 #ifdef PLATFORM_WEB
     #include <emscripten/emscripten.h>

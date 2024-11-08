@@ -178,7 +178,13 @@ void frDrawBodyLines(const frBody *b, float thick, Color color) {
         }
     }
 
-    DrawCircleV((Vector2) { .x = position.x, .y = position.y }, 2.0f, color);
+    DrawRing((Vector2) { .x = position.x, .y = position.y },
+                 2.0f,
+                 1.0f,
+                 0.0f,
+                 360.0f,
+                 4,
+                 color);
 }
 
 /* 
