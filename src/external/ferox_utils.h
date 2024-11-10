@@ -27,41 +27,29 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Macros =================================================================> */
 
-#define INT_BIT  (sizeof(int) * CHAR_BIT)
-
-/* ========================================================================> */
-
 /* Creates a bit array with `n` bits. */
-#define frCreateBitArray(n)               \
-    calloc(                               \
-        ((n) + (INT_BIT - 1)) / INT_BIT,  \
-        sizeof(int)                       \
-    )
+#define frCreateBitArray(n)  \
+    calloc((n), sizeof(char))
 
 /* Releases the memory allocated for `ba`. */
 #define frReleaseBitArray(ba)  \
     free((ba))
 
 /* Clears all bits of `ba`. */
-#define frBitArrayClear(ba, n)                                            \
-    do {                                                                  \
-        for (int i = 0, j = ((n) / INT_BIT); i < j; ((ba)[i] = 0), i++);  \
-    } while (0)
+#define frBitArrayClear(ba, n)  \
+    memset((ba), 0, (n))
 
 /* Returns the `i`-th bit of `ba`. */
-#define frBitArrayGet(ba, i)                            \
-    (!!((ba)[(i) / INT_BIT] & (1 << ((i) % INT_BIT))))
+#define frBitArrayGet(ba, i)  \
+    ((ba)[i])
 
 /* Sets the `i`-th bit of `ba`. */
-#define frBitArraySet(ba, i)                          \
-    ((ba)[(i) / INT_BIT] |= (1 << ((i) % INT_BIT)))
-
-/* Resets the `i`-th bit of `ba`. */
-#define frBitArrayReset(ba, i)                        \
-    ((ba)[(i) / INT_BIT] &= ~(1 << ((i) % INT_BIT)))
+#define frBitArraySet(ba, i)  \
+    ((ba)[(i)] = 1)
 
 /* ========================================================================> */
 
@@ -227,6 +215,6 @@
 /* Typedefs ===============================================================> */
 
 /* A data type that represents a bit array.*/
-typedef int *frBitArray;
+typedef char *frBitArray;
 
 #endif  // `FEROX_UTILS_H`
