@@ -204,14 +204,11 @@ frAABB frGetShapeAABB(const frShape *s, frTransform tx) {
                 if (maxVertex.y < v.y) maxVertex.y = v.y;
             }
 
-            float deltaX = maxVertex.x - minVertex.x;
-            float deltaY = maxVertex.y - minVertex.y;
-
             result.x = minVertex.x;
             result.y = minVertex.y;
 
-            result.width = deltaX;
-            result.height = deltaY;
+            result.width = maxVertex.x - minVertex.x;
+            result.height = maxVertex.y - minVertex.y;
         }
     }
 

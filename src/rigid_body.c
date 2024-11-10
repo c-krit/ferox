@@ -220,7 +220,7 @@ void frSetBodyPosition(frBody *b, frVector2 position) {
 
     b->tx.position = position;
 
-    b->aabb = frGetShapeAABB(b->shape, b->tx);
+    b->aabb.x += position.x, b->aabb.y += position.y;
 }
 
 /* Sets the `angle` of `b`, in radians. */
