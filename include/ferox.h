@@ -79,6 +79,19 @@ extern "C" {
 
 /* Macros =================================================================> */
 
+/* The major, minor, and the patch release version of this library. */
+#define FR_API_VERSION_MAJOR   0
+#define FR_API_VERSION_MINOR   10
+#define FR_API_VERSION_PATCH   0
+
+/* The full version string of this library. */
+#define FR_API_VERSION  \
+    FR_API_STRINGIFY(FR_API_VERSION_MAJOR) "."  \
+    FR_API_STRINGIFY(FR_API_VERSION_MINOR) "."  \
+    FR_API_STRINGIFY(FR_API_VERSION_PATCH)
+
+/* ========================================================================> */
+
 /* Compiler-specific attribute for a function that must be inlined. */
 #ifndef FR_API_INLINE
     #ifdef _MSC_VER
@@ -93,6 +106,10 @@ extern "C" {
         #define FR_API_INLINE inline
     #endif
 #endif  // `FR_API_INLINE`
+
+/* Converts the given value to a string literal. */
+#define FR_API_STRINGIFY_(x)   #x
+#define FR_API_STRINGIFY(x)    FR_API_STRINGIFY_(x)
 
 /* ========================================================================> */
 
