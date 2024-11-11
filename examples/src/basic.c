@@ -51,7 +51,8 @@ static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
 static const float BOX_WIDTH = 40.0f, BOX_HEIGHT = 40.0f;
-static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / (TARGET_FPS << 1);
+
+static const float CELL_SIZE = 1.5f, DELTA_TIME = 1.0f / (TARGET_FPS << 1);
 
 /* Private Variables ======================================================= */
 
@@ -72,7 +73,7 @@ static void DeinitExample(void);
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | basic.c");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | " __FILE__);
 
     InitExample();
 

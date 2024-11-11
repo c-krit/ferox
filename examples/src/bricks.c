@@ -53,13 +53,15 @@
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float CELL_SIZE = 2.0f, DELTA_TIME = 1.0f / TARGET_FPS;
+static const float CELL_SIZE = 1.5f, DELTA_TIME = 1.0f / TARGET_FPS;
 
 /* Private Variables ======================================================= */
 
 static frWorld *world;
 
 static frBody *borders[BORDER_COUNT], *platforms[PLATFORM_COUNT], *cursor;
+
+static Color boxColor = LIGHTGRAY, borderColor = BROWN, platformColor = BROWN;
 
 static float cursorCounter;
 
@@ -74,7 +76,7 @@ static void DeinitExample(void);
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | bricks.c");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | " __FILE__);
 
     InitExample();
 
@@ -136,8 +138,11 @@ static void InitExample(void) {
                               frPixelsToUnits(0.1f * SCREEN_WIDTH),
                               frPixelsToUnits(1.0f * SCREEN_HEIGHT)));
 
-        for (int i = 0; i < BORDER_COUNT; i++)
+        for (int i = 0; i < BORDER_COUNT; i++) {
+            frSetBodyUserData(borders[i], &borderColor);
+
             frAddBodyToWorld(world, borders[i]);
+        }
     }
 
     {
@@ -179,8 +184,11 @@ static void InitExample(void) {
                                                  .y = 0.35f * SCREEN_HEIGHT }),
             frCreateCircle(platformMaterial, frPixelsToUnits(84.0f)));
 
-        for (int i = 0; i < PLATFORM_COUNT; i++)
+        for (int i = 0; i < PLATFORM_COUNT; i++) {
+            frSetBodyUserData(platforms[i], &platformColor);
+
             frAddBodyToWorld(world, platforms[i]);
+        }
     }
 
     {
@@ -228,6 +236,7 @@ static void UpdateExample(void) {
                                                 frGetBodyShape(cursor));
 
             frSetBodyAngle(box, frGetBodyAngle(cursor));
+            frSetBodyUserData(box, &boxColor);
 
             frAddBodyToWorld(world, box);
 
@@ -247,16 +256,12 @@ static void UpdateExample(void) {
                    0.25f,
                    ColorAlpha(DARKGRAY, 0.75f));
 
-        for (int i = 0; i < BORDER_COUNT; i++)
-            frDrawBodyLines(borders[i], 1.5f, BROWN);
+        for (int i = 0, j = frGetBodyCountInWorld(world); i < j; i++) {
+            const frBody *body = frGetBodyInWorld(world, i);
+            const Color *color = frGetBodyUserData(body);
 
-        for (int i = 0; i < PLATFORM_COUNT; i++)
-            frDrawBodyLines(platforms[i], 1.5f, BROWN);
-
-        for (int i = BORDER_COUNT + PLATFORM_COUNT;
-             i < frGetBodyCountInWorld(world);
-             i++)
-            frDrawBodyLines(frGetBodyInWorld(world, i), 1.0f, LIGHTGRAY);
+            frDrawBodyLines(body, 1.0f, *color);
+        }
 
         frDrawBodyLines(cursor, 1.0f, WHITE);
 

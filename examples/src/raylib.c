@@ -85,7 +85,7 @@ static void DeinitExample(void);
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | raylib.c");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | " __FILE__);
 
     InitExample();
 
@@ -132,8 +132,7 @@ static void InitExample(void) {
             0.5f * (SCREEN_HEIGHT - raylibTexture.height)
         };
 
-        for (int i = 0; i < LOGO_WIDTH_IN_PIECES * LOGO_HEIGHT_IN_PIECES;
-                i++) {
+        for (int i = 0; i < LOGO_WIDTH_IN_PIECES * LOGO_HEIGHT_IN_PIECES; i++) {
             pieces[i].offset.x = (i % LOGO_WIDTH_IN_PIECES) * pieceWidth;
             pieces[i].offset.y = (i / LOGO_WIDTH_IN_PIECES) * pieceHeight;
 
@@ -143,24 +142,23 @@ static void InitExample(void) {
             };
 
             pieces[i].body = frCreateBodyFromShape(FR_BODY_DYNAMIC,
-                                                    frVector2PixelsToUnits(
-                                                        position),
-                                                    pieceShape);
+                                                   frVector2PixelsToUnits(
+                                                       position),
+                                                   pieceShape);
 
             frAddBodyToWorld(world, pieces[i].body);
         }
 
         ball = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
-            frVector2PixelsToUnits((frVector2) {
-                .x = -SCREEN_WIDTH, .y = 0.5f * SCREEN_HEIGHT }),
-            frCreateCircle((frMaterial) { .density = 4.0f,
-                                            .friction = 0.35f },
-                            frPixelsToUnits(18.0f)));
+            frVector2PixelsToUnits(
+                (frVector2) { .x = -SCREEN_WIDTH, .y = 0.5f * SCREEN_HEIGHT }),
+            frCreateCircle((frMaterial) { .density = 4.0f, .friction = 0.35f },
+                           frPixelsToUnits(18.0f)));
 
         frApplyImpulseToBody(ball,
-                                frGetBodyPosition(ball),
-                                (frVector2) { .x = 256.0f });
+                             frGetBodyPosition(ball),
+                             (frVector2) { .x = 256.0f });
 
         frAddBodyToWorld(world, ball);
     }

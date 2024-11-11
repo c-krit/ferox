@@ -117,7 +117,7 @@ static void OnPreStep(frBodyPair key, frCollision *value);
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | cows.c");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | " __FILE__);
 
     InitExample();
 
@@ -174,11 +174,12 @@ static void InitExample(void) {
         .count = 3
     };
 
-    player = frCreateBodyFromShape(
-        FR_BODY_KINEMATIC,
-        frVector2PixelsToUnits((frVector2) { .x = 0.5f * SCREEN_WIDTH,
-                                             .y = 0.5f * SCREEN_HEIGHT }),
-        frCreatePolygon(frStructZero(frMaterial), &playerVertices));
+    player = frCreateBodyFromShape(FR_BODY_KINEMATIC,
+                                   frVector2PixelsToUnits((frVector2) {
+                                       .x = 0.5f * SCREEN_WIDTH,
+                                       .y = 0.5f * SCREEN_HEIGHT }),
+                                   frCreatePolygon(frStructZero(frMaterial),
+                                                   &playerVertices));
 
     frSetBodyUserData(player, (void *) &entityData[ENTITY_PLAYER]);
 

@@ -58,6 +58,8 @@ static frWorld *world;
 
 static frBody *player;
 
+static Color bodyColor, ringColor, playerColor;
+
 /* Private Function Prototypes ============================================= */
 
 static void InitExample(void);
@@ -73,7 +75,7 @@ static void OnRaycastQuery(frRaycastHit raycastHit, void *ctx);
 int main(void) {
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | raycast.c");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "c-krit/ferox | " __FILE__);
 
     InitExample();
 
@@ -121,23 +123,31 @@ static void InitExample(void) {
                                           .x = 14.0f, .y = 16.0f }) },
                             .count = 3 }));
 
+    {
+        bodyColor = ColorAlpha(LIGHTGRAY, 0.95f);
+        ringColor = ColorAlpha(YELLOW, 0.85f);
+        playerColor = ColorAlpha(GREEN, 0.85f);
+    }
+
+    frSetBodyUserData(player, &playerColor);
+
     frAddBodyToWorld(world, player);
 
     for (int i = 0; i < MAX_OBJECT_COUNT; i++) {
-        frVector2 position = {
-            .x = GetRandomValue(0, 1)
-                     ? GetRandomValue(0, 0.47f * SCREEN_WIDTH)
-                     : GetRandomValue(0.53f * SCREEN_WIDTH, SCREEN_WIDTH),
-            .y = GetRandomValue(0, 1)
-                     ? GetRandomValue(0, 0.47f * SCREEN_HEIGHT)
-                     : GetRandomValue(0.53f * SCREEN_HEIGHT, SCREEN_HEIGHT)
-        };
+        frVector2 position = frStructZero(frVector2);
+
+        while (position.x > -2.0f && position.x < 2.0f && position.y > -2.0f
+               && position.y < 2.0f)
+            position.x = GetRandomValue(0, SCREEN_WIDTH),
+            position.y = GetRandomValue(0, SCREEN_HEIGHT);
 
         frBody *body =
             frCreateBodyFromShape(FR_BODY_STATIC,
                                   frVector2PixelsToUnits(position),
                                   frCreateCircle(frStructZero(frMaterial),
                                                  0.22f * GetRandomValue(2, 4)));
+
+        frSetBodyUserData(body, &bodyColor);
 
         frAddBodyToWorld(world, body);
     }
@@ -184,18 +194,14 @@ static void UpdateExample(void) {
                    0.25f,
                    ColorAlpha(DARKGRAY, 0.75f));
 
-        const int bodyCount = frGetBodyCountInWorld(world);
+        for (int i = 0, j = frGetBodyCountInWorld(world); i < j; i++) {
+            const frBody *body = frGetBodyInWorld(world, i);
+            const Color *color = frGetBodyUserData(body);
 
-        for (int i = 1; i < bodyCount; i++)
-            frDrawBodyLines(frGetBodyInWorld(world, i),
-                            2.0f,
-                            ColorAlpha(LIGHTGRAY, 0.95f));
-
-        Color ringColor = ColorAlpha(YELLOW, 0.85f);
+            frDrawBodyLines(body, 1.0f, *color);
+        }
 
         frComputeWorldRaycast(world, ray, OnRaycastQuery, &ringColor);
-
-        frDrawBodyLines(player, 2.0f, ColorAlpha(GREEN, 0.85f));
 
         frDrawArrow(rayOrigin,
                     frVector2Add(rayOrigin, rayDirection),
