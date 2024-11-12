@@ -108,14 +108,94 @@ TEST utCircleVsCircle(void) {
         ASSERT_IN_RANGE(1.0f, collision.contacts[0].point.y, FLT_EPSILON);
     }
 
-    frReleaseBody(b1), frReleaseBody(b2);
     frReleaseShape(s1), frReleaseShape(s2);
+    frReleaseBody(b1), frReleaseBody(b2);
 
     PASS();
 }
 
 TEST utCircleVsPolygon(void) {
-    /* TODO: ... */
+    frShape *s1 = frCreateCircle(frStructZero(frMaterial), 1.0f);
+    frShape *s2 = frCreateRectangle(frStructZero(frMaterial), 2.0f, 2.0f);
+
+    frBody *b1 = frCreateBodyFromShape(FR_BODY_KINEMATIC,
+                                       frStructZero(frVector2),
+                                       s1);
+
+    frBody *b2 = frCreateBodyFromShape(FR_BODY_KINEMATIC,
+                                       frStructZero(frVector2),
+                                       s2);
+
+    frCollision collision = { .count = 0 };
+
+    {
+        frSetBodyPosition(b1, (frVector2) { .x = -1.5f });
+        frSetBodyPosition(b2, (frVector2) { .x = 1.5f });
+
+        (void) frComputeCollision(b1, b2, &collision);
+
+        ASSERT_EQ(0, collision.count);
+    }
+
+    {
+        frSetBodyPosition(b1, (frVector2) { .x = -1.0f });
+        frSetBodyPosition(b2, (frVector2) { .x = 1.0f });
+
+        (void) frComputeCollision(b1, b2, &collision);
+
+        ASSERT_EQ(1, collision.count);
+
+        ASSERT_IN_RANGE(1.0f, collision.direction.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.direction.y, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].depth, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.y, FLT_EPSILON);
+    }
+
+    {
+        frSetBodyPosition(b1, (frVector2) { .x = -0.5f });
+        frSetBodyPosition(b2, (frVector2) { .x = 0.5f });
+
+        (void) frComputeCollision(b1, b2, &collision);
+
+        ASSERT_EQ(1, collision.count);
+
+        ASSERT_IN_RANGE(1.0f, collision.direction.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.direction.y, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(1.0f, collision.contacts[0].depth, FLT_EPSILON);
+
+        ASSERT_IN_RANGE(0.5f, collision.contacts[0].point.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(0.0f, collision.contacts[0].point.y, FLT_EPSILON);
+    }
+
+    {
+        float offsetX = 0.01f, offsetY = 0.01f;
+
+        frSetBodyPosition(b1, frStructZero(frVector2));
+        frSetBodyPosition(b2,
+                          (frVector2) { .x = 1.0f + offsetX,
+                                        .y = 1.0f + offsetY });
+
+        (void) frComputeCollision(b1, b2, &collision);
+
+        ASSERT_EQ(1, collision.count);
+
+        frVector2 direction = frVector2Normalize(
+            frVector2Subtract(frGetBodyPosition(b2), frGetBodyPosition(b1)));
+
+        ASSERT_IN_RANGE(direction.x, collision.direction.x, FLT_EPSILON);
+        ASSERT_IN_RANGE(direction.y, collision.direction.y, FLT_EPSILON);
+
+        float depth = 1.0f - sqrtf((offsetX * offsetX) + (offsetY * offsetY));
+
+        ASSERT_IN_RANGE(depth, collision.contacts[0].depth, FLT_EPSILON);
+    }
+
+    frReleaseShape(s1), frReleaseShape(s2);
+    frReleaseBody(b1), frReleaseBody(b2);
 
     PASS();
 }

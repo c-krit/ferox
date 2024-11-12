@@ -29,9 +29,9 @@
 
 /* Macros =================================================================> */
 
-#define BIT_ARRAY_LENGTH    ((1 << 6) + 1)
-#define DYN_ARRAY_CAPACITY  ((1 << 5) + 1)
-#define RING_BUFFER_LENGTH  ((1 << 4) + 1)
+#define BIT_ARRAY_LENGTH   ((1 << 6) + 1)
+#define DYN_ARRAY_CAPACITY ((1 << 5) + 1)
+#define RING_BUFFER_LENGTH ((1 << 4) + 1)
 
 /* Private Function Prototypes ============================================> */
 
@@ -60,7 +60,7 @@ TEST utBitArrayOps(void) {
 
         int numberCount = 0;
 
-        for (int i = 0; i < BIT_ARRAY_LENGTH; i++) 
+        for (int i = 0; i < BIT_ARRAY_LENGTH; i++)
             if (frBitArrayGet(ba, i)) numberCount++;
 
         ASSERT_EQ(6, numberCount);
@@ -86,10 +86,8 @@ TEST utDynArrayOps(void) {
 
         ASSERT_LT(DYN_ARRAY_CAPACITY, frGetDynArrayCapacity(values));
 
-        ASSERT_EQ(
-            (DYN_ARRAY_CAPACITY << 1), 
-            frGetDynArrayValue(values, DYN_ARRAY_CAPACITY)
-        );
+        ASSERT_EQ((DYN_ARRAY_CAPACITY << 1),
+                  frGetDynArrayValue(values, DYN_ARRAY_CAPACITY));
 
         frSetDynArrayCapacity(values, (DYN_ARRAY_CAPACITY >> 1));
 
