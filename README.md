@@ -133,7 +133,7 @@ PS C:\Users\jdeokkim\source\repos\ferox> nmake -f NMakefile
 
 ### [w64devkit](https://github.com/skeeto/w64devkit)
 
-Download the latest release of w64devkit from [here](https://github.com/skeeto/w64devkit/releases), extract the `.zip` file to your working directory, and run `w64devkit.exe`.
+Download the latest release of w64devkit from [here](https://github.com/skeeto/w64devkit/releases), run `w64devkit-x64-2.0.0.exe` and wait for the archive to be extracted to your working directory, and run `w64devkit/w64devkit.exe`.
 
 ```console
 $ mkdir ~/workspace && cd ~/workspace
@@ -152,14 +152,16 @@ You may need to compile raylib for Windows before compiling the examples:
 ```console
 $ cd .. && wget https://github.com/raysan5/raylib/archive/refs/tags/4.5.0.zip
 $ unzip 4.5.0.zip && mv raylib-4.5.0 raylib
-$ cd raylib/src && make -j`nproc`
+$ make -C raylib/src -j`nproc`
+$ rm ./*.zip
 ```
 
 Finally, in order to compile the examples, do:
 
 ```console
 $ cd ~/workspace/ferox/examples
-$ make -f Makefile.mingw RAYLIB_PATH=../../raylib
+$ make -f Makefile.mingw \
+  RAYLIB_INCLUDE_PATH=../../raylib/src RAYLIB_LIBRARY_PATH=../../raylib/src
 ```
 
 </details>
