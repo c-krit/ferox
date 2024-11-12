@@ -337,8 +337,7 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
         NOTE: This will find the edge of the 'polygon' collision shape
         closest to the center of the 'circle' collision shape.
     */
-    for (int j = vertices->count - 1, i = 0; i < vertices->count;
-             j = i, i++) {
+    for (int j = vertices->count - 1, i = 0; i < vertices->count; j = i, i++) {
         float dot = frVector2Dot(normals->data[i],
                                  frVector2Subtract(txCenter,
                                                    vertices->data[i]));
@@ -405,8 +404,8 @@ static bool frComputeCollisionCirclePoly(const frShape *s1,
                 if (magnitude <= 0.0f) magnitude = FLT_EPSILON;
 
                 collision->direction = frVector2ScalarMultiply(
-                        frVector2RotateTx(frVector2Negate(direction), polyTx),
-                        1.0f / magnitude);
+                    frVector2RotateTx(frVector2Negate(direction), polyTx),
+                    1.0f / magnitude);
 
                 if (frVector2Dot(deltaPosition, collision->direction) < 0.0f)
                     collision->direction = frVector2Negate(
@@ -508,9 +507,8 @@ static bool frComputeCollisionPolys(const frShape *s1,
         float refDot1 = frVector2Dot(refEdge.data[0], refEdgeVector);
         float refDot2 = frVector2Dot(refEdge.data[1], refEdgeVector);
 
-        if (!frClipEdge(&incEdge, refEdgeVector, refDot1))
-            return false;
-        
+        if (!frClipEdge(&incEdge, refEdgeVector, refDot1)) return false;
+
         if (!frClipEdge(&incEdge, frVector2Negate(refEdgeVector), -refDot2))
             return false;
 

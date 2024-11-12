@@ -50,7 +50,7 @@
 static const Rectangle SCREEN_BOUNDS = { .width = SCREEN_WIDTH,
                                          .height = SCREEN_HEIGHT };
 
-static const float BOX_WIDTH = 40.0f, BOX_HEIGHT = 40.0f;
+static const float BOX_WIDTH = 1.25f, BOX_HEIGHT = 1.25f;
 
 static const float CELL_SIZE = 1.5f, DELTA_TIME = 1.0f / (TARGET_FPS << 1);
 
@@ -112,15 +112,16 @@ static void InitExample(void) {
 
     boxShape = frCreateRectangle((frMaterial) { .density = 1.0f,
                                                 .friction = 0.75f },
-                                 frPixelsToUnits(BOX_WIDTH),
-                                 frPixelsToUnits(BOX_HEIGHT));
+                                 BOX_WIDTH,
+                                 BOX_HEIGHT);
 
     for (int i = 0; i < BOX_COUNT; i++) {
         boxes[i] = frCreateBodyFromShape(
             FR_BODY_DYNAMIC,
             frVector2PixelsToUnits((frVector2) {
                 .x = 0.5f * SCREEN_WIDTH,
-                .y = (0.74f * SCREEN_HEIGHT) - (i * (BOX_HEIGHT + 1.0f)) }),
+                .y = (0.74f * SCREEN_HEIGHT)
+                     - (i * (frUnitsToPixels(BOX_HEIGHT) + 1.0f)) }),
             boxShape);
 
         frAddBodyToWorld(world, boxes[i]);

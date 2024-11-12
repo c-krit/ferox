@@ -152,10 +152,8 @@ void frQuerySpatialHash(frSpatialHash *sh,
             if (entry == NULL) continue;
 
             for (int i = 0; i < frGetDynArrayLength(entry->value); i++)
-                frDynArrayPush(
-                    sh->queryResult, 
-                    frGetDynArrayValue(entry->value, i)
-                );
+                frDynArrayPush(sh->queryResult,
+                               frGetDynArrayValue(entry->value, i));
         }
 
     {
@@ -176,10 +174,6 @@ void frQuerySpatialHash(frSpatialHash *sh,
         will be called with the user data pointer `ctx`.
     */
     for (int i = 0; i < frGetDynArrayLength(sh->queryResult); i++)
-        func(
-            (frContextNode) { 
-                .id = frGetDynArrayValue(sh->queryResult, i), 
-                .ctx = userData 
-            }
-        );
+        func((frContextNode) { .id = frGetDynArrayValue(sh->queryResult, i),
+                               .ctx = userData });
 }

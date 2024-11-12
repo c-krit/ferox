@@ -61,7 +61,8 @@ static frWorld *world;
 
 static frBody *borders[BORDER_COUNT], *platforms[PLATFORM_COUNT], *cursor;
 
-static Color boxColor = LIGHTGRAY, borderColor = BROWN, platformColor = BROWN;
+static Color boxColor = LIGHTGRAY, borderColor = DARKBROWN,
+             platformColor = BROWN;
 
 static float cursorCounter;
 

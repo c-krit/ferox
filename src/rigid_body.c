@@ -172,8 +172,7 @@ float frGetBodyTorque(const frBody *b) {
 
 /* Returns the AABB (Axis-Aligned Bounding Box) of `b`. */
 frAABB frGetBodyAABB(const frBody *b) {
-    return (b != NULL && b->shape != NULL) ? b->aabb
-                                           : frStructZero(frAABB);
+    return (b != NULL && b->shape != NULL) ? b->aabb : frStructZero(frAABB);
 }
 
 /* Returns the user data of `b`. */
@@ -208,8 +207,7 @@ void frSetBodyShape(frBody *b, frShape *s) {
 
     b->shape = s;
 
-    b->aabb = (s != NULL) ? frGetShapeAABB(s, b->tx)
-                          : frStructZero(frAABB);
+    b->aabb = (s != NULL) ? frGetShapeAABB(s, b->tx) : frStructZero(frAABB);
 
     frComputeBodyMass(b);
 }
@@ -589,6 +587,5 @@ static void frComputeBodyMass(frBody *b) {
 
 /* Normalizes the `angle` to a range `[-2π, 2π]`. */
 static FR_API_INLINE float frNormalizeAngle(float angle) {
-    // return angle - (TWO_PI * floorf((angle + (M_PI - ?)) * INVERSE_TWO_PI));
     return angle - (TWO_PI * floorf((angle + -M_PI) * INVERSE_TWO_PI));
 }
