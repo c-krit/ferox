@@ -226,7 +226,7 @@ void frStepWorld(frWorld *w, float dt) {
         const frCollision *value = &w->cache[j].value;
 
         for (int k = 0; k < value->count; k++)
-            if (value->contacts[k].timestamp < w->timestamp) {
+            if (w->timestamp - value->contacts[k].timestamp > dt) {
                 hmdel(w->cache, key);
 
                 break;
