@@ -95,6 +95,9 @@
 /* Sets the capacity of `arr` to `newCapacity`. */
 #define frSetDynArrayCapacity(arr, newCapacity)     \
     do {                                            \
+        if ((arr).buffer == NULL)                   \
+            frInitDynArray((arr));                  \
+                                                    \
         void *newBuffer = realloc(                  \
             (arr).buffer,                           \
             (newCapacity) * sizeof *((arr).buffer)  \

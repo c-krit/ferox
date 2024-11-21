@@ -111,6 +111,7 @@ frWorld *frCreateWorld(frVector2 gravity, float cellSize) {
     result->hash = frCreateSpatialHash(cellSize);
 
     frSetDynArrayCapacity(result->bodies, FR_WORLD_MAX_OBJECT_COUNT);
+
     frInitRingBuffer(result->rbf, FR_WORLD_MAX_OBJECT_COUNT);
 
     return result;
