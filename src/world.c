@@ -269,6 +269,13 @@ void frUpdateWorld(frWorld *w, float dt) {
     if (w == NULL || dt <= 0.0f) return;
 
     float currentTime = frGetCurrentTime();
+
+    if (w->timestamp <= 0.0f) {
+        w->timestamp = currentTime;
+
+        return;
+    }
+
     float elapsedTime = currentTime - w->timestamp;
 
     w->timestamp = currentTime, w->accumulator += elapsedTime;

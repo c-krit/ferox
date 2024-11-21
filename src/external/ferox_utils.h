@@ -77,7 +77,10 @@
 /* Releases the memory allocated for `arr`. */
 #define frReleaseDynArray(arr)  \
     do {                        \
-       free((arr).buffer);      \
+        free((arr).buffer);     \
+                                \
+        ((arr).length) = 0;     \
+        ((arr).capacity) = 0;   \
     } while (0)
 
 /* Returns the capacity of `arr`. */
@@ -118,12 +121,12 @@
     ((arr).length = newLength)
 
 /* Appends `newValue` at the end of `arr`. */
-#define frDynArrayPush(arr, newValue)                               \
-    do {                                                            \
-        if ((arr).length >= (arr).capacity)                         \
-            frSetDynArrayCapacity((arr), ((arr).capacity << 1));    \
-                                                                    \
-        (arr).buffer[(arr).length] = (newValue), ++((arr).length);  \
+#define frDynArrayPush(arr, newValue)                             \
+    do {                                                          \
+        if ((arr).length >= (arr).capacity)                       \
+            frSetDynArrayCapacity((arr), ((arr).capacity << 1));  \
+                                                                  \
+        (arr).buffer[(arr).length] = (newValue), (arr).length++;  \
     } while (0)
 
 /* Swaps the `i`-th value and the `j`-th value of `arr`. */

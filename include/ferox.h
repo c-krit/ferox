@@ -82,7 +82,7 @@ extern "C" {
 /* The major, minor, and the patch release version of this library. */
 #define FR_API_VERSION_MAJOR   0
 #define FR_API_VERSION_MINOR   9
-#define FR_API_VERSION_PATCH   6
+#define FR_API_VERSION_PATCH   7
 
 /* The full version string of this library. */
 #define FR_API_VERSION  \
