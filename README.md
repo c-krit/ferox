@@ -361,47 +361,46 @@ $ make -f Makefile.mingw RAYLIB_INCLUDE_PATH=../../raylib RAYLIB_LIBRARY_PATH=..
 
 ### Introduction
 
-- [Catto, Erin. “How Do Physics Engines Work?” USC GamePipe Laboratory. January, 2019.](https://github.com/erincatto/box2d-lite/blob/master/docs/HowDoPhysicsEnginesWork.pdf)
-- [Gaul, Randy. “How to Create a Custom Physics Engine.” Envato Tuts+. April–June, 2013.](https://gamedevelopment.tutsplus.com/series/how-to-create-a-custom-physics-engine--gamedev-12715)
-- [Hecker, Chris. “Behind the Screen: Physics, Parts 1-3.” Game Developer Magazine. 1996–1997.](https://www.chrishecker.com/Rigid_Body_Dynamics)
+- [C. Hecker, “Behind the Screen: Physics, Part 1,” Game Developer Magazine, 1996.](https://www.chrishecker.com/Rigid_Body_Dynamics)
+- [C. Hecker, “Behind the Screen: Physics, Part 2,” Game Developer Magazine, 1997.](https://www.chrishecker.com/Rigid_Body_Dynamics)
+- [E. Catto, “How Do Physics Engines Work?” USC GamePipe Laboratory, Jan. 2019.](https://github.com/erincatto/box2d-lite/blob/master/docs/HowDoPhysicsEnginesWork.pdf)
+- [R. Gaul, “How to Create a Custom Physics Engine,” Envato Tuts+, Apr. 2013.](https://gamedevelopment.tutsplus.com/series/how-to-create-a-custom-physics-engine--gamedev-12715)
 
 ### Collision Detection
 
-- [Bittle, William. “Contact Points Using Clipping.” dyn4j.org. November 17, 2011.](https://dyn4j.org/2011/11/contact-points-using-clipping/)
-- [Bittle, William. “SAT (Separating Axis Theorem).” dyn4j.org. January 01, 2010.](https://dyn4j.org/2010/01/sat/)
-- [Bostock, Mike. “Sutherland–Hodgman Clipping.” observablehq.com. August 02, 2020.](https://observablehq.com/@mbostock/sutherland-hodgman-clipping)
-- [Boyd, Stephen P. “Convex Optimization.”, 46–51. Cambridge University Press. March, 2004.](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
-- [Coumans, Erwin. “Collision Detection – Contact Generation and GPU Acceleration.” ACM SIGGRAPH ASIA 2010. July 26, 2010.](https://sgvr.kaist.ac.kr/~sungeui/Collision_tutorial/Erwin.pdf)
-- [E. J. Hastings, J. Mesit, and R. K. Guha. “Optimization of Large-Scale, Real-Time Simulations by Spatial Hashing. Proc. 2005 Summer Computer Simulation Conference, Cherry Hill, NJ, USA. July 24–28, 2005.](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=u_GkP-EAAAAJ&citation_for_view=u_GkP-EAAAAJ:UeHWp8X0CEIC)
-- [MacDonald, Tristam. “Spatial Hashing.” GameDev.net. October 01, 2009.](https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/spatial-hashing-r2697/)
-- [Teschner, Matthias, Bruno Heidelberger, Matthias Müller, Danat Pomeranets, and Markus Gross. n.d. “Optimized Spatial Hashing for Collision Detection of Deformable Objects.” Computer Graphics Laboratory, ETH Zurich. January 2005.](https://matthias-research.github.io/pages/publications/tetraederCollision.pdf)
-- [Van den Bergen, Gino. “Physics for Game Programmers: Spatial Data Structures.” Game Developers Conference 2013. March, 2013.](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/box2d/GDC13_vandenBergen_Gino_Physics_Tut.pdf)
+- [E. Coumans, “Collision Detection – Contact Generation and GPU Acceleration,” ACM SIGGRAPH ASIA 2010, Jul. 2010.](https://sgvr.kaist.ac.kr/~sungeui/Collision_tutorial/Erwin.pdf)
+- [E. J. Hastings, J. Mesit, and R. K. Guha, “Optimization of Large-Scale, Real-Time Simulations by Spatial Hashing. Proc. 2005 Summer Computer Simulation Conference, Cherry Hill, NJ, USA, Jul. 2005.](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=u_GkP-EAAAAJ&citation_for_view=u_GkP-EAAAAJ:UeHWp8X0CEIC)
+- [G. van den Bergen, “Physics for Game Programmers: Spatial Data Structures.” Game Developers Conference 2013, Mar. 2013.](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/box2d/GDC13_vandenBergen_Gino_Physics_Tut.pdf)
+- [M. Bostock, “Sutherland–Hodgman Clipping,” observablehq.com, Aug. 2020.](https://observablehq.com/@mbostock/sutherland-hodgman-clipping)
+- [S. Boyd, “Convex Optimization,” Cambridge University Press, Mar. 2004, pp. 46–51.](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
+- [T. MacDonald, “Spatial Hashing.” GameDev.net, Oct. 2009.](https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/spatial-hashing-r2697)
+- [W. Bittle, “Contact Points Using Clipping,” dyn4j.org, Nov. 2011.](https://dyn4j.org/2011/11/contact-points-using-clipping)
+- [W. Bittle, “SAT (Separating Axis Theorem),” dyn4j.org, Jan. 2010.](https://dyn4j.org/2011/11/contact-points-using-clipping)
 
-### Constraint Solver
+### Constraint Solvers
 
-- [Catto, Erin. “Fast and Simple Physics Using Sequential Impulses.” San Jose, CA. March, 2006.](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
-- [Catto, Erin. “Iterative Dynamics with Temporal Coherence.” Crystal Dynamics, Menlo Park, CA. June, 2005.](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
-- [Catto, Erin. “Solver2D.” box2d.org. February 05, 2024.](https://box2d.org/posts/2024/02/solver2d/)
-- [Chou, Ming-Lun. “Game Physics: Resolution – Contact Constraints.” allenchou.net. December 31, 2013.](https://allenchou.net/2013/12/game-physics-resolution-contact-constraints/)
-- [Chou, Ming-Lun. “Game Physics: Stability – Warm Starting.” allenchou.net. January 04, 2014.](http://allenchou.net/2014/01/game-physics-stability-warm-starting/)
-- [Strunk, Oliver. “Stop my Constraints from Blowing Up!” Game Developers Conference 2013. March, 2013.](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/box2d/Strunk_Oliver_Stop_My_Constraints_From_Blowing_Up.pdf)
-- [Tonge, Richard. “Iterative Rigid Body Solvers.” Game Developers Conference 2013. March, 2013.](https://archive.org/details/GDC2013Tonge)
+- [E. Catto, “Fast and Simple Physics Using Sequential Impulses,” San Jose, CA. Mar. 2006.](https://box2d.org/files/ErinCatto_SequentialImpulses_GDC2006.pdf)
+- [E. Catto, “Iterative Dynamics with Temporal Coherence,” Crystal Dynamics, Menlo Park, CA, Jun. 2005.](https://box2d.org/files/ErinCatto_IterativeDynamics_GDC2005.pdf)
+- [E. Catto, “Solver2D,” box2d.org, Feb. 2024.](https://box2d.org/posts/2024/02/solver2d)
+- [R. Tonge, “Iterative Rigid Body Solvers,” Game Developers Conference 2013, Mar. 2013.](https://archive.org/details/GDC2013Tonge)
+- [M. Chou, “Game Physics: Resolution – Contact Constraints,” allenchou.net, Dec. 2013.](https://allenchou.net/2013/12/game-physics-resolution-contact-constraints)
+- [O. Strunk, “Stop my Constraints from Blowing Up!” Game Developers Conference 2013, Mar. 2013.](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/box2d/Strunk_Oliver_Stop_My_Constraints_From_Blowing_Up.pdf)
 
 ### Numerical Methods
 
-- [Catto, Erin. “Numerical Methods.” San Jose, CA. March, 2015.](https://box2d.org/files/ErinCatto_NumericalMethods_GDC2015.pdf)
-- [Fiedler, Glenn. “Integration Basics.” Gaffer on Games. June 01, 2004.](https://gafferongames.com/post/integration_basics/)
-- [Witkin, Andrew, and David Baraff. n.d. “An Introduction to Physically Based Modeling: Differential Equation Basics.” ACM SIGGRAPH 1995. August, 1995.](http://www.cs.cmu.edu/~baraff/sigcourse/index.html)
+- [A. Witkin, and D. Baraff, “An Introduction to Physically Based Modeling: Differential Equation Basics,” ACM SIGGRAPH 1995, Aug. 1995.](http://www.cs.cmu.edu/~baraff/sigcourse/index.html)
+- [E. Catto, “Numerical Methods,” San Jose, CA, Mar. 2015.](https://box2d.org/files/ErinCatto_NumericalMethods_GDC2015.pdf)
+- [G. Fiendler, “Integration Basics,” Gaffer on Games, Jun. 2004.](https://gafferongames.com/post/integration_basics)
 
 ### Raycast Queries
 
-- [Rees, Gareth. “How do you detect where two line segments intersect?” stackoverflow.com. February, 2009.](https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282)
-- [Scratchapixel. “A Minimal Ray-Tracer: Rendering Simple Shapes (Sphere, Cube, Disk, Plane, etc.).” scratchapixel.com. November, 2022.](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html)
+- [G. Rees, “How do you detect where two line segments intersect?” stackoverflow.com, Feb. 2009.](https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect/565282#565282)
+- [Scratchapixel, “A Minimal Ray-Tracer: Rendering Simple Shapes (Sphere, Cube, Disk, Plane, etc.),” scratchapixel.com, Nov. 2022.](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html)
 
 ### Miscellaneous
 
-- [Allan, Jackson. “An Extensive Benchmark of C and C++ Hash Tables.” jacksonallan.github.io. May 29, 2024.](https://jacksonallan.github.io/c_cpp_hash_tables_benchmark/)
-- [Anderson, Sean. “Bit Twiddling Hacks.” graphics.stanford.edu. 1997.](http://graphics.stanford.edu/%7Eseander/bithacks.html)
+- [J. Allan, “An Extensive Benchmark of C and C++ Hash Tables,” jacksonallan.github.io, May. 2024.](https://jacksonallan.github.io/c_cpp_hash_tables_benchmark)
+- [S. Anderson, “Bit Twiddling Hacks,” graphics.stanford.edu, 1997.](http://graphics.stanford.edu/%7Eseander/bithacks.html)
 
 ## License
 
